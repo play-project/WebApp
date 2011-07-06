@@ -1,0 +1,8 @@
+06 juil. 2011 16:37:38,888 INFO  ~ Starting E:\workspace\webapp
+06 juil. 2011 16:37:39,466 WARN  ~ You're running Play! in DEV mode
+06 juil. 2011 16:37:39,571 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
+06 juil. 2011 16:37:52,865 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
+06 juil. 2011 16:37:53,571 INFO  ~ Application 'webapp' is now started !
+06 juil. 2011 17:19:23,915 WARN  ~ SQL Error: 42122, SQLState: 42S22
+06 juil. 2011 17:19:23,916 ERROR ~ Column "LOGIN" not found; SQL statement:
+select entitypool0_.id as id14_ from EntityPool entitypool0_ where login=? and password=? limit ? [42122-149]

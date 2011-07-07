@@ -16,12 +16,16 @@ public class UserEventBuffer {
 	}
 
 	public void publish(Event e) {
-		getEventStream().publish(e);
+		stream.publish(e);
 	}
-	
+
 	/**
 	 * GETTERS AND SETTERS
 	 */
+
+	public ArchivedEventStream getArchivedEventStream() {
+		return stream;
+	}
 
 	public EventStream getEventStream() {
 		return stream.eventStream();

@@ -8,14 +8,12 @@ import play.db.jpa.*;
 import play.libs.F.*;
 
 @Entity
-public class StreamEventBuffer extends Model {
+public class EventStreamMC extends Model {
 	public String source;
 	@ManyToMany
 	public List<User> subscribingUsers;
-	@Transient
-	public final ArchivedEventStream eventStream = new ArchivedEventStream(50);
 
-	public StreamEventBuffer(String streamSource) {
+	public EventStreamMC(String streamSource) {
 		this.source = streamSource;
 		subscribingUsers = new ArrayList<User>();
 	}
@@ -28,17 +26,15 @@ public class StreamEventBuffer extends Model {
 		subscribingUsers.remove(u);
 	}
 
-	public void publishEvent(Event e) {
+	public void multicast(Event e) {
+		e.setStreamId(id);
 		for (User u : subscribingUsers) {
 			u.publishEvent(e);
 		}
 	}
-	
+
 	/**
 	 * GETTERS AND SETTERS
 	 */
 
-	public EventStream getStream() {
-		return eventStream.eventStream();
-	}
 }

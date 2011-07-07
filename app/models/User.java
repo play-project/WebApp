@@ -15,7 +15,7 @@ public class User extends Model {
 	public String name;
 	public String email;
 	@ManyToMany(mappedBy = "subscribingUsers")
-	public List<StreamEventBuffer> eventStreams;
+	public List<EventStreamMC> eventStreams;
 	@Transient private UserEventBuffer eventBuffer;
 
 	public User(String login, String password, String name, String email) {
@@ -23,12 +23,12 @@ public class User extends Model {
 		this.password = password;
 		this.name = name;
 		this.email = email;
-		this.eventStreams = new ArrayList<StreamEventBuffer>();
+		this.eventStreams = new ArrayList<EventStreamMC>();
 		this.eventBuffer = new UserEventBuffer();
 	}
 
 	public boolean subscribe(Long streamId) {
-		StreamEventBuffer eb = ModelManager.get().getStreamById(streamId);
+		EventStreamMC eb = ModelManager.get().getStreamById(streamId);
 		if (eb != null) {
 			eb.addUser(this);
 			eventStreams.add(eb);
@@ -38,7 +38,7 @@ public class User extends Model {
 	}
 
 	public boolean unsubscribe(Long streamId) {
-		StreamEventBuffer eb = ModelManager.get().getStreamById(streamId);
+		EventStreamMC eb = ModelManager.get().getStreamById(streamId);
 		if (eb != null) {
 			eb.removeUser(this);
 			eventStreams.remove(eb);

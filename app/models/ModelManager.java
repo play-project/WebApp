@@ -8,11 +8,11 @@ public class ModelManager {
 
 	public static ModelManager instance = null;
 	private ArrayList<User> connectedUsers;
-	private List<StreamEventBuffer> streams;
+	private List<EventStreamMC> streams;
 
 	public ModelManager() {
 		connectedUsers = new ArrayList<User>();
-		streams = StreamEventBuffer.findAll();
+		streams = EventStreamMC.findAll();
 
 		testInit();
 	}
@@ -32,7 +32,7 @@ public class ModelManager {
 		User u = User.find("byLoginAndPassword", login, password).first();
 		if (u != null) {
 			connectedUsers.add(u);
-			for (StreamEventBuffer eb : u.eventStreams) {
+			for (EventStreamMC eb : u.eventStreams) {
 				eb.addUser(u);
 			}
 		}
@@ -47,8 +47,8 @@ public class ModelManager {
 		return false;
 	}
 
-	public StreamEventBuffer getStreamById(Long id) {
-		for (StreamEventBuffer eb : streams) {
+	public EventStreamMC getStreamById(Long id) {
+		for (EventStreamMC eb : streams) {
 			if (eb.id == id) {
 				return eb;
 			}
@@ -64,7 +64,7 @@ public class ModelManager {
 		return connectedUsers;
 	}
 
-	public List<StreamEventBuffer> getStreams() {
+	public List<EventStreamMC> getStreams() {
 		return streams;
 	}
 }

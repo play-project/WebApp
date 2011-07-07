@@ -49,4 +49,10 @@ public class Event {
 	public void setContent(String content) {
 		this.content = content;
 	}
+
+	@Override
+	public String toString() {
+		return "Event [eventId=" + eventId + ", streamId=" + streamId + ", name=" + name + ", content="
+				+ content + "]";
+	}
 }

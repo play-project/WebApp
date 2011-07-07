@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<testsuite failures="0" time="0.023" errors="0" skipped="0" tests="2" name="BasicTest">
-  <testcase classname="BasicTest" name="createAndRetrieveUser" time="0.013">
+<testsuite failures="0" time="0.021" errors="0" skipped="0" tests="4" name="BasicTest">
+  <testcase classname="BasicTest" name="createAndRetrieveUser" time="0.004">
       </testcase>
-  <testcase classname="BasicTest" name="tryConnectAsUser" time="0.01">
+  <testcase classname="BasicTest" name="tryConnectAsUser" time="0.007">
+      </testcase>
+  <testcase classname="BasicTest" name="createAndRetrieveStreamEventBuffer" time="0.004">
+      </testcase>
+  <testcase classname="BasicTest" name="trySubscribeStream" time="0.006">
       </testcase>
 </testsuite>

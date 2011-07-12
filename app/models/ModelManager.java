@@ -3,22 +3,32 @@ package models;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import play.Logger;
+import play.db.jpa.JPA;
+import play.db.jpa.Model;
 
 public class ModelManager {
 
 	public static ModelManager instance = null;
-	private ArrayList<User> connectedUsers;
-	private List<EventStreamMC> streams;
+	private ArrayList<User> connectedUsers = new ArrayList<User>();
+	private List<EventStreamMC> streams = new ArrayList<EventStreamMC>();
 
 	public ModelManager() {
-		connectedUsers = new ArrayList<User>();
-		streams = EventStreamMC.findAll();
-
-		testInit();
+		User u = new User("claw", "pwd", "Alex", "test@gmail.com");
+		User u2 = new User("claw2", "pwd", "Alex2", "test@gmail.com");
+		EventStreamMC eb = new EventStreamMC("http://www.wservice.com/stream1");
+		streams.add(eb);
+		eb.save();
+		u.eventStreamIds.add(eb.id);
+		u2.eventStreamIds.add(eb.id);
+		u.save();
+		u2.save();
 	}
 
-	public void testInit() {
-
+	public void reset() {
+		connectedUsers.clear();
 	}
 
 	public static ModelManager get() {
@@ -31,9 +41,25 @@ public class ModelManager {
 	public User connect(String login, String password) {
 		User u = User.find("byLoginAndPassword", login, password).first();
 		if (u != null) {
+			Logger.info("connect es : " + u.eventStreamIds.size());
+			for(int i=0; i<connectedUsers.size(); i++){
+				if(connectedUsers.get(i).id == u.id){
+					connectedUsers.remove(i);
+					i--;
+				}
+			}
 			connectedUsers.add(u);
-			for (EventStreamMC eb : u.eventStreams) {
-				eb.addUser(u);
+			
+			//TODO : TEST
+			u.eventStreamIds.add(streams.get(0).id);
+			
+			u.setEventBuffer(new UserEventBuffer());
+			EventStreamMC es;
+			for (Long id : u.eventStreamIds) {
+				es = getStreamById(id);
+				if (es != null) {
+					es.addUser(u);
+				}
 			}
 		}
 		return u;
@@ -47,6 +73,22 @@ public class ModelManager {
 		return false;
 	}
 
+	public boolean isConnected(User u) {
+		if (connectedUsers.contains(u)) {
+			return true;
+		}
+		return false;
+	}
+
+	public User getUserById(Long id) {
+		for (User u : connectedUsers) {
+			if (u.id == id) {
+				return u;
+			}
+		}
+		return null;
+	}
+
 	public EventStreamMC getStreamById(Long id) {
 		for (EventStreamMC eb : streams) {
 			if (eb.id == id) {
@@ -55,7 +97,7 @@ public class ModelManager {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * GETTERS AND SETTERS
 	 */

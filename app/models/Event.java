@@ -1,30 +1,19 @@
 package models;
 
 public class Event {
-	private Long eventId;
 	private Long streamId;
-	private String name;
+	private String title;
 	private String content;
 
-	public Event(Long eventId, Long id, String name, String content) {
+	public Event(String title, String content) {
 		super();
-		this.eventId = eventId;
-		this.streamId = id;
-		this.name = name;
+		this.title = title;
 		this.content = content;
 	}
 	
 	/**
 	 * GETTERS AND SETTERS
 	 */
-
-	public Long getEventId() {
-		return eventId;
-	}
-
-	public void setEventId(Long eventId) {
-		this.eventId = eventId;
-	}
 
 	public Long getStreamId() {
 		return streamId;
@@ -34,12 +23,12 @@ public class Event {
 		this.streamId = streamId;
 	}
 
-	public String getName() {
-		return name;
+	public String getTitle() {
+		return title;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
 	public String getContent() {
@@ -52,7 +41,6 @@ public class Event {
 
 	@Override
 	public String toString() {
-		return "Event [eventId=" + eventId + ", streamId=" + streamId + ", name=" + name + ", content="
-				+ content + "]";
+		return "Event [streamId=" + streamId + ", title=" + title + ", content=" + content + "]";
 	}
 }

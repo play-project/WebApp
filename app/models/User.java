@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import play.Logger;
 import play.db.jpa.*;
 import play.libs.F.ArchivedEventStream;
 
@@ -14,24 +15,29 @@ public class User extends Model {
 	public String password;
 	public String name;
 	public String email;
-	@ManyToMany(mappedBy = "subscribingUsers")
-	public List<EventStreamMC> eventStreams;
-	@Transient private UserEventBuffer eventBuffer;
+	@ElementCollection
+	public List<Long> eventStreamIds;
+	@Transient
+	UserEventBuffer eventBuffer;
 
-	public User(String login, String password, String name, String email) {
+	public User(String login, String password, String name, String email, ArrayList<Long> eventStreamIds) {
 		this.login = login;
 		this.password = password;
 		this.name = name;
 		this.email = email;
-		this.eventStreams = new ArrayList<EventStreamMC>();
-		this.eventBuffer = new UserEventBuffer();
+		this.eventStreamIds = eventStreamIds;
+		UserEventBuffer eventBuffer = new UserEventBuffer();
+	}
+
+	public User(String login, String password, String name, String email) {
+		this(login, password, name, email, new ArrayList<Long>());
 	}
 
 	public boolean subscribe(Long streamId) {
 		EventStreamMC eb = ModelManager.get().getStreamById(streamId);
 		if (eb != null) {
 			eb.addUser(this);
-			eventStreams.add(eb);
+			eventStreamIds.add(eb.id);
 			return true;
 		}
 		return false;
@@ -41,21 +47,27 @@ public class User extends Model {
 		EventStreamMC eb = ModelManager.get().getStreamById(streamId);
 		if (eb != null) {
 			eb.removeUser(this);
-			eventStreams.remove(eb);
+			eventStreamIds.remove(eb.id);
 			return true;
 		}
 		return false;
-	}
-	
-	public void publishEvent(Event e){
-		eventBuffer.publish(e);
 	}
 
 	/**
 	 * GETTERS AND SETTERS
 	 */
-	
+
 	public UserEventBuffer getEventBuffer() {
 		return eventBuffer;
+	}
+
+	public void setEventBuffer(UserEventBuffer eventBuffer) {
+		this.eventBuffer = eventBuffer;
+	}
+
+	@Override
+	public String toString() {
+		return "User [login=" + login + ", password=" + password + ", name=" + name + ", email=" + email
+				+ "]";
 	}
 }

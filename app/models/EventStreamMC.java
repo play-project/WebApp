@@ -4,13 +4,14 @@ import java.util.*;
 
 import javax.persistence.*;
 
+import play.Logger;
 import play.db.jpa.*;
 import play.libs.F.*;
 
 @Entity
 public class EventStreamMC extends Model {
 	public String source;
-	@ManyToMany
+	@Transient
 	public List<User> subscribingUsers;
 
 	public EventStreamMC(String streamSource) {
@@ -28,8 +29,10 @@ public class EventStreamMC extends Model {
 
 	public void multicast(Event e) {
 		e.setStreamId(id);
+		Logger.info("size : " + subscribingUsers.size());
 		for (User u : subscribingUsers) {
-			u.publishEvent(e);
+			Logger.info(u + "");
+			u.getEventBuffer().publish(e);
 		}
 	}
 

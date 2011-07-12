@@ -4,19 +4,20 @@ import java.util.*;
 
 import javax.persistence.*;
 
+import play.Logger;
 import play.db.jpa.*;
-import play.libs.F.ArchivedEventStream;
-import play.libs.F.EventStream;
+import play.libs.F.*;
 
 public class UserEventBuffer {
-	private final ArchivedEventStream<Event> stream = new ArchivedEventStream<Event>(20);
+	final ArchivedEventStream<Event> stream = new ArchivedEventStream<Event>(20);
 
-	public UserEventBuffer() {
-
+	public Promise<List<IndexedEvent<Event>>> nextEvents(long lastReceived) {
+		return stream.nextEvents(lastReceived);
 	}
 
 	public void publish(Event e) {
 		stream.publish(e);
+		Logger.info("nb events : " + stream.availableEvents(0).size());
 	}
 
 	/**

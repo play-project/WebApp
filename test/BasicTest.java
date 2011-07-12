@@ -23,6 +23,8 @@ public class BasicTest extends UnitTest {
 		User claw = User.find("byEmail", "abourdin@polytech.unice.fr").first();
 		assertNotNull(claw);
 		assertEquals("Alex", claw.name);
+		claw = User.find("byLoginAndPassword", "Claw", "pwd").first();
+		assertNotNull(claw);
 		assertEquals("Claw", claw.login);
 	}
 
@@ -65,18 +67,18 @@ public class BasicTest extends UnitTest {
 		assertTrue(claw.subscribe(eb.id));
 		assertEquals(1, eb.subscribingUsers.size());
 		assertNotNull(eb.subscribingUsers.get(0));
-		
+
 		// Publish and multicast
-		Promise<List<IndexedEvent<Event>>> p1 = claw.getEventBuffer().getArchivedEventStream()
-				.nextEvents(0);
-		Promise<List<IndexedEvent<Event>>> p2 = claw.getEventBuffer().getArchivedEventStream()
-				.nextEvents(0);
-		Event e1 = new Event(1L, eb.id, "event1", "event 1 content");
+		Promise<List<IndexedEvent<Event>>> p1 = ModelManager.get().getUserEventBufferMap().get(claw.id)
+				.getArchivedEventStream().nextEvents(0);
+		Promise<List<IndexedEvent<Event>>> p2 = ModelManager.get().getUserEventBufferMap().get(claw.id)
+				.getArchivedEventStream().nextEvents(0);
+		Event e1 = new Event("event1", "event 1 content");
 		eb.multicast(e1);
 		assertTrue(p1.isDone());
 		assertFalse(p2.isDone());
 		assertEquals(1, p1.get().size());
-		assertEquals("event1", p1.get().get(0).data.getName());
+		assertEquals("event1", p1.get().get(0).data.getTitle());
 		assertEquals(e1.toString(), p1.get().get(0).data.toString());
 	}
 }

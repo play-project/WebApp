@@ -47,6 +47,15 @@ div#streams {
 	width: 430px;
 	min-height: 486px;
 }
+
+a.subscribe-button {
+	position : absolute;
+	margin-top : -27px;
+	margin-left : 140px;
+}
+a.subscribe-button:hover {
+	color: #EE0;
+}
 </style>
 
 <script type="text/javascript">
@@ -75,6 +84,32 @@ $(function() {
 	$("#tabs").tabs().addClass('ui-tabs-vertical ui-helper-clearfix');
 	$("#tabs li").removeClass('ui-corner-top').addClass('ui-corner-left');
 	$(".ui-tabs-vertical .ui-tabs-panel").height($(".ui-tabs-nav").first().height());
+	
+	var subAction = #{jsAction @subscribe(':streamId') /}
+	$("a.subscribe-button").click(function(event){
+		event.stopPropagation();
+		var id = $(this).parent().attr('id');
+		var sid = id.substring(id.lastIndexOf('-') + 1);
+		$("#available-streams").accordion( "option", "disabled", true );
+	    $.ajax({
+            url: subAction({streamId: sid}),
+            type: 'POST',
+	        dataType: 'json',
+	        success: function(results) {
+	            $(results).each(function() {
+					$('#stream-'+this.id).remove();
+					$('#desc-stream-'+this.id).remove();
+					$('#tabs').tabs('add','#tab-stream'+this.id,this.title);
+					$('#tab-stream'+this.id).html('<h2>'+this.title+'</h2><div id="stream'+this.id+'-events"></div>');
+				})
+				$("#available-streams").accordion( "option", "disabled", false );
+	        },
+	        error: function() {
+	            alert('Subscribe : error');
+				$("#available-streams").accordion( "option", "disabled", false );
+	        }
+	    });
+	});
 });
 </script>
 
@@ -85,8 +120,8 @@ $(function() {
 	%{
 		for(int i=0; i<streams.size(); i++){
 	}%
-		<h3><a href="#">${streams.get(i).title}</a></h3>
-		<div><p>
+		<h3 id="stream-${streams.get(i).id}"><a href="#">${streams.get(i).title}</a><a href="#" class="subscribe-button">Subscribe</a></h3>
+		<div id="desc-stream-${streams.get(i).id}"><p>
 		${streams.get(i).content}
 		</p></div>
 	%{	
@@ -133,16 +168,13 @@ $(function() {
 	<input id="send3" type="button" value="Send event on Stream 4" /><br/><br/>
 </div>
 
-<div id="events">
-</div>
-
 <script type="text/javascript">
     var lastReceived = 0
     var waitEvents = #{jsAction @waitEvents(':lastReceived') /}
-    var send0 = #{jsAction @sendEvent("Event !","Un test de long polling", 0) /}
-    var send1 = #{jsAction @sendEvent("Event !","Un test de long polling", 1) /}
-    var send2 = #{jsAction @sendEvent("Event !","Un test de long polling", 2) /}
-    var send3 = #{jsAction @sendEvent("Event !","Un test de long polling", 3) /}
+    var send0 = #{jsAction @sendEvent('Event !','Un test de long polling', 0) /}
+    var send1 = #{jsAction @sendEvent('Event !','Un test de long polling', 1) /}
+    var send2 = #{jsAction @sendEvent('Event !','Un test de long polling', 2) /}
+    var send3 = #{jsAction @sendEvent('Event !','Un test de long polling', 3) /}
     
     $('#send0').click(function(e) {
         $.post(send0())
@@ -160,7 +192,7 @@ $(function() {
 	var getEvents = function() {
 	    $.ajax({
             url: waitEvents({lastReceived: lastReceived}),
-            type: "GET",
+            type: 'GET',
 	        dataType: 'json',
 	        success: function(events) {
 	            $(events).each(function() {
@@ -170,7 +202,6 @@ $(function() {
 	            getEvents()
 	        },
 	        error: function() {
-	        	alert("Error !");
 	            getEvents();
 	        }
 	    });

@@ -24,13 +24,15 @@ public class Application extends Controller {
 
 	public static void index() {
 		User u = ModelManager.get().getUserById(Long.parseLong(session.get("userid")));
-		if(u == null){
+		if (u == null) {
 			logout();
 		}
 		String username = u.name;
 		ArrayList<StreamDesc> streams = ModelManager.get().getAllStreamsDesc();
 		ArrayList<StreamDesc> userStreams = u.getStreamsDesc();
-		Logger.info("ustreams size : " + userStreams.size());
+		for (int i = 0; i < userStreams.size(); i++) {
+			streams.remove(userStreams.get(i));
+		}
 		render(username, streams, userStreams);
 	}
 
@@ -42,6 +44,10 @@ public class Application extends Controller {
 	}
 
 	public static void logout() {
+		if (session.get("userid") != null) {
+			User u = ModelManager.get().getUserById(Long.parseLong(session.get("userid")));
+			ModelManager.get().disconnect(u);
+		}
 		session.clear();
 		login();
 	}
@@ -53,7 +59,7 @@ public class Application extends Controller {
 		session.put("userid", u.id);
 		index();
 	}
-	
+
 	public static void test2() {
 		session.put("userid", null);
 		User u = ModelManager.get().connect("claw2", "pwd2");
@@ -61,7 +67,7 @@ public class Application extends Controller {
 		session.put("userid", u.id);
 		index();
 	}
-	
+
 	public static void processLogin(@Required String login, @Required String password) {
 		if (validation.hasErrors()) {
 			flash.error("Please enter your login and password.");
@@ -85,10 +91,23 @@ public class Application extends Controller {
 
 	public static void waitEvents(@Required Long lastReceived) throws InterruptedException,
 			ExecutionException {
-		Logger.info("Waiting ...");
 		User u = ModelManager.get().getUserById(Long.parseLong(session.get("userid")));
 		List events = await(u.getEventBuffer().nextEvents(lastReceived));
-		Logger.info("Push !");
-		renderJSON(events, new TypeToken<List<IndexedEvent<Event>>>() {}.getType());
+		renderJSON(events, new TypeToken<List<IndexedEvent<Event>>>() {
+		}.getType());
+	}
+
+	public static void subscribe(@Required Long streamId) {
+		Long id = Long.parseLong(session.get("userid"));
+		User u = ModelManager.get().getUserById(id);
+		String result;
+		if (u != null) {
+			StreamDesc sd = u.subscribe(streamId);
+			result = "{\"id\":\"" + sd.id + "\",\"title\":\"" + sd.title + "\",\"content\":\""
+					+ sd.content + "\"}";
+		} else {
+			result = "";
+		}
+		renderJSON(result);
 	}
 }

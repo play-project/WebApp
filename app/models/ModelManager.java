@@ -65,7 +65,7 @@ public class ModelManager {
 	}
 
 	public boolean disconnect(User user) {
-		if (connectedUsers.contains(user)) {
+		if (user != null && connectedUsers.contains(user)) {
 			for (int i = 0; i < user.eventStreamIds.size(); i++) {
 				EventStreamMC es = getStreamById(user.eventStreamIds.get(i));
 				if (es != null) {

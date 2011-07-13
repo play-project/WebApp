@@ -33,14 +33,14 @@ public class User extends Model {
 		this(login, password, name, email, new ArrayList<Long>());
 	}
 
-	public boolean subscribe(Long streamId) {
+	public StreamDesc subscribe(Long streamId) {
 		EventStreamMC eb = ModelManager.get().getStreamById(streamId);
 		if (eb != null) {
 			eb.addUser(this);
 			eventStreamIds.add(eb.id);
-			return true;
+			return eb.desc;
 		}
-		return false;
+		return null;
 	}
 
 	public boolean unsubscribe(Long streamId) {

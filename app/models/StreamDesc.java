@@ -15,4 +15,15 @@ public class StreamDesc extends Model {
 		this.title = title;
 		this.content = content;
 	}
+	
+	@Override
+	public boolean equals(Object o){
+		if(this == o) return true;
+		if(!(o instanceof StreamDesc)) return false;
+		StreamDesc u = (StreamDesc) o;
+		if(u.id.equals(id) && u.source.equals(source)){
+			return true;
+		}
+		return false;
+	}
 }

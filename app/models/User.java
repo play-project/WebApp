@@ -52,6 +52,26 @@ public class User extends Model {
 		}
 		return false;
 	}
+	
+	public ArrayList<StreamDesc> getStreamsDesc(){
+		ArrayList<StreamDesc> result = new ArrayList<StreamDesc>();
+		for(Long sid : eventStreamIds){
+			EventStreamMC es = ModelManager.get().getStreamById(sid);
+			if(es != null){
+				result.add(es.desc);
+			}
+		}
+		return result;
+	}
+
+	public void doSubscribtions() {
+		for(Long i : eventStreamIds){
+			EventStreamMC eb = ModelManager.get().getStreamById(i);
+			if (eb != null) {
+				eb.addUser(this);
+			}
+		}
+	}
 
 	/**
 	 * GETTERS AND SETTERS
@@ -63,6 +83,17 @@ public class User extends Model {
 
 	public void setEventBuffer(UserEventBuffer eventBuffer) {
 		this.eventBuffer = eventBuffer;
+	}
+	
+	@Override
+	public boolean equals(Object o){
+		if(this == o) return true;
+		if(!(o instanceof User)) return false;
+		User u = (User) o;
+		if(u.id.equals(id) && u.name.equals(name) && u.password.equals(password) && u.email.equals(email)){
+			return true;
+		}
+		return false;
 	}
 
 	@Override

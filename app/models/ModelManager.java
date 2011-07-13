@@ -13,16 +13,29 @@ public class ModelManager {
 
 	public static ModelManager instance = null;
 	private ArrayList<User> connectedUsers = new ArrayList<User>();
-	private List<EventStreamMC> streams = new ArrayList<EventStreamMC>();
+	private ArrayList<EventStreamMC> streams = new ArrayList<EventStreamMC>();
 
 	public ModelManager() {
+		Logger.info("NEW MODELMANAGER");
 		User u = new User("claw", "pwd", "Alex", "test@gmail.com");
-		User u2 = new User("claw2", "pwd", "Alex2", "test@gmail.com");
-		EventStreamMC eb = new EventStreamMC("http://www.wservice.com/stream1");
-		streams.add(eb);
-		eb.save();
-		u.eventStreamIds.add(eb.id);
-		u2.eventStreamIds.add(eb.id);
+		User u2 = new User("claw2", "pwd2", "Alex2", "test2@gmail.com");
+		EventStreamMC eb1 = new EventStreamMC("http://www.wservice.com/stream1", "Stream 1", "A first Stream for tests");
+		EventStreamMC eb2 = new EventStreamMC("http://www.wservice.com/stream1", "Stream 2", "A second Stream for tests");
+		EventStreamMC eb3 = new EventStreamMC("http://www.wservice.com/stream1", "Stream 3", "A third Stream for tests");
+		EventStreamMC eb4 = new EventStreamMC("http://www.wservice.com/stream1", "Stream 4", "A fourth Stream for tests");
+		streams.add(eb1);
+		streams.add(eb2);
+		streams.add(eb3);
+		streams.add(eb4);
+		eb1.save();
+		eb2.save();
+		eb3.save();
+		eb4.save();
+		u.eventStreamIds.add(eb1.id);
+		u.eventStreamIds.add(eb3.id);
+		u2.eventStreamIds.add(eb1.id);
+		u2.eventStreamIds.add(eb2.id);
+		u2.eventStreamIds.add(eb4.id);
 		u.save();
 		u2.save();
 	}
@@ -40,33 +53,25 @@ public class ModelManager {
 
 	public User connect(String login, String password) {
 		User u = User.find("byLoginAndPassword", login, password).first();
+		Logger.info("u : " + u);
 		if (u != null) {
-			Logger.info("connect es : " + u.eventStreamIds.size());
-			for(int i=0; i<connectedUsers.size(); i++){
-				if(connectedUsers.get(i).id == u.id){
-					connectedUsers.remove(i);
-					i--;
-				}
-			}
+			disconnect(u);
 			connectedUsers.add(u);
-			
-			//TODO : TEST
-			u.eventStreamIds.add(streams.get(0).id);
-			
+			u.doSubscribtions();
+
 			u.setEventBuffer(new UserEventBuffer());
-			EventStreamMC es;
-			for (Long id : u.eventStreamIds) {
-				es = getStreamById(id);
-				if (es != null) {
-					es.addUser(u);
-				}
-			}
 		}
 		return u;
 	}
 
 	public boolean disconnect(User user) {
 		if (connectedUsers.contains(user)) {
+			for (int i = 0; i < user.eventStreamIds.size(); i++) {
+				EventStreamMC es = getStreamById(user.eventStreamIds.get(i));
+				if (es != null) {
+					es.removeUser(user);
+				}
+			}
 			connectedUsers.remove(user);
 			return true;
 		}
@@ -91,7 +96,7 @@ public class ModelManager {
 
 	public EventStreamMC getStreamById(Long id) {
 		for (EventStreamMC eb : streams) {
-			if (eb.id == id) {
+			if (id.equals(eb.id)) {
 				return eb;
 			}
 		}
@@ -106,7 +111,15 @@ public class ModelManager {
 		return connectedUsers;
 	}
 
-	public List<EventStreamMC> getStreams() {
+	public ArrayList<EventStreamMC> getStreams() {
 		return streams;
+	}
+	
+	public ArrayList<StreamDesc> getAllStreamsDesc() {
+		ArrayList<StreamDesc> result = new ArrayList<StreamDesc>();
+		for(EventStreamMC es : streams){
+			result.add(es.desc);
+		}
+		return result;
 	}
 }

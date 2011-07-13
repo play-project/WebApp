@@ -15,7 +15,7 @@ import models.*;
 
 public class Application extends Controller {
 
-	@Before(unless = { "login", "processLogin", "test", "reset" })
+	@Before(unless = { "login", "processLogin", "logout", "test", "test2" })
 	public static void checkAuthentification() {
 		if (session.get("userid") == null) {
 			login();
@@ -24,8 +24,14 @@ public class Application extends Controller {
 
 	public static void index() {
 		User u = ModelManager.get().getUserById(Long.parseLong(session.get("userid")));
+		if(u == null){
+			logout();
+		}
 		String username = u.name;
-		render(username);
+		ArrayList<StreamDesc> streams = ModelManager.get().getAllStreamsDesc();
+		ArrayList<StreamDesc> userStreams = u.getStreamsDesc();
+		Logger.info("ustreams size : " + userStreams.size());
+		render(username, streams, userStreams);
 	}
 
 	public static void login() {
@@ -39,13 +45,6 @@ public class Application extends Controller {
 		session.clear();
 		login();
 	}
-	
-	public static void reset(){
-		ModelManager.get().reset();
-		session.put("userid", null);
-		session.clear();
-		index();
-	}
 
 	public static void test() {
 		session.put("userid", null);
@@ -57,12 +56,12 @@ public class Application extends Controller {
 	
 	public static void test2() {
 		session.put("userid", null);
-		User u = ModelManager.get().connect("claw2", "pwd");
+		User u = ModelManager.get().connect("claw2", "pwd2");
 		Logger.info("u : " + u);
 		session.put("userid", u.id);
 		index();
 	}
-
+	
 	public static void processLogin(@Required String login, @Required String password) {
 		if (validation.hasErrors()) {
 			flash.error("Please enter your login and password.");
@@ -70,6 +69,7 @@ public class Application extends Controller {
 		}
 		User u = ModelManager.get().connect(login, password);
 		if (u != null) {
+			Logger.info("u : " + u);
 			session.put("userid", u.id);
 			index();
 		} else {
@@ -78,9 +78,9 @@ public class Application extends Controller {
 		}
 	}
 
-	public static void sendEvent(@Required String title, @Required String content) {
-		Logger.info("Event: " + title + " " + content);
-		ModelManager.get().getStreams().get(0).multicast(new Event(title, content));
+	public static void sendEvent(@Required String title, @Required String content, @Required int channel) {
+		Logger.info("Event: " + title + " " + content + "on channel " + channel);
+		ModelManager.get().getStreams().get(channel).multicast(new Event(title, content));
 	}
 
 	public static void waitEvents(@Required Long lastReceived) throws InterruptedException,

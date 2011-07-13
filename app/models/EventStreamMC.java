@@ -10,12 +10,14 @@ import play.libs.F.*;
 
 @Entity
 public class EventStreamMC extends Model {
-	public String source;
+	@OneToOne
+	public StreamDesc desc;
 	@Transient
 	public List<User> subscribingUsers;
 
-	public EventStreamMC(String streamSource) {
-		this.source = streamSource;
+	public EventStreamMC(String source, String title, String content) {
+		desc = new StreamDesc(source, title, content);
+		desc.save();
 		subscribingUsers = new ArrayList<User>();
 	}
 
@@ -29,9 +31,8 @@ public class EventStreamMC extends Model {
 
 	public void multicast(Event e) {
 		e.setStreamId(id);
-		Logger.info("size : " + subscribingUsers.size());
+		Logger.info("id : " + id);
 		for (User u : subscribingUsers) {
-			Logger.info(u + "");
 			u.getEventBuffer().publish(e);
 		}
 	}
@@ -39,5 +40,4 @@ public class EventStreamMC extends Model {
 	/**
 	 * GETTERS AND SETTERS
 	 */
-
 }

@@ -17,7 +17,6 @@ public class UserEventBuffer {
 
 	public void publish(Event e) {
 		stream.publish(e);
-		Logger.info("nb events : " + stream.availableEvents(0).size());
 	}
 
 	/**

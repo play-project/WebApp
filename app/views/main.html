@@ -13,10 +13,25 @@
         #{get 'moreScripts' /}
     </head>
     <body>
-        #{doLayout /}
+	    <div id="top">
+			<div id="logo">
+				<a href="http://research.petalslink.org">
+					<img id="logo-img" src="@{'/public/images/play.png'}">
+				</a>
+			</div>
+		</div>
+		<div id="header" class="sectionbottom ">
+			<span class="topBarDiv">Play</span>
+		</div>
+		<div id="content">
+       		#{doLayout /}
+        </div>
         
         %{ if(session.get("userid") != null) { }%
         <a href="@{Application.logout()}">Logout</a>
         %{ } }%
+        
+        <div id="footer">
+        </div>
     </body>
 </html>

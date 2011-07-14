@@ -31,7 +31,6 @@ public class EventStreamMC extends Model {
 
 	public void multicast(Event e) {
 		e.setStreamId(id);
-		Logger.info("id : " + id);
 		for (User u : subscribingUsers) {
 			u.getEventBuffer().publish(e);
 		}

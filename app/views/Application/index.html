@@ -2,7 +2,6 @@
 #{set title:'Home' /}
 
 <style type="text/css">
-
 /* Accordion
 ----------------------------------*/
 
@@ -56,7 +55,75 @@ a.subscribe-button {
 a.subscribe-button:hover {
 	color: #EE0;
 }
+
+.ui-dialog {
+	font-size: 72.5%;
+}
 </style>
+
+<h1 class="pagetitle">Hello ${username ?: 'Guest'} !</h1>
+
+<div id="available-streams-container">
+	<div id="available-streams">
+	<h3 id="stream-5000"><a href="#">Error Stream</a><a href="#" class="subscribe-button">Subscribe</a></h3>
+	<div id="desc-stream-5000"><p>
+	A stream to generate errors
+	</p></div>
+	%{
+		for(int i=0; i<streams.size(); i++){
+	}%
+		<h3 id="stream-${streams.get(i).id}"><a href="#">${streams.get(i).title}</a><a href="#" class="subscribe-button">Subscribe</a></h3>
+		<div id="desc-stream-${streams.get(i).id}"><p>
+		${streams.get(i).content}
+		</p></div>
+	%{	
+		}
+	%}
+	</div>
+</div>
+
+<div id="streams">
+	<div id="tabs">
+		<ul id="stream-tabs">
+			<li><a href="#tab-allstreams">All streams</a></li>
+			%{
+				for(int i=0; i<userStreams.size(); i++){
+			}%
+					<li><a href="#tab-stream-${userStreams.get(i).id}">${userStreams.get(i).title}</a></li>
+			%{
+				}
+			}%
+		</ul>
+		<div id="tab-allstreams">
+			<h2>All streams</h2>
+			<div id="allstreams-events">
+			</div>
+		</div>
+		%{
+			for(int i=0; i<userStreams.size(); i++){
+		}%
+			<div id="tab-stream-${userStreams.get(i).id}">
+				<h2>${userStreams.get(i).title}<a href="#" id="unsubscribe-button-${userStreams.get(i).id}" class="unsubscribe-button">Unsubscribe</a></h2>
+				<div id="stream-events-${userStreams.get(i).id}">
+				</div>
+			</div>
+		%{
+			}
+		}%
+	</div>
+	
+	<div id="error1" title="Error"><br/><span class="ui-icon ui-icon-alert" style="float:left; margin:-2px 30px 0 15px;"></span>Error : stream not found</div>
+	<div id="error2" title="Error"><br/><span class="ui-icon ui-icon-alert" style="float:left; margin:-2px 30px 0 15px;"></span>Error : subscription failed</div>
+	<div id="error3" title="Error"><br/><span class="ui-icon ui-icon-alert" style="float:left; margin:-2px 30px 0 15px;"></span>Error : unsubscription failed</div>
+</div>
+
+<div style="clear:left; padding-top:30px;">
+	<input id="send0" type="button" value="Send event on Stream 1" /><br/>
+	<input id="send1" type="button" value="Send event on Stream 2" /><br/>
+	<input id="send2" type="button" value="Send event on Stream 3" /><br/>
+	<input id="send3" type="button" value="Send event on Stream 4" /><br/><br/>
+	<input id="test" type="button" value="Test" /><br/><br/>
+</div>
 
 <script type="text/javascript">
 $(function() {
@@ -85,9 +152,21 @@ $(function() {
 	$("#tabs li").removeClass('ui-corner-top').addClass('ui-corner-left');
 	$(".ui-tabs-vertical .ui-tabs-panel").height($(".ui-tabs-nav").first().height());
 	
+	$("#error1, #error2, #error3").dialog({
+		resizable: false,
+		draggable: false,
+		autoOpen: false,
+		modal: true,
+		height: 120,
+		buttons: {
+			Ok: function() {
+				$(this).dialog("close");
+			}
+		}
+	});
+	
 	var subAction = #{jsAction @subscribe(':streamId') /}
-	$("a.subscribe-button").click(function(event){
-		event.stopPropagation();
+	$("a.subscribe-button").live('click', function() {
 		var id = $(this).parent().attr('id');
 		var sid = id.substring(id.lastIndexOf('-') + 1);
 		$("#available-streams").accordion( "option", "disabled", true );
@@ -97,78 +176,56 @@ $(function() {
 	        dataType: 'json',
 	        success: function(results) {
 	            $(results).each(function() {
-					$('#stream-'+this.id).remove();
-					$('#desc-stream-'+this.id).remove();
-					$('#tabs').tabs('add','#tab-stream'+this.id,this.title);
-					$('#tab-stream'+this.id).html('<h2>'+this.title+'</h2><div id="stream'+this.id+'-events"></div>');
+		            if(this.id != "-1"){
+						$('#stream-'+this.id).remove();
+						$('#desc-stream-'+this.id).remove();
+						$('#tabs').tabs('add','#tab-stream-'+this.id,this.title);
+						$('#tab-stream-'+this.id).html('<h2>'+this.title+'<a href="#" id="unsubscribe-button-'+this.id+'" class="unsubscribe-button">Unsubscribe</a></h2><div id="stream-events-'+this.id+'"></div>');
+					} else {
+						$("#error2").dialog("open");
+					}
 				})
 				$("#available-streams").accordion( "option", "disabled", false );
 	        },
 	        error: function() {
-	            alert('Subscribe : error');
+				$("#error1").dialog("open");
 				$("#available-streams").accordion( "option", "disabled", false );
 	        }
 	    });
 	});
+	
+	var unsubAction = #{jsAction @unsubscribe(':streamId') /}
+	$("a.unsubscribe-button").live('click', function() {
+		var id = $(this).attr('id');
+		var sid = id.substring(id.lastIndexOf('-') + 1);
+	    $.ajax({
+            url: unsubAction({streamId: sid}),
+            type: 'POST',
+	        dataType: 'json',
+	        success: function(results) {
+	            $(results).each(function() {
+		            if(this.id != "-1"){
+						$("#available-streams")
+							.append('<h3 id="stream-'+this.id+'"><a href="#">'+this.title+'</a><a href="#" class="subscribe-button">Subscribe</a></h3><div id="desc-stream-'+this.id+'"><p>'+this.content+'</p></div>')
+							.accordion("destroy")
+							.accordion({
+									autoHeight: false,
+									navigation: true,
+									collapsible: true
+							});
+						$("#tabs").tabs("remove", $("#tabs").tabs("option", "selected"));
+					} else {
+						$("#error1").dialog("open");
+					}
+				})
+	        },
+	        error: function() {
+				$("#error3").dialog("open");
+	        }
+	    });
+	});
 });
-</script>
 
-<h1 class="pagetitle">Hello ${username ?: 'Guest'} !</h1>
-
-<div id="available-streams-container">
-	<div id="available-streams">
-	%{
-		for(int i=0; i<streams.size(); i++){
-	}%
-		<h3 id="stream-${streams.get(i).id}"><a href="#">${streams.get(i).title}</a><a href="#" class="subscribe-button">Subscribe</a></h3>
-		<div id="desc-stream-${streams.get(i).id}"><p>
-		${streams.get(i).content}
-		</p></div>
-	%{	
-		}
-	%}
-	</div>
-</div>
-
-<div id="streams">
-	<div id="tabs">
-		<ul id="stream-tabs">
-			<li><a href="#tab-allstreams">All streams</a></li>
-			%{
-				for(int i=0; i<userStreams.size(); i++){
-			}%
-					<li><a href="#tab-stream${userStreams.get(i).id}">${userStreams.get(i).title}</a></li>
-			%{
-				}
-			}%
-		</ul>
-		<div id="tab-allstreams">
-			<h2>All streams</h2>
-			<div id="allstreams-events">
-			</div>
-		</div>
-		%{
-			for(int i=0; i<userStreams.size(); i++){
-		}%
-			<div id="tab-stream${userStreams.get(i).id}">
-				<h2>${userStreams.get(i).title}</h2>
-				<div id="stream${userStreams.get(i).id}-events">
-				</div>
-			</div>
-		%{
-			}
-		}%
-	</div>
-</div>
-
-<div style="clear:left; padding-top:30px;">
-	<input id="send0" type="button" value="Send event on Stream 1" /><br/>
-	<input id="send1" type="button" value="Send event on Stream 2" /><br/>
-	<input id="send2" type="button" value="Send event on Stream 3" /><br/>
-	<input id="send3" type="button" value="Send event on Stream 4" /><br/><br/>
-</div>
-
-<script type="text/javascript">
     var lastReceived = 0
     var waitEvents = #{jsAction @waitEvents(':lastReceived') /}
     var send0 = #{jsAction @sendEvent('Event !','Un test de long polling', 0) /}
@@ -176,18 +233,23 @@ $(function() {
     var send2 = #{jsAction @sendEvent('Event !','Un test de long polling', 2) /}
     var send3 = #{jsAction @sendEvent('Event !','Un test de long polling', 3) /}
     
-    $('#send0').click(function(e) {
+    $("#send0").click(function(e) {
         $.post(send0())
     });
-    $('#send1').click(function(e) {
+    $("#send1").click(function(e) {
         $.post(send1())
     });
-    $('#send2').click(function(e) {
+    $("#send2").click(function(e) {
         $.post(send2())
     });
-    $('#send3').click(function(e) {
+    $("#send3").click(function(e) {
         $.post(send3())
     });
+	
+	$("#test").click(function(e) {
+		var selectedTab = $("#tabs").tabs('option', 'selected');
+		alert(selectedTab);
+	});
     
 	var getEvents = function() {
 	    $.ajax({
@@ -209,7 +271,7 @@ $(function() {
 	
 	var display = function(event) {
 	    $('#allstreams-events').prepend('<div id="event'+event.id+'" class="event"><h3>'+event.id+' : '+event.data.title+'</h3><p>'+event.data.content+'</p></div>');
-	    $('#stream'+event.data.streamId+'-events').prepend('<div id="event'+event.id+'" class="event"><h3>'+event.id+' : '+event.data.title+'</h3><p>'+event.data.content+'</p></div>');
+	    $('#stream-events-'+event.data.streamId).prepend('<div id="event'+event.id+'" class="event"><h3>'+event.id+' : '+event.data.title+'</h3><p>'+event.data.content+'</p></div>');
 	}
 	
 	$(document).ready(function(){

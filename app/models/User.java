@@ -34,6 +34,9 @@ public class User extends Model {
 	}
 
 	public StreamDesc subscribe(Long streamId) {
+		if (eventStreamIds.contains(streamId)) {
+			return null;
+		}
 		EventStreamMC eb = ModelManager.get().getStreamById(streamId);
 		if (eb != null) {
 			eb.addUser(this);
@@ -43,21 +46,24 @@ public class User extends Model {
 		return null;
 	}
 
-	public boolean unsubscribe(Long streamId) {
+	public StreamDesc unsubscribe(Long streamId) {
+		if (!eventStreamIds.contains(streamId)) {
+			return null;
+		}
 		EventStreamMC eb = ModelManager.get().getStreamById(streamId);
 		if (eb != null) {
 			eb.removeUser(this);
 			eventStreamIds.remove(eb.id);
-			return true;
+			return eb.desc;
 		}
-		return false;
+		return null;
 	}
-	
-	public ArrayList<StreamDesc> getStreamsDesc(){
+
+	public ArrayList<StreamDesc> getStreamsDesc() {
 		ArrayList<StreamDesc> result = new ArrayList<StreamDesc>();
-		for(Long sid : eventStreamIds){
+		for (Long sid : eventStreamIds) {
 			EventStreamMC es = ModelManager.get().getStreamById(sid);
-			if(es != null){
+			if (es != null) {
 				result.add(es.desc);
 			}
 		}
@@ -65,8 +71,8 @@ public class User extends Model {
 	}
 
 	public void doSubscribtions() {
-		for(Long i : eventStreamIds){
-			EventStreamMC eb = ModelManager.get().getStreamById(i);
+		for (Long esid : eventStreamIds) {
+			EventStreamMC eb = ModelManager.get().getStreamById(esid);
 			if (eb != null) {
 				eb.addUser(this);
 			}
@@ -84,13 +90,16 @@ public class User extends Model {
 	public void setEventBuffer(UserEventBuffer eventBuffer) {
 		this.eventBuffer = eventBuffer;
 	}
-	
+
 	@Override
-	public boolean equals(Object o){
-		if(this == o) return true;
-		if(!(o instanceof User)) return false;
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (!(o instanceof User))
+			return false;
 		User u = (User) o;
-		if(u.id.equals(id) && u.name.equals(name) && u.password.equals(password) && u.email.equals(email)){
+		if (u.id.equals(id) && u.name.equals(name) && u.password.equals(password)
+				&& u.email.equals(email)) {
 			return true;
 		}
 		return false;
@@ -98,7 +107,7 @@ public class User extends Model {
 
 	@Override
 	public String toString() {
-		return "User [login=" + login + ", password=" + password + ", name=" + name + ", email=" + email
-				+ "]";
+		return "User [id=" + id + ", login=" + login + ", password=" + password + ", name=" + name
+				+ ", email=" + email + "]";
 	}
 }

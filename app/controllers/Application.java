@@ -100,13 +100,27 @@ public class Application extends Controller {
 	public static void subscribe(@Required Long streamId) {
 		Long id = Long.parseLong(session.get("userid"));
 		User u = ModelManager.get().getUserById(id);
-		String result;
+		String result = "{\"id\":\"-1\"}";
 		if (u != null) {
 			StreamDesc sd = u.subscribe(streamId);
-			result = "{\"id\":\"" + sd.id + "\",\"title\":\"" + sd.title + "\",\"content\":\""
-					+ sd.content + "\"}";
-		} else {
-			result = "";
+			if (sd != null) {
+				result = "{\"id\":\"" + sd.id + "\",\"title\":\"" + sd.title + "\",\"content\":\""
+						+ sd.content + "\"}";
+			}
+		}
+		renderJSON(result);
+	}
+
+	public static void unsubscribe(@Required Long streamId) {
+		Long id = Long.parseLong(session.get("userid"));
+		User u = ModelManager.get().getUserById(id);
+		String result = "{\"id\":\"-1\"}";
+		if (u != null) {
+			StreamDesc sd = u.unsubscribe(streamId);
+			if (sd != null) {
+				result = "{\"id\":\"" + sd.id + "\",\"title\":\"" + sd.title + "\",\"content\":\""
+						+ sd.content + "\"}";
+			}
 		}
 		renderJSON(result);
 	}

@@ -13,6 +13,7 @@ GET 	/reset							Application.reset
 # Event push
 GET		/waitevents						Application.waitEvents
 POST	/subscribe						Application.subscribe
+POST	/unsubscribe					Application.unsubscribe
 POST    /sendevent             		 	Application.sendEvent
 
 # Ignore favicon requests

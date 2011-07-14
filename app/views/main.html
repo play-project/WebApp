@@ -27,11 +27,10 @@
        		#{doLayout /}
         </div>
         
-        %{ if(session.get("userid") != null) { }%
-        <a href="@{Application.logout()}">Logout</a>
-        %{ } }%
-        
         <div id="footer">
+			%{ if(session.get("userid") != null) { }%
+			<a href="@{Application.logout()}">Logout</a>
+			%{ } }%
         </div>
     </body>
 </html>

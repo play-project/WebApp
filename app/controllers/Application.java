@@ -55,7 +55,6 @@ public class Application extends Controller {
 	public static void test() {
 		session.put("userid", null);
 		User u = ModelManager.get().connect("claw", "pwd");
-		Logger.info("u : " + u);
 		session.put("userid", u.id);
 		index();
 	}
@@ -63,7 +62,6 @@ public class Application extends Controller {
 	public static void test2() {
 		session.put("userid", null);
 		User u = ModelManager.get().connect("claw2", "pwd2");
-		Logger.info("u : " + u);
 		session.put("userid", u.id);
 		index();
 	}

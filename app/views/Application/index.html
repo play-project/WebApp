@@ -47,6 +47,14 @@ div#streams {
 	min-height: 486px;
 }
 
+.event {
+	margin-top: 10px;
+}
+.event h3 {
+	font-size: 12px;
+	margin-bottom: 5px;
+}
+
 a.subscribe-button {
 	position: absolute;
 	margin-top: -27px;
@@ -66,6 +74,12 @@ a.unsubscribe-button {
 }
 a.unsubscribe-button:hover {
 	color: #EE0;
+}
+
+.unread-count {
+	float: right;
+	width: 100px;
+	text-align: right;
 }
 
 .ui-dialog {
@@ -97,11 +111,11 @@ a.unsubscribe-button:hover {
 <div id="streams">
 	<div id="tabs">
 		<ul id="stream-tabs">
-			<li><a href="#tab-allstreams">All streams</a></li>
+			<li><a href="#tab-allstreams"><span id="unread-all" class="unread-count">0</span>All streams</a></li>
 			%{
 				for(int i=0; i<userStreams.size(); i++){
 			}%
-					<li><a href="#tab-stream-${userStreams.get(i).id}">${userStreams.get(i).title}</a></li>
+					<li><a href="#tab-stream-${userStreams.get(i).id}"><span id="unread-${userStreams.get(i).id}" class="unread-count">0</span>${userStreams.get(i).title}</a></li>
 			%{
 				}
 			}%
@@ -181,11 +195,11 @@ $(function() {
 	
 	var subAction = #{jsAction @subscribe(':streamId') /}
 	$("a.subscribe-button").live('click', function() {
-		var id = $(this).parent().attr('id');
-		var sid = id.substring(id.lastIndexOf('-') + 1);
+		var $id = $(this).parent().attr('id');
+		var $sid = $id.substring($id.lastIndexOf('-') + 1);
 		$("#available-streams").accordion( "option", "disabled", true );
 	    $.ajax({
-            url: subAction({streamId: sid}),
+            url: subAction({streamId: $sid}),
             type: 'POST',
 	        dataType: 'json',
 	        success: function(results) {
@@ -193,7 +207,7 @@ $(function() {
 		            if(this.id != "-1"){
 						$('#stream-'+this.id).remove();
 						$('#desc-stream-'+this.id).remove();
-						$('#tabs').tabs('add','#tab-stream-'+this.id,this.title);
+						$('#tabs').tabs('add','#tab-stream-'+this.id,'<span id="unread-'+this.id+'" class="unread-count">0</span>'+this.title);
 						$('#tab-stream-'+this.id).html('<h2>'+this.title+'<a href="#" id="unsubscribe-button-'+this.id+'" class="unsubscribe-button">Unsubscribe</a></h2><div id="stream-events-'+this.id+'"></div>');
 					} else {
 						$("#error2").dialog("open");
@@ -210,10 +224,10 @@ $(function() {
 	
 	var unsubAction = #{jsAction @unsubscribe(':streamId') /}
 	$("a.unsubscribe-button").live('click', function() {
-		var id = $(this).attr('id');
-		var sid = id.substring(id.lastIndexOf('-') + 1);
+		var $id = $(this).attr('id');
+		var $sid = $id.substring($id.lastIndexOf('-') + 1);
 	    $.ajax({
-            url: unsubAction({streamId: sid}),
+            url: unsubAction({streamId: $sid}),
             type: 'POST',
 	        dataType: 'json',
 	        success: function(results) {
@@ -221,12 +235,13 @@ $(function() {
 		            if(this.id != "-1"){
 						$("#available-streams")
 							.sortable("destroy")
+							.accordion("destroy")
 							.append('<h3 id="stream-'+this.id+'"><a href="#">'+this.title+'</a><a href="#" class="subscribe-button">Subscribe</a></h3><div id="desc-stream-'+this.id+'"><p>'+this.content+'</p></div>')
 							.accordion({
 									autoHeight: false,
 									navigation: true,
 									collapsible: true
-							})
+							});
 						$("#tabs").tabs("remove", $("#tabs").tabs("option", "selected"));
 					} else {
 						$("#error1").dialog("open");
@@ -240,55 +255,82 @@ $(function() {
 	});
 });
 
-    var lastReceived = 0
-    var waitEvents = #{jsAction @waitEvents(':lastReceived') /}
-    var send0 = #{jsAction @sendEvent('Event !','Un test de long polling', 0) /}
-    var send1 = #{jsAction @sendEvent('Event !','Un test de long polling', 1) /}
-    var send2 = #{jsAction @sendEvent('Event !','Un test de long polling', 2) /}
-    var send3 = #{jsAction @sendEvent('Event !','Un test de long polling', 3) /}
-    
-    $("#send0").click(function(e) {
-        $.post(send0())
-    });
-    $("#send1").click(function(e) {
-        $.post(send1())
-    });
-    $("#send2").click(function(e) {
-        $.post(send2())
-    });
-    $("#send3").click(function(e) {
-        $.post(send3())
-    });
-	
-	$("#test").click(function(e) {
-		var selectedTab = $("#tabs").tabs('option', 'selected');
-		alert(selectedTab);
+var $lastReceived = 0
+var waitEvents = #{jsAction @waitEvents(':lastReceived') /}
+%{
+	String txt = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ullamcorper laoreet fermentum. Cras placerat dui pharetra arcu ultricies sit amet commodo tortor molestie.";
+}%
+var send0 = #{jsAction @sendEvent('Event !', txt, 0) /}
+var send1 = #{jsAction @sendEvent('Event !', txt, 1) /}
+var send2 = #{jsAction @sendEvent('Event !', txt, 2) /}
+var send3 = #{jsAction @sendEvent('Event !', txt, 3) /}
+
+$("#send0").click(function(e) {
+	$.post(send0())
+});
+$("#send1").click(function(e) {
+	$.post(send1())
+});
+$("#send2").click(function(e) {
+	$.post(send2())
+});
+$("#send3").click(function(e) {
+	$.post(send3())
+});
+
+$("#test").click(function(e) {
+	var $selectedTab = $("#tabs").tabs('option', 'selected');
+	alert($selectedTab);
+});
+
+var getEvents = function() {
+	$.ajax({
+		url: waitEvents({lastReceived: $lastReceived}),
+		type: 'GET',
+		dataType: 'json',
+		success: function(events) {
+			var k = events.length;
+			$(events).each(function() {
+				k--;
+				display(this, (k == 0));
+				$lastReceived = this.id;
+			})
+			getEvents()
+		},
+		error: function() {
+			getEvents();
+		}
 	});
-    
-	var getEvents = function() {
-	    $.ajax({
-            url: waitEvents({lastReceived: lastReceived}),
-            type: 'GET',
-	        dataType: 'json',
-	        success: function(events) {
-	            $(events).each(function() {
-	                display(this)
-                    lastReceived = this.id
-	            })
-	            getEvents()
-	        },
-	        error: function() {
-	            getEvents();
-	        }
-	    });
+}
+
+var display = function(event, blink) {
+	if(blink){
+		$('#unread-'+event.data.streamId).parent().animate({
+			"color": "#FF0"
+		}, 200);
 	}
 	
-	var display = function(event) {
-	    $('#allstreams-events').prepend('<div id="event'+event.id+'" class="event"><h3>'+event.id+' : '+event.data.title+'</h3><p>'+event.data.content+'</p></div>');
-	    $('#stream-events-'+event.data.streamId).prepend('<div id="event'+event.id+'" class="event"><h3>'+event.id+' : '+event.data.title+'</h3><p>'+event.data.content+'</p></div>');
+	var cptall = parseInt($('#unread-all').html());
+	$('#unread-all').html(cptall+1);
+	var cpt = parseInt($('#unread-'+event.data.streamId).html());
+	$('#unread-'+event.data.streamId).html(cpt+1);
+	
+	if(blink){
+		$('#unread-'+event.data.streamId).parent().animate({
+			"color": "#4F7425"
+		}, 200);
 	}
 	
-	$(document).ready(function(){
-		getEvents();
-	});
+	$('#stream-events-'+event.data.streamId)
+		.prepend('<div id="event-'+event.id+'" class="event"><h3>'+event.id+' : '+event.data.title+'</h3><p>'+event.data.content+'</p></div>');
+	$('#event-'+event.id).hide().fadeIn();
+	
+	$('#allstreams-events')
+		.prepend('<div id="eventall-'+event.id+'" class="event"><h3>'+event.id+' : '+event.data.title+'</h3><p>'+event.data.content+'</p></div>');
+	$('#eventall-'+event.id).hide().fadeIn();
+}
+
+$(document).ready(function(){
+	getEvents();
+});
 </script>

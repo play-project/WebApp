@@ -8,6 +8,7 @@ import java.util.Map;
 import play.Logger;
 import play.db.jpa.JPA;
 import play.db.jpa.Model;
+import play.mvc.Controller;
 
 public class ModelManager {
 
@@ -73,7 +74,6 @@ public class ModelManager {
 			disconnect(u);
 			connectedUsers.add(u);
 			u.doSubscribtions();
-
 			u.setEventBuffer(new UserEventBuffer());
 		}
 		return u;

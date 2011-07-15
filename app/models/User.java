@@ -41,6 +41,7 @@ public class User extends Model {
 		if (eb != null) {
 			eb.addUser(this);
 			eventStreamIds.add(eb.id);
+			this.merge();
 			return eb.desc;
 		}
 		return null;
@@ -54,6 +55,7 @@ public class User extends Model {
 		if (eb != null) {
 			eb.removeUser(this);
 			eventStreamIds.remove(eb.id);
+			this.merge();
 			return eb.desc;
 		}
 		return null;

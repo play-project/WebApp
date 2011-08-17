@@ -14,21 +14,21 @@ public class ModelManager {
 
 	public static ModelManager instance = null;
 	private ArrayList<User> connectedUsers = new ArrayList<User>();
-	private ArrayList<EventStreamMC> streams = new ArrayList<EventStreamMC>();
+	private ArrayList<EventTopic> streams = new ArrayList<EventTopic>();
 
 	public ModelManager() {
 		Logger.info("NEW MODELMANAGER");
 		User u = new User("claw", "pwd", "Alex", "test@gmail.com");
 		User u2 = new User("claw2", "pwd2", "Alex2", "test2@gmail.com");
-		EventStreamMC eb1 = new EventStreamMC("topic1", "http://www.wservice.com/stream1", "Stream 1", "A first Stream for tests");
-		EventStreamMC eb2 = new EventStreamMC("topic2", "http://www.wservice.com/stream1", "Stream 2", "A second Stream for tests");
-		EventStreamMC eb3 = new EventStreamMC("topic3", "http://www.wservice.com/stream1", "Stream 3", "A third Stream for tests");
-		EventStreamMC eb4 = new EventStreamMC("topic4", "http://www.wservice.com/stream1", "Stream 4", "A fourth Stream for tests");
-		EventStreamMC eb5 = new EventStreamMC("topic5", "http://www.wservice.com/stream1", "Stream 5", "A fourth Stream for tests");
-		EventStreamMC eb6 = new EventStreamMC("topic6", "http://www.wservice.com/stream1", "Stream 6", "A sixth Stream for tests");
-		EventStreamMC eb7 = new EventStreamMC("topic7", "http://www.wservice.com/stream1", "Stream 7", "A seventh Stream for tests");
-		EventStreamMC eb8 = new EventStreamMC("topic8", "http://www.wservice.com/stream1", "Stream 8", "A eighth Stream for tests");
-		EventStreamMC eb9 = new EventStreamMC("topic9", "http://www.wservice.com/stream1", "Stream 9", "A ninth Stream for tests");
+		EventTopic eb1 = new EventTopic("topic1", "http://www.wservice.com/stream1", "Stream 1", "A first Stream for tests");
+		EventTopic eb2 = new EventTopic("topic2", "http://www.wservice.com/stream1", "Stream 2", "A second Stream for tests");
+		EventTopic eb3 = new EventTopic("topic3", "http://www.wservice.com/stream1", "Stream 3", "A third Stream for tests");
+		EventTopic eb4 = new EventTopic("topic4", "http://www.wservice.com/stream1", "Stream 4", "A fourth Stream for tests");
+		EventTopic eb5 = new EventTopic("topic5", "http://www.wservice.com/stream1", "Stream 5", "A fourth Stream for tests");
+		EventTopic eb6 = new EventTopic("topic6", "http://www.wservice.com/stream1", "Stream 6", "A sixth Stream for tests");
+		EventTopic eb7 = new EventTopic("topic7", "http://www.wservice.com/stream1", "Stream 7", "A seventh Stream for tests");
+		EventTopic eb8 = new EventTopic("topic8", "http://www.wservice.com/stream1", "Stream 8", "A eighth Stream for tests");
+		EventTopic eb9 = new EventTopic("topic9", "http://www.wservice.com/stream1", "Stream 9", "A ninth Stream for tests");
 		streams.add(eb1);
 		streams.add(eb2);
 		streams.add(eb3);
@@ -73,7 +73,7 @@ public class ModelManager {
 	public boolean disconnect(User user) {
 		if (user != null && connectedUsers.contains(user)) {
 			for (int i = 0; i < user.eventStreamIds.size(); i++) {
-				EventStreamMC es = getStreamById(user.eventStreamIds.get(i));
+				EventTopic es = getStreamById(user.eventStreamIds.get(i));
 				if (es != null) {
 					es.removeUser(user);
 				}
@@ -100,9 +100,9 @@ public class ModelManager {
 		return null;
 	}
 
-	public EventStreamMC getStreamById(String streamId) {
+	public EventTopic getStreamById(String streamId) {
 		Logger.info("streamId : " + streamId);
-		for (EventStreamMC eb : streams) {
+		for (EventTopic eb : streams) {
 			Logger.info("id : " + eb.id);
 			if (streamId.equals(eb.id)) {
 				Logger.info("equal !");
@@ -121,7 +121,7 @@ public class ModelManager {
 		return connectedUsers;
 	}
 
-	public ArrayList<EventStreamMC> getStreams() {
+	public ArrayList<EventTopic> getStreams() {
 		return streams;
 	}
 }

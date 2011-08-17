@@ -31,9 +31,9 @@ public class Application extends Controller {
 			logout();
 		}
 		String username = u.name;
-		ArrayList<EventStreamMC> streams = new ArrayList<EventStreamMC>();
+		ArrayList<EventTopic> streams = new ArrayList<EventTopic>();
 		streams.addAll(ModelManager.get().getStreams());
-		ArrayList<EventStreamMC> userStreams = u.getStreams();
+		ArrayList<EventTopic> userStreams = u.getStreams();
 		for (int i = 0; i < userStreams.size(); i++) {
 			streams.remove(userStreams.get(i));
 		}
@@ -104,7 +104,7 @@ public class Application extends Controller {
 		User u = ModelManager.get().getUserById(id);
 		String result = "{\"id\":\"-1\"}";
 		if (u != null) {
-			EventStreamMC sd = u.subscribe(streamId);
+			EventTopic sd = u.subscribe(streamId);
 			if (sd != null) {
 				result = "{\"id\":\"" + sd.id + "\",\"title\":\"" + sd.title + "\",\"content\":\""
 						+ sd.content + "\"}";
@@ -118,7 +118,7 @@ public class Application extends Controller {
 		User u = ModelManager.get().getUserById(id);
 		String result = "{\"id\":\"-1\"}";
 		if (u != null) {
-			EventStreamMC sd = u.unsubscribe(streamId);
+			EventTopic sd = u.unsubscribe(streamId);
 			if (sd != null) {
 				result = "{\"id\":\"" + sd.id + "\",\"title\":\"" + sd.title + "\",\"content\":\""
 						+ sd.content + "\"}";

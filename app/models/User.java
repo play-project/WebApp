@@ -34,11 +34,11 @@ public class User extends Model {
 		this(login, password, name, email, new ArrayList<String>());
 	}
 
-	public EventStreamMC subscribe(String streamId) {
+	public EventTopic subscribe(String streamId) {
 		if (eventStreamIds.contains(streamId)) {
 			return null;
 		}
-		EventStreamMC eb = ModelManager.get().getStreamById(streamId);
+		EventTopic eb = ModelManager.get().getStreamById(streamId);
 		if (eb != null) {
 			eb.addUser(this);
 			eventStreamIds.add(eb.id);
@@ -48,11 +48,11 @@ public class User extends Model {
 		return null;
 	}
 
-	public EventStreamMC unsubscribe(String streamId) {
+	public EventTopic unsubscribe(String streamId) {
 		if (!eventStreamIds.contains(streamId)) {
 			return null;
 		}
-		EventStreamMC eb = ModelManager.get().getStreamById(streamId);
+		EventTopic eb = ModelManager.get().getStreamById(streamId);
 		if (eb != null) {
 			eb.removeUser(this);
 			eventStreamIds.remove(eb.id);
@@ -62,10 +62,10 @@ public class User extends Model {
 		return null;
 	}
 
-	public ArrayList<EventStreamMC> getStreams() {
-		ArrayList<EventStreamMC> result = new ArrayList<EventStreamMC>();
+	public ArrayList<EventTopic> getStreams() {
+		ArrayList<EventTopic> result = new ArrayList<EventTopic>();
 		for (String sid : eventStreamIds) {
-			EventStreamMC es = ModelManager.get().getStreamById(sid);
+			EventTopic es = ModelManager.get().getStreamById(sid);
 			if (es != null) {
 				result.add(es);
 			}
@@ -75,7 +75,7 @@ public class User extends Model {
 
 	public void doSubscribtions() {
 		for (String esid : eventStreamIds) {
-			EventStreamMC eb = ModelManager.get().getStreamById(esid);
+			EventTopic eb = ModelManager.get().getStreamById(esid);
 			if (eb != null) {
 				eb.addUser(this);
 			}

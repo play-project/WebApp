@@ -8,17 +8,19 @@ import play.Logger;
 import play.db.jpa.*;
 import play.libs.F.*;
 
-@Entity
-public class EventStreamMC extends Model {
-	@OneToOne
-	public StreamDesc desc;
-	@Transient
+public class EventStreamMC {
+	public String id;
+	public String source;
+	public String title;
+	public String content;
 	public List<User> subscribingUsers;
 
-	public EventStreamMC(String source, String title, String content) {
-		desc = new StreamDesc(source, title, content);
-		desc.save();
-		subscribingUsers = new ArrayList<User>();
+	public EventStreamMC(String id, String source, String title, String content) {
+		this.id = id;
+		this.source = source;
+		this.title = title;
+		this.content = content;
+		this.subscribingUsers = new ArrayList<User>();
 	}
 
 	public void addUser(User u) {
@@ -36,7 +38,16 @@ public class EventStreamMC extends Model {
 		}
 	}
 
-	/**
-	 * GETTERS AND SETTERS
-	 */
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (!(o instanceof EventStreamMC))
+			return false;
+		EventStreamMC u = (EventStreamMC) o;
+		if (u.id.equals(id) && u.source.equals(source)) {
+			return true;
+		}
+		return false;
+	}
 }

@@ -1,7 +1,7 @@
 package models;
 
 public class Event {
-	private Long streamId;
+	private String streamId;
 	private String title;
 	private String content;
 
@@ -15,12 +15,12 @@ public class Event {
 	 * GETTERS AND SETTERS
 	 */
 
-	public Long getStreamId() {
+	public String getStreamId() {
 		return streamId;
 	}
 
-	public void setStreamId(Long streamId) {
-		this.streamId = streamId;
+	public void setStreamId(String id) {
+		this.streamId = id;
 	}
 
 	public String getTitle() {

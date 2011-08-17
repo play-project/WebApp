@@ -16,6 +16,11 @@ POST	/subscribe						Application.subscribe
 POST	/unsubscribe					Application.unsubscribe
 POST    /sendevent             		 	Application.sendEvent
 
+# WS Test
+POST	/webservice/soapnotifendpoint						WebService.soapNotifEndPoint
+GET		/webservice/notif							WebService.notif
+GET		/webservice/subscribe						WebService.subscribe
+
 # Ignore favicon requests
 GET     /favicon.ico                    404
 

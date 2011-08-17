@@ -1,4 +1,6 @@
 # Application dependencies
 
 require:
-    - play
+	- play
+    - play -> fbconnect head
+    - play -> oauth 1.0

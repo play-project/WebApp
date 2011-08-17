@@ -20,15 +20,15 @@ public class ModelManager {
 		Logger.info("NEW MODELMANAGER");
 		User u = new User("claw", "pwd", "Alex", "test@gmail.com");
 		User u2 = new User("claw2", "pwd2", "Alex2", "test2@gmail.com");
-		EventStreamMC eb1 = new EventStreamMC("http://www.wservice.com/stream1", "Stream 1", "A first Stream for tests");
-		EventStreamMC eb2 = new EventStreamMC("http://www.wservice.com/stream1", "Stream 2", "A second Stream for tests");
-		EventStreamMC eb3 = new EventStreamMC("http://www.wservice.com/stream1", "Stream 3", "A third Stream for tests");
-		EventStreamMC eb4 = new EventStreamMC("http://www.wservice.com/stream1", "Stream 4", "A fourth Stream for tests");
-		EventStreamMC eb5 = new EventStreamMC("http://www.wservice.com/stream1", "Stream 5", "A fourth Stream for tests");
-		EventStreamMC eb6 = new EventStreamMC("http://www.wservice.com/stream1", "Stream 6", "A sixth Stream for tests");
-		EventStreamMC eb7 = new EventStreamMC("http://www.wservice.com/stream1", "Stream 7", "A seventh Stream for tests");
-		EventStreamMC eb8 = new EventStreamMC("http://www.wservice.com/stream1", "Stream 8", "A eighth Stream for tests");
-		EventStreamMC eb9 = new EventStreamMC("http://www.wservice.com/stream1", "Stream 9", "A ninth Stream for tests");
+		EventStreamMC eb1 = new EventStreamMC("topic1", "http://www.wservice.com/stream1", "Stream 1", "A first Stream for tests");
+		EventStreamMC eb2 = new EventStreamMC("topic2", "http://www.wservice.com/stream1", "Stream 2", "A second Stream for tests");
+		EventStreamMC eb3 = new EventStreamMC("topic3", "http://www.wservice.com/stream1", "Stream 3", "A third Stream for tests");
+		EventStreamMC eb4 = new EventStreamMC("topic4", "http://www.wservice.com/stream1", "Stream 4", "A fourth Stream for tests");
+		EventStreamMC eb5 = new EventStreamMC("topic5", "http://www.wservice.com/stream1", "Stream 5", "A fourth Stream for tests");
+		EventStreamMC eb6 = new EventStreamMC("topic6", "http://www.wservice.com/stream1", "Stream 6", "A sixth Stream for tests");
+		EventStreamMC eb7 = new EventStreamMC("topic7", "http://www.wservice.com/stream1", "Stream 7", "A seventh Stream for tests");
+		EventStreamMC eb8 = new EventStreamMC("topic8", "http://www.wservice.com/stream1", "Stream 8", "A eighth Stream for tests");
+		EventStreamMC eb9 = new EventStreamMC("topic9", "http://www.wservice.com/stream1", "Stream 9", "A ninth Stream for tests");
 		streams.add(eb1);
 		streams.add(eb2);
 		streams.add(eb3);
@@ -38,15 +38,6 @@ public class ModelManager {
 		streams.add(eb7);
 		streams.add(eb8);
 		streams.add(eb9);
-		eb1.save();
-		eb2.save();
-		eb3.save();
-		eb4.save();
-		eb5.save();
-		eb6.save();
-		eb7.save();
-		eb8.save();
-		eb9.save();
 		u.eventStreamIds.add(eb1.id);
 		u.eventStreamIds.add(eb3.id);
 		u2.eventStreamIds.add(eb1.id);
@@ -109,12 +100,16 @@ public class ModelManager {
 		return null;
 	}
 
-	public EventStreamMC getStreamById(Long id) {
+	public EventStreamMC getStreamById(String streamId) {
+		Logger.info("streamId : " + streamId);
 		for (EventStreamMC eb : streams) {
-			if (id.equals(eb.id)) {
+			Logger.info("id : " + eb.id);
+			if (streamId.equals(eb.id)) {
+				Logger.info("equal !");
 				return eb;
 			}
 		}
+		Logger.info("fail :(");
 		return null;
 	}
 
@@ -128,13 +123,5 @@ public class ModelManager {
 
 	public ArrayList<EventStreamMC> getStreams() {
 		return streams;
-	}
-	
-	public ArrayList<StreamDesc> getAllStreamsDesc() {
-		ArrayList<StreamDesc> result = new ArrayList<StreamDesc>();
-		for(EventStreamMC es : streams){
-			result.add(es.desc);
-		}
-		return result;
 	}
 }

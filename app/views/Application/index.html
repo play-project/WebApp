@@ -260,10 +260,10 @@ var waitEvents = #{jsAction @waitEvents(':lastReceived') /}
 %{
 	String txt = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ullamcorper laoreet fermentum. Cras placerat dui pharetra arcu ultricies sit amet commodo tortor molestie.";
 }%
-var send0 = #{jsAction @sendEvent('Event !', txt, 0) /}
-var send1 = #{jsAction @sendEvent('Event !', txt, 1) /}
-var send2 = #{jsAction @sendEvent('Event !', txt, 2) /}
-var send3 = #{jsAction @sendEvent('Event !', txt, 3) /}
+var send0 = #{jsAction @sendEvent('Event !', txt, 'topic1') /}
+var send1 = #{jsAction @sendEvent('Event !', txt, 'topic2') /}
+var send2 = #{jsAction @sendEvent('Event !', txt, 'topic3') /}
+var send3 = #{jsAction @sendEvent('Event !', txt, 'topic4') /}
 
 $("#send0").click(function(e) {
 	$.post(send0())

@@ -16,11 +16,12 @@ public class User extends Model {
 	public String name;
 	public String email;
 	@ElementCollection
-	public List<Long> eventStreamIds;
+	public List<String> eventStreamIds;
 	@Transient
 	UserEventBuffer eventBuffer;
 
-	public User(String login, String password, String name, String email, ArrayList<Long> eventStreamIds) {
+	public User(String login, String password, String name, String email,
+			ArrayList<String> eventStreamIds) {
 		this.login = login;
 		this.password = password;
 		this.name = name;
@@ -30,10 +31,10 @@ public class User extends Model {
 	}
 
 	public User(String login, String password, String name, String email) {
-		this(login, password, name, email, new ArrayList<Long>());
+		this(login, password, name, email, new ArrayList<String>());
 	}
 
-	public StreamDesc subscribe(Long streamId) {
+	public EventStreamMC subscribe(String streamId) {
 		if (eventStreamIds.contains(streamId)) {
 			return null;
 		}
@@ -42,12 +43,12 @@ public class User extends Model {
 			eb.addUser(this);
 			eventStreamIds.add(eb.id);
 			this.merge();
-			return eb.desc;
+			return eb;
 		}
 		return null;
 	}
 
-	public StreamDesc unsubscribe(Long streamId) {
+	public EventStreamMC unsubscribe(String streamId) {
 		if (!eventStreamIds.contains(streamId)) {
 			return null;
 		}
@@ -56,24 +57,24 @@ public class User extends Model {
 			eb.removeUser(this);
 			eventStreamIds.remove(eb.id);
 			this.merge();
-			return eb.desc;
+			return eb;
 		}
 		return null;
 	}
 
-	public ArrayList<StreamDesc> getStreamsDesc() {
-		ArrayList<StreamDesc> result = new ArrayList<StreamDesc>();
-		for (Long sid : eventStreamIds) {
+	public ArrayList<EventStreamMC> getStreams() {
+		ArrayList<EventStreamMC> result = new ArrayList<EventStreamMC>();
+		for (String sid : eventStreamIds) {
 			EventStreamMC es = ModelManager.get().getStreamById(sid);
 			if (es != null) {
-				result.add(es.desc);
+				result.add(es);
 			}
 		}
 		return result;
 	}
 
 	public void doSubscribtions() {
-		for (Long esid : eventStreamIds) {
+		for (String esid : eventStreamIds) {
 			EventStreamMC eb = ModelManager.get().getStreamById(esid);
 			if (eb != null) {
 				eb.addUser(this);

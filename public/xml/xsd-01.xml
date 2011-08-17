@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+        <xsd:element name="cardiacRythm">
+                <xsd:complexType>
+                        <xsd:sequence>
+                                <xsd:element name="fireman" type="FiremanType" />
+                                <xsd:element name="value" type="xsd:int" />
+                        </xsd:sequence>
+                </xsd:complexType>
+        </xsd:element>
+        <xsd:complexType name="FiremanType">
+                <xsd:sequence>
+                        <xsd:element name="name" type="string" />
+                        <xsd:element ref="EndpointReference" />
+                </xsd:sequence>
+        </xsd:complexType>
+</xsd:schema>

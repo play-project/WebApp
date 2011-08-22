@@ -31,13 +31,13 @@ public class Application extends Controller {
 			logout();
 		}
 		String username = u.name;
-		ArrayList<EventTopic> streams = new ArrayList<EventTopic>();
-		streams.addAll(ModelManager.get().getStreams());
-		ArrayList<EventTopic> userStreams = u.getStreams();
-		for (int i = 0; i < userStreams.size(); i++) {
-			streams.remove(userStreams.get(i));
+		ArrayList<EventTopic> topics = new ArrayList<EventTopic>();
+		topics.addAll(ModelManager.get().getTopics());
+		ArrayList<EventTopic> userTopics = u.getTopics();
+		for (int i = 0; i < userTopics.size(); i++) {
+			topics.remove(userTopics.get(i));
 		}
-		render(username, streams, userStreams);
+		render(username, topics, userTopics);
 	}
 
 	public static void login() {
@@ -88,7 +88,7 @@ public class Application extends Controller {
 
 	public static void sendEvent(@Required String title, @Required String content, @Required String topic) {
 		Logger.info("Event: " + title + "\nContent: " + content + "\nTopic " + topic);
-		ModelManager.get().getStreamById(topic).multicast(new Event(title, content));
+		ModelManager.get().getTopicById(topic).multicast(new Event(title, content));
 	}
 
 	public static void waitEvents(@Required Long lastReceived) throws InterruptedException,
@@ -99,12 +99,12 @@ public class Application extends Controller {
 		}.getType());
 	}
 
-	public static void subscribe(@Required String streamId) {
+	public static void subscribe(@Required String topicId) {
 		Long id = Long.parseLong(session.get("userid"));
 		User u = ModelManager.get().getUserById(id);
 		String result = "{\"id\":\"-1\"}";
 		if (u != null) {
-			EventTopic sd = u.subscribe(streamId);
+			EventTopic sd = u.subscribe(topicId);
 			if (sd != null) {
 				result = "{\"id\":\"" + sd.id + "\",\"title\":\"" + sd.title + "\",\"content\":\""
 						+ sd.content + "\"}";
@@ -113,12 +113,12 @@ public class Application extends Controller {
 		renderJSON(result);
 	}
 
-	public static void unsubscribe(@Required String streamId) {
+	public static void unsubscribe(@Required String topicId) {
 		Long id = Long.parseLong(session.get("userid"));
 		User u = ModelManager.get().getUserById(id);
 		String result = "{\"id\":\"-1\"}";
 		if (u != null) {
-			EventTopic sd = u.unsubscribe(streamId);
+			EventTopic sd = u.unsubscribe(topicId);
 			if (sd != null) {
 				result = "{\"id\":\"" + sd.id + "\",\"title\":\"" + sd.title + "\",\"content\":\""
 						+ sd.content + "\"}";

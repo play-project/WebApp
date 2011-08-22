@@ -5,7 +5,7 @@
 /* Accordion
 ----------------------------------*/
 
-div#available-streams-container {
+div#available-topics-container {
 	border: 1px solid #DDDDDD;
 	border-radius: 2px;
 	diplay: block;
@@ -17,7 +17,7 @@ div#available-streams-container {
 	padding: 3px;
 }
 
-div#available-streams {
+div#available-topics {
 	font-size: 72.5%;
 	float: left;
 	width: 250px;
@@ -31,7 +31,7 @@ div#available-streams {
 .ui-tabs-vertical .ui-tabs-nav li a { display:block; width:90%; }
 .ui-tabs-vertical .ui-tabs-nav li.ui-tabs-selected { padding-bottom: 0; margin-bottom: 2px; padding-right: 2px; border-right-width: 1px; border-right-width: 1px; }
 
-div#streams {
+div#topics {
 	font-size: 65%;
 	float: left;
 	padding: 0 0 0 20px;
@@ -89,18 +89,18 @@ a.unsubscribe-button:hover {
 
 <h1 class="pagetitle">Hello ${username ?: 'Guest'} !</h1>
 
-<div id="available-streams-container">
-	<div id="available-streams">
-	<h3 id="stream-5000"><a href="#">Error Stream</a><a href="#" class="subscribe-button">Subscribe</a></h3>
-	<div id="desc-stream-5000"><p>
-	A stream to generate errors
+<div id="available-topics-container">
+	<div id="available-topics">
+	<h3 id="topic-5000"><a href="#">Error Topic</a><a href="#" class="subscribe-button">Subscribe</a></h3>
+	<div id="desc-topic-5000"><p>
+	A topic to generate errors
 	</p></div>
 	%{
-		for(int i=0; i<streams.size(); i++){
+		for(int i=0; i<topics.size(); i++){
 	}%
-		<h3 id="stream-${streams.get(i).id}"><a href="#">${streams.get(i).title}</a><a href="#" class="subscribe-button">Subscribe</a></h3>
-		<div id="desc-stream-${streams.get(i).id}"><p>
-		${streams.get(i).content}
+		<h3 id="topic-${topics.get(i).id}"><a href="#">${topics.get(i).title}</a><a href="#" class="subscribe-button">Subscribe</a></h3>
+		<div id="desc-topic-${topics.get(i).id}"><p>
+		${topics.get(i).content}
 		</p></div>
 	%{	
 		}
@@ -108,29 +108,29 @@ a.unsubscribe-button:hover {
 	</div>
 </div>
 
-<div id="streams">
+<div id="topics">
 	<div id="tabs">
-		<ul id="stream-tabs">
-			<li><a href="#tab-allstreams"><span id="unread-all" class="unread-count">0</span>All streams</a></li>
+		<ul id="topic-tabs">
+			<li><a href="#tab-alltopics"><span id="unread-all" class="unread-count">0</span>All topics</a></li>
 			%{
-				for(int i=0; i<userStreams.size(); i++){
+				for(int i=0; i<userTopics.size(); i++){
 			}%
-					<li><a href="#tab-stream-${userStreams.get(i).id}"><span id="unread-${userStreams.get(i).id}" class="unread-count">0</span>${userStreams.get(i).title}</a></li>
+					<li><a href="#tab-topic-${userTopics.get(i).id}"><span id="unread-${userTopics.get(i).id}" class="unread-count">0</span>${userTopics.get(i).title}</a></li>
 			%{
 				}
 			}%
 		</ul>
-		<div id="tab-allstreams">
-			<h2>All streams</h2>
-			<div id="allstreams-events">
+		<div id="tab-alltopics">
+			<h2>All topics</h2>
+			<div id="alltopics-events">
 			</div>
 		</div>
 		%{
-			for(int i=0; i<userStreams.size(); i++){
+			for(int i=0; i<userTopics.size(); i++){
 		}%
-			<div id="tab-stream-${userStreams.get(i).id}">
-				<h2>${userStreams.get(i).title}<a href="#" id="unsubscribe-button-${userStreams.get(i).id}" class="unsubscribe-button">Unsubscribe</a></h2>
-				<div id="stream-events-${userStreams.get(i).id}">
+			<div id="tab-topic-${userTopics.get(i).id}">
+				<h2>${userTopics.get(i).title}<a href="#" id="unsubscribe-button-${userTopics.get(i).id}" class="unsubscribe-button">Unsubscribe</a></h2>
+				<div id="topic-events-${userTopics.get(i).id}">
 				</div>
 			</div>
 		%{
@@ -138,28 +138,28 @@ a.unsubscribe-button:hover {
 		}%
 	</div>
 	
-	<div id="error1" title="Error"><br/><span class="ui-icon ui-icon-alert" style="float:left; margin:-2px 30px 0 15px;"></span>Error : stream not found</div>
+	<div id="error1" title="Error"><br/><span class="ui-icon ui-icon-alert" style="float:left; margin:-2px 30px 0 15px;"></span>Error : topic not found</div>
 	<div id="error2" title="Error"><br/><span class="ui-icon ui-icon-alert" style="float:left; margin:-2px 30px 0 15px;"></span>Error : subscription failed</div>
 	<div id="error3" title="Error"><br/><span class="ui-icon ui-icon-alert" style="float:left; margin:-2px 30px 0 15px;"></span>Error : unsubscription failed</div>
 </div>
 
 <div style="clear:left; padding-top:30px;">
-	<input id="send0" type="button" value="Send event on Stream 1" /><br/>
-	<input id="send1" type="button" value="Send event on Stream 2" /><br/>
-	<input id="send2" type="button" value="Send event on Stream 3" /><br/>
-	<input id="send3" type="button" value="Send event on Stream 4" /><br/><br/>
+	<input id="send0" type="button" value="Send event on Topic 1" /><br/>
+	<input id="send1" type="button" value="Send event on Topic 2" /><br/>
+	<input id="send2" type="button" value="Send event on Topic 3" /><br/>
+	<input id="send3" type="button" value="Send event on Topic 4" /><br/><br/>
 	<input id="test" type="button" value="Test" /><br/><br/>
 </div>
 
 <script type="text/javascript">
 $(function() {
-	$("#available-streams").accordion({
+	$("#available-topics").accordion({
 			autoHeight: false,
 			navigation: true,
 			collapsible: true
 	});
 	/*
-	$("#available-streams").sortable({
+	$("#available-topics").sortable({
             delay: 300,
             opacity: 0.7,
             revert: 100,
@@ -168,7 +168,7 @@ $(function() {
             zIndex: 50000
     });
 	*/
-    $("#stream-tabs").sortable({
+    $("#topic-tabs").sortable({
             distance: 10,
             opacity: 0.7,
             revert: 100,
@@ -193,50 +193,50 @@ $(function() {
 		}
 	});
 	
-	var subAction = #{jsAction @subscribe(':streamId') /}
+	var subAction = #{jsAction @subscribe(':topicId') /}
 	$("a.subscribe-button").live('click', function() {
 		var $id = $(this).parent().attr('id');
 		var $sid = $id.substring($id.lastIndexOf('-') + 1);
-		$("#available-streams").accordion( "option", "disabled", true );
+		$("#available-topics").accordion( "option", "disabled", true );
 	    $.ajax({
-            url: subAction({streamId: $sid}),
+            url: subAction({topicId: $sid}),
             type: 'POST',
 	        dataType: 'json',
 	        success: function(results) {
 	            $(results).each(function() {
 		            if(this.id != "-1"){
-						$('#stream-'+this.id).remove();
-						$('#desc-stream-'+this.id).remove();
-						$('#tabs').tabs('add','#tab-stream-'+this.id,'<span id="unread-'+this.id+'" class="unread-count">0</span>'+this.title);
-						$('#tab-stream-'+this.id).html('<h2>'+this.title+'<a href="#" id="unsubscribe-button-'+this.id+'" class="unsubscribe-button">Unsubscribe</a></h2><div id="stream-events-'+this.id+'"></div>');
+						$('#topic-'+this.id).remove();
+						$('#desc-topic-'+this.id).remove();
+						$('#tabs').tabs('add','#tab-topic-'+this.id,'<span id="unread-'+this.id+'" class="unread-count">0</span>'+this.title);
+						$('#tab-topic-'+this.id).html('<h2>'+this.title+'<a href="#" id="unsubscribe-button-'+this.id+'" class="unsubscribe-button">Unsubscribe</a></h2><div id="topic-events-'+this.id+'"></div>');
 					} else {
 						$("#error2").dialog("open");
 					}
 				})
-				$("#available-streams").accordion( "option", "disabled", false );
+				$("#available-topics").accordion( "option", "disabled", false );
 	        },
 	        error: function() {
 				$("#error1").dialog("open");
-				$("#available-streams").accordion( "option", "disabled", false );
+				$("#available-topics").accordion( "option", "disabled", false );
 	        }
 	    });
 	});
 	
-	var unsubAction = #{jsAction @unsubscribe(':streamId') /}
+	var unsubAction = #{jsAction @unsubscribe(':topicId') /}
 	$("a.unsubscribe-button").live('click', function() {
 		var $id = $(this).attr('id');
 		var $sid = $id.substring($id.lastIndexOf('-') + 1);
 	    $.ajax({
-            url: unsubAction({streamId: $sid}),
+            url: unsubAction({topicId: $sid}),
             type: 'POST',
 	        dataType: 'json',
 	        success: function(results) {
 	            $(results).each(function() {
 		            if(this.id != "-1"){
-						$("#available-streams")
+						$("#available-topics")
 							.sortable("destroy")
 							.accordion("destroy")
-							.append('<h3 id="stream-'+this.id+'"><a href="#">'+this.title+'</a><a href="#" class="subscribe-button">Subscribe</a></h3><div id="desc-stream-'+this.id+'"><p>'+this.content+'</p></div>')
+							.append('<h3 id="topic-'+this.id+'"><a href="#">'+this.title+'</a><a href="#" class="subscribe-button">Subscribe</a></h3><div id="desc-topic-'+this.id+'"><p>'+this.content+'</p></div>')
 							.accordion({
 									autoHeight: false,
 									navigation: true,
@@ -305,27 +305,27 @@ var getEvents = function() {
 
 var display = function(event, blink) {
 	if(blink){
-		$('#unread-'+event.data.streamId).parent().animate({
+		$('#unread-'+event.data.topicId).parent().animate({
 			"color": "#FF0"
 		}, 200);
 	}
 	
 	var cptall = parseInt($('#unread-all').html());
 	$('#unread-all').html(cptall+1);
-	var cpt = parseInt($('#unread-'+event.data.streamId).html());
-	$('#unread-'+event.data.streamId).html(cpt+1);
+	var cpt = parseInt($('#unread-'+event.data.topicId).html());
+	$('#unread-'+event.data.topicId).html(cpt+1);
 	
 	if(blink){
-		$('#unread-'+event.data.streamId).parent().animate({
+		$('#unread-'+event.data.topicId).parent().animate({
 			"color": "#4F7425"
 		}, 200);
 	}
 	
-	$('#stream-events-'+event.data.streamId)
+	$('#topic-events-'+event.data.topicId)
 		.prepend('<div id="event-'+event.id+'" class="event"><h3>'+event.id+' : '+event.data.title+'</h3><p>'+event.data.content+'</p></div>');
 	$('#event-'+event.id).hide().fadeIn();
 	
-	$('#allstreams-events')
+	$('#alltopics-events')
 		.prepend('<div id="eventall-'+event.id+'" class="event"><h3>'+event.id+' : '+event.data.title+'</h3><p>'+event.data.content+'</p></div>');
 	$('#eventall-'+event.id).hide().fadeIn();
 }

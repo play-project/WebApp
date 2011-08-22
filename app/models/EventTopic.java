@@ -32,7 +32,7 @@ public class EventTopic {
 	}
 
 	public void multicast(Event e) {
-		e.setStreamId(id);
+		e.setTopicId(id);
 		for (User u : subscribingUsers) {
 			u.getEventBuffer().publish(e);
 		}

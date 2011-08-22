@@ -5,9 +5,10 @@ import java.util.List;
 
 import javax.persistence.*;
 
+import com.google.gson.JsonObject;
+
 import play.Logger;
 import play.db.jpa.*;
-import play.libs.F.ArchivedEventStream;
 
 @Entity
 public class User extends Model {
@@ -16,17 +17,17 @@ public class User extends Model {
 	public String name;
 	public String email;
 	@ElementCollection
-	public List<String> eventStreamIds;
+	public List<String> eventTopicIds;
 	@Transient
 	UserEventBuffer eventBuffer;
 
 	public User(String login, String password, String name, String email,
-			ArrayList<String> eventStreamIds) {
+			ArrayList<String> eventTopicIds) {
 		this.login = login;
 		this.password = password;
 		this.name = name;
 		this.email = email;
-		this.eventStreamIds = eventStreamIds;
+		this.eventTopicIds = eventTopicIds;
 		UserEventBuffer eventBuffer = new UserEventBuffer();
 	}
 
@@ -34,38 +35,38 @@ public class User extends Model {
 		this(login, password, name, email, new ArrayList<String>());
 	}
 
-	public EventTopic subscribe(String streamId) {
-		if (eventStreamIds.contains(streamId)) {
+	public EventTopic subscribe(String topicId) {
+		if (eventTopicIds.contains(topicId)) {
 			return null;
 		}
-		EventTopic eb = ModelManager.get().getStreamById(streamId);
+		EventTopic eb = ModelManager.get().getTopicById(topicId);
 		if (eb != null) {
 			eb.addUser(this);
-			eventStreamIds.add(eb.id);
+			eventTopicIds.add(eb.id);
 			this.merge();
 			return eb;
 		}
 		return null;
 	}
 
-	public EventTopic unsubscribe(String streamId) {
-		if (!eventStreamIds.contains(streamId)) {
+	public EventTopic unsubscribe(String topicId) {
+		if (!eventTopicIds.contains(topicId)) {
 			return null;
 		}
-		EventTopic eb = ModelManager.get().getStreamById(streamId);
+		EventTopic eb = ModelManager.get().getTopicById(topicId);
 		if (eb != null) {
 			eb.removeUser(this);
-			eventStreamIds.remove(eb.id);
+			eventTopicIds.remove(eb.id);
 			this.merge();
 			return eb;
 		}
 		return null;
 	}
 
-	public ArrayList<EventTopic> getStreams() {
+	public ArrayList<EventTopic> getTopics() {
 		ArrayList<EventTopic> result = new ArrayList<EventTopic>();
-		for (String sid : eventStreamIds) {
-			EventTopic es = ModelManager.get().getStreamById(sid);
+		for (String sid : eventTopicIds) {
+			EventTopic es = ModelManager.get().getTopicById(sid);
 			if (es != null) {
 				result.add(es);
 			}
@@ -74,8 +75,8 @@ public class User extends Model {
 	}
 
 	public void doSubscribtions() {
-		for (String esid : eventStreamIds) {
-			EventTopic eb = ModelManager.get().getStreamById(esid);
+		for (String esid : eventTopicIds) {
+			EventTopic eb = ModelManager.get().getTopicById(esid);
 			if (eb != null) {
 				eb.addUser(this);
 			}

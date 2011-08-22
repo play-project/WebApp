@@ -1,7 +1,7 @@
 package models;
 
 public class Event {
-	private String streamId;
+	private String topicId;
 	private String title;
 	private String content;
 
@@ -15,12 +15,12 @@ public class Event {
 	 * GETTERS AND SETTERS
 	 */
 
-	public String getStreamId() {
-		return streamId;
+	public String getTopicId() {
+		return topicId;
 	}
 
-	public void setStreamId(String id) {
-		this.streamId = id;
+	public void setTopicId(String id) {
+		this.topicId = id;
 	}
 
 	public String getTitle() {
@@ -41,6 +41,6 @@ public class Event {
 
 	@Override
 	public String toString() {
-		return "Event [streamId=" + streamId + ", title=" + title + ", content=" + content + "]";
+		return "Event [topicId=" + topicId + ", title=" + title + ", content=" + content + "]";
 	}
 }

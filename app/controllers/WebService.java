@@ -54,10 +54,10 @@ public class WebService extends Controller {
 	public static void subscribe() {
 		String topic = "internalns:rootTopic1";
 		String address = "http://127.0.0.1:8080/alert-0.0.1-SNAPSHOT/NotificationConsumer";
-		String urlName = "http://krake03.perimeter.fzi.de:8085/petals/services/NotificationBrokerService";
+		String urlName = "http://krake03.fzi.de:8085/petals/services/NotificationBrokerService";
 
 		try {
-			Logger.info("before");
+			Logger.info("Before");
 			SubscribeEventsClient.subscribe(topic, address, urlName);
 			Logger.info("After");
 		} catch (Exception e) {
@@ -68,7 +68,7 @@ public class WebService extends Controller {
 	public static void notif() {
 		String topic = "internalns:rootTopic1";
 		String message = "Test notif";
-		String urlName = "http://krake03.perimeter.fzi.de:8085/petals/services/NotificationBrokerService";
+		String urlName = "http://krake03.fzi.de:8085/petals/services/NotificationBrokerService";
 
 		try {
 			NotifyEventsClient.notifyEvent(topic, message, urlName);

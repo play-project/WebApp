@@ -1,4 +1,4 @@
 # Application dependencies
 
 require:
-    play -> fbconnect-head
+    play -> maven-head

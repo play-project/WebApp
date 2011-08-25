@@ -17,12 +17,12 @@ public class BasicTest extends UnitTest {
 	@Test
 	public void createAndRetrieveUser() {
 		// Create a new user and save it
-		new User("Claw", "pwd", "Alex", "abourdin@polytech.unice.fr").save();
+		//new User("Claw", "pwd", "Alex", "abourdin@polytech.unice.fr").save();
 
 		// Test
 		User claw = User.find("byEmail", "abourdin@polytech.unice.fr").first();
 		assertNotNull(claw);
-		assertEquals("Alex", claw.name);
+		assertEquals("Alex", claw.firstname);
 		claw = User.find("byLoginAndPassword", "Claw", "pwd").first();
 		assertNotNull(claw);
 		assertEquals("Claw", claw.login);
@@ -31,7 +31,7 @@ public class BasicTest extends UnitTest {
 	@Test
 	public void tryConnectAsUser() {
 		// Create a new user and save it
-		new User("Claw", "pwd", "Alex", "abourdin@polytech.unice.fr").save();
+		//new User("Claw", "pwd", "Alex", "abourdin@polytech.unice.fr").save();
 
 		ModelManager ep = ModelManager.get();
 		// Test
@@ -43,7 +43,7 @@ public class BasicTest extends UnitTest {
 	@Test
 	public void trySubscribeStreamAndPublish() throws InterruptedException, ExecutionException {
 		//new EventStreamMC("http://www.wservice.com/stream1").save();
-		new User("Claw", "pwd", "Alex", "abourdin@polytech.unice.fr").save();
+		//new User("Claw", "pwd", "Alex", "abourdin@polytech.unice.fr").save();
 
 		// Prepare
 		//EventStreamMC eb = EventStreamMC.find("bySource", "http://www.wservice.com/stream1").first();

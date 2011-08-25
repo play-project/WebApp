@@ -87,7 +87,14 @@ a.unsubscribe-button:hover {
 }
 </style>
 
-<h1 class="pagetitle">Hello ${username ?: 'Guest'} !</h1>
+
+#{if fbInfo.get("error") == null}
+	<h1>Hello <a href='${fbInfo.get("link").getAsString()}'><img src="http://graph.facebook.com/${fbInfo.get("username").getAsString()}/picture" />${fbInfo.get("name").getAsString()}</a></h1>
+#{/if}
+#{else}
+	<h1 class="pagetitle">Hello ${username ?: 'Guest'} !</h1>
+#{/else}
+<br/>
 
 <div id="available-topics-container">
 	<div id="available-topics">

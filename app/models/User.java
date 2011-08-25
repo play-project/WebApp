@@ -1,6 +1,7 @@
 package models;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.*;
@@ -14,25 +15,34 @@ import play.db.jpa.*;
 public class User extends Model {
 	public String login;
 	public String password;
-	public String name;
+	public String firstname;
+	public String lastname;
 	public String email;
+	public String gender;
+    public String fbId;
 	@ElementCollection
 	public List<String> eventTopicIds;
 	@Transient
 	UserEventBuffer eventBuffer;
+	@Transient
+	public String fbAccessToken;
 
-	public User(String login, String password, String name, String email,
-			ArrayList<String> eventTopicIds) {
+	public User(String login, String password, String firstname, String lastname, String email,
+			String gender, String fbId, ArrayList<String> eventTopicIds) {
 		this.login = login;
 		this.password = password;
-		this.name = name;
+		this.firstname = firstname;
+		this.lastname = lastname;
 		this.email = email;
+		this.gender = gender;
+		this.fbId = fbId;
 		this.eventTopicIds = eventTopicIds;
 		UserEventBuffer eventBuffer = new UserEventBuffer();
 	}
 
-	public User(String login, String password, String name, String email) {
-		this(login, password, name, email, new ArrayList<String>());
+	public User(String login, String password, String firstname, String lastname, String email,
+			String gender, String fbId) {
+		this(login, password, firstname, lastname, email, gender, fbId, new ArrayList<String>());
 	}
 
 	public EventTopic subscribe(String topicId) {
@@ -43,7 +53,8 @@ public class User extends Model {
 		if (eb != null) {
 			eb.addUser(this);
 			eventTopicIds.add(eb.id);
-			this.merge();
+			Collections.sort(eventTopicIds);
+			update();
 			return eb;
 		}
 		return null;
@@ -57,7 +68,7 @@ public class User extends Model {
 		if (eb != null) {
 			eb.removeUser(this);
 			eventTopicIds.remove(eb.id);
-			this.merge();
+			update();
 			return eb;
 		}
 		return null;
@@ -82,6 +93,18 @@ public class User extends Model {
 			}
 		}
 	}
+	
+	private void update(){
+		User u = User.find("byId", this.id).first();
+		u.login = login;
+		u.password = password;
+		u.firstname = firstname;
+		u.lastname = lastname;
+		u.email = email;
+		u.gender = gender;
+		u.eventTopicIds = eventTopicIds;
+		u.save();
+	}
 
 	/**
 	 * GETTERS AND SETTERS
@@ -102,7 +125,7 @@ public class User extends Model {
 		if (!(o instanceof User))
 			return false;
 		User u = (User) o;
-		if (u.id.equals(id) && u.name.equals(name) && u.password.equals(password)
+		if (u.id.equals(id) && u.firstname.equals(firstname) && u.password.equals(password)
 				&& u.email.equals(email)) {
 			return true;
 		}
@@ -111,7 +134,9 @@ public class User extends Model {
 
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", login=" + login + ", password=" + password + ", name=" + name
-				+ ", email=" + email + "]";
+		return "User id=" + id + " [login=" + login + ", password=" + password + ", firstname="
+				+ firstname + ", lastname=" + lastname + ", email=" + email + ", gender=" + gender
+				+ ", eventTopicIds=" + eventTopicIds + "]";
 	}
+
 }

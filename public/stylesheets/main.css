@@ -59,6 +59,10 @@ h1 {
     font-weight: bold;
 }
 
+a {
+	text-decoration: none;
+}
+
 h2 {
     border-bottom: 1px solid;
     font-size: 20px;

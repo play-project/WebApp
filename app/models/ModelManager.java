@@ -33,8 +33,8 @@ public class ModelManager {
 	 */
 	public ModelManager() {
 		Logger.info("NEW MODELMANAGER");
-		User u = new User("claw", "pwd", "Alex", "Bourdin", "test@gmail.com", "male", "550988465");
-		User u2 = new User("claw2", "pwd2", "Alex2", "Bourdin2", "test2@gmail.com", "male", "550988465");
+		User u = new User("test@play.eu", "pwd", "Alexandre", "Bourdin", "male", "");
+		User u2 = new User("test2@play.eu", "pwd2", "TestGuy", "Number2", "male", "fb550988465");
 		EventTopic et1 = new EventTopic("topic1", "http://www.wservice.com/topic1", "Topic 1",
 				"A first topic for tests");
 		EventTopic et2 = new EventTopic("topic2", "http://www.wservice.com/topic1", "Topic 2",
@@ -85,8 +85,8 @@ public class ModelManager {
 	 * @param password
 	 * @return User
 	 */
-	public User connect(String login, String password) {
-		User u = User.find("byLoginAndPassword", login, password).first();
+	public User connect(String email, String password) {
+		User u = User.find("byEmailAndPassword", email, password).first();
 		Logger.info("u : " + u);
 		if (u != null) {
 			disconnect(u);
@@ -145,7 +145,7 @@ public class ModelManager {
 	 */
 	public User getUserById(Long id) {
 		for (User u : connectedUsers) {
-			if (u.id == id) {
+			if (u.id.equals(id)) {
 				return u;
 			}
 		}

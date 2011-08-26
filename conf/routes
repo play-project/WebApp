@@ -4,11 +4,15 @@
 
 # Home page
 GET     /								Application.index
+GET		/login							Application.login
+POST	/proclog						Application.processLogin
+GET		/register						Application.register
+POST	/procreg						Application.processRegistration
+GET		/fbauth							Application.facebookAuth
 
 GET		/logout							Application.logout
 GET		/test							Application.test
 GET		/test2							Application.test2
-GET 	/reset							Application.reset
 
 # Event push
 GET		/waitevents						Application.waitEvents
@@ -20,9 +24,6 @@ POST    /sendevent             		 	Application.sendEvent
 POST	/webservice/soapnotifendpoint				WebService.soapNotifEndPoint
 GET		/webservice/notif							WebService.notif
 GET		/webservice/subscribe						WebService.subscribe
-
-# FB Test
-GET		/facebook						Facebook.index
 
 # Ignore favicon requests
 GET     /favicon.ico                    404

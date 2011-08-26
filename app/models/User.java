@@ -13,13 +13,12 @@ import play.db.jpa.*;
 
 @Entity
 public class User extends Model {
-	public String login;
+	public String email;
 	public String password;
 	public String firstname;
 	public String lastname;
-	public String email;
 	public String gender;
-    public String fbId;
+	public String fbId;
 	@ElementCollection
 	public List<String> eventTopicIds;
 	@Transient
@@ -27,22 +26,20 @@ public class User extends Model {
 	@Transient
 	public String fbAccessToken;
 
-	public User(String login, String password, String firstname, String lastname, String email,
-			String gender, String fbId, ArrayList<String> eventTopicIds) {
-		this.login = login;
+	public User(String email, String password, String firstname, String lastname, String gender, String fbId,
+			ArrayList<String> eventTopicIds) {
+		this.email = email;
 		this.password = password;
 		this.firstname = firstname;
 		this.lastname = lastname;
-		this.email = email;
 		this.gender = gender;
 		this.fbId = fbId;
 		this.eventTopicIds = eventTopicIds;
 		UserEventBuffer eventBuffer = new UserEventBuffer();
 	}
 
-	public User(String login, String password, String firstname, String lastname, String email,
-			String gender, String fbId) {
-		this(login, password, firstname, lastname, email, gender, fbId, new ArrayList<String>());
+	public User(String email, String password, String firstname, String lastname, String gender, String fbId) {
+		this(email, password, firstname, lastname, gender, fbId, new ArrayList<String>());
 	}
 
 	public EventTopic subscribe(String topicId) {
@@ -93,14 +90,13 @@ public class User extends Model {
 			}
 		}
 	}
-	
-	private void update(){
+
+	private void update() {
 		User u = User.find("byId", this.id).first();
-		u.login = login;
+		u.email = email;
 		u.password = password;
 		u.firstname = firstname;
 		u.lastname = lastname;
-		u.email = email;
 		u.gender = gender;
 		u.eventTopicIds = eventTopicIds;
 		u.save();
@@ -134,9 +130,8 @@ public class User extends Model {
 
 	@Override
 	public String toString() {
-		return "User id=" + id + " [login=" + login + ", password=" + password + ", firstname="
-				+ firstname + ", lastname=" + lastname + ", email=" + email + ", gender=" + gender
-				+ ", eventTopicIds=" + eventTopicIds + "]";
+		return "User id=" + id + " [email=" + email + ", password=" + password + ", firstname=" + firstname
+				+ ", lastname=" + lastname + ", gender=" + gender + ", eventTopicIds=" + eventTopicIds + "]";
 	}
 
 }

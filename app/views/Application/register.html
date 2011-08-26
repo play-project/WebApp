@@ -1,2 +1,36 @@
 #{extends 'main.html' /}
 #{set title:'Registration' /}
+
+<h1>Registration</h1>
+
+#{if flash.get("error")}
+    <p style="color:#c00">
+        %{
+        	String[] errors = flash.get("error");
+        	for(String e : errors){
+        		if(!e.equals("[") && !e.equals("]")){
+        			out.print(e);
+        		}
+        		if(e.equals(",")){
+        			out.println("<br/>");	
+        		}  		
+        	}
+        %}
+    </p>
+    %{
+    	out.print("<br/>");
+    %}
+#{/if}
+
+<form action="@{Application.processRegistration()}" method="POST">
+    Email : <input type="text" name="email" value="${email}" /><br/>
+    Confirm email : <input type="text" name="emailconf" value="${emailconf}" /><br/><br/>
+    Password : <input type="text" name="password" /><br/>
+    Confirm password : <input type="text" name="passwordconf" /><br/><br/>
+    First name : <input type="text" name="firstname" value="${firstname}${fbInfo.get("first_name").getAsString()}" /><br/>
+    Last name : <input type="text" name="lastname" value="${lastname}${fbInfo.get("last_name").getAsString()}" /><br/>
+    Gender :
+    M <input type="radio" name="gender" value="M" #{if gender.equals("M") || fbInfo.get("gender").getAsString().equals("male")}checked#{/if}/>
+	F <input type="radio" name="gender" value="F" #{if gender.equals("F") || fbInfo.get("gender").getAsString().equals("female")}checked#{/if}/><br/><br/>
+    <input type="submit" value="Register" /><br/>
+</form><br/>

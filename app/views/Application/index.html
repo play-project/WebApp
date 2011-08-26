@@ -88,11 +88,11 @@ a.unsubscribe-button:hover {
 </style>
 
 
-#{if fbInfo.get("error") == null}
+#{if fbInfo != null && fbInfo.get("error") == null}
 	<h1>Hello <a href='${fbInfo.get("link").getAsString()}'><img src="http://graph.facebook.com/${fbInfo.get("username").getAsString()}/picture" />${fbInfo.get("name").getAsString()}</a></h1>
 #{/if}
 #{else}
-	<h1 class="pagetitle">Hello ${username ?: 'Guest'} !</h1>
+	<h1 class="pagetitle">Hello ${u.firstname+" "+u.lastname} !</h1>
 #{/else}
 <br/>
 
@@ -148,6 +148,7 @@ a.unsubscribe-button:hover {
 	<div id="error1" title="Error"><br/><span class="ui-icon ui-icon-alert" style="float:left; margin:-2px 30px 0 15px;"></span>Error : topic not found</div>
 	<div id="error2" title="Error"><br/><span class="ui-icon ui-icon-alert" style="float:left; margin:-2px 30px 0 15px;"></span>Error : subscription failed</div>
 	<div id="error3" title="Error"><br/><span class="ui-icon ui-icon-alert" style="float:left; margin:-2px 30px 0 15px;"></span>Error : unsubscription failed</div>
+	<div id="error4" title="Error"><br/><span class="ui-icon ui-icon-alert" style="float:left; margin:-2px 30px 0 15px;"></span>Error : disconnected</div>
 </div>
 
 <div style="clear:left; padding-top:30px;">
@@ -199,12 +200,23 @@ $(function() {
 			}
 		}
 	});
+	$("#error4").dialog({
+		resizable: false,
+		draggable: false,
+		autoOpen: false,
+		modal: true,
+		height: 120,
+		buttons: {
+			Ok: function() {
+				location.href = "/";
+			}
+		}
+	});
 	
 	var subAction = #{jsAction @subscribe(':topicId') /}
 	$("a.subscribe-button").live('click', function() {
 		var $id = $(this).parent().attr('id');
 		var $sid = $id.substring($id.lastIndexOf('-') + 1);
-		$("#available-topics").accordion( "option", "disabled", true );
 	    $.ajax({
             url: subAction({topicId: $sid}),
             type: 'POST',
@@ -212,15 +224,20 @@ $(function() {
 	        success: function(results) {
 	            $(results).each(function() {
 		            if(this.id != "-1"){
+						$("#available-topics").accordion("destroy");
 						$('#topic-'+this.id).remove();
 						$('#desc-topic-'+this.id).remove();
+						$("#available-topics").accordion({
+							autoHeight: false,
+							navigation: true,
+							collapsible: true
+						});
 						$('#tabs').tabs('add','#tab-topic-'+this.id,'<span id="unread-'+this.id+'" class="unread-count">0</span>'+this.title);
 						$('#tab-topic-'+this.id).html('<h2>'+this.title+'<a href="#" id="unsubscribe-button-'+this.id+'" class="unsubscribe-button">Unsubscribe</a></h2><div id="topic-events-'+this.id+'"></div>');
 					} else {
 						$("#error2").dialog("open");
 					}
 				})
-				$("#available-topics").accordion( "option", "disabled", false );
 	        },
 	        error: function() {
 				$("#error1").dialog("open");
@@ -241,7 +258,6 @@ $(function() {
 	            $(results).each(function() {
 		            if(this.id != "-1"){
 						$("#available-topics")
-							.sortable("destroy")
 							.accordion("destroy")
 							.append('<h3 id="topic-'+this.id+'"><a href="#">'+this.title+'</a><a href="#" class="subscribe-button">Subscribe</a></h3><div id="desc-topic-'+this.id+'"><p>'+this.content+'</p></div>')
 							.accordion({
@@ -296,6 +312,9 @@ var getEvents = function() {
 		type: 'GET',
 		dataType: 'json',
 		success: function(events) {
+			if(events.error == "disconnected"){
+				$("#error4").dialog("open")
+			}
 			var k = events.length;
 			$(events).each(function() {
 				k--;

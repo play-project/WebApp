@@ -1,10 +1,8 @@
-#{extends 'main.html' /}
-#{set title:'Home' /}
+#{extends 'main.html' /} #{set title:'Play Project Web Demo' /}
 
 <style type="text/css">
 /* Accordion
 ----------------------------------*/
-
 div#available-topics-container {
 	border: 1px solid #DDDDDD;
 	border-radius: 2px;
@@ -18,24 +16,54 @@ div#available-topics-container {
 }
 
 div#available-topics {
-	font-size: 72.5%;
+	font-size: 95%;
 	float: left;
 	width: 250px;
 }
 
+div#available-topics div {
+	font-size: 110%;
+}
+
 /* Vertical Tabs
 ----------------------------------*/
-.ui-tabs-vertical { width: 700px; }
-.ui-tabs-vertical .ui-tabs-nav { padding: 3px 2px 3px 3px; float: left; width: 230px; }
-.ui-tabs-vertical .ui-tabs-nav li { clear: left; width: 100%; border-bottom-width: 1px !important; border-right-width: 0 !important; margin: 0 -1px 3px 0; }
-.ui-tabs-vertical .ui-tabs-nav li a { display:block; width:90%; }
-.ui-tabs-vertical .ui-tabs-nav li.ui-tabs-selected { padding-bottom: 0; margin-bottom: 2px; padding-right: 2px; border-right-width: 1px; border-right-width: 1px; }
-
 div#topics {
-	font-size: 65%;
+	font-size: 80%;
 	float: left;
 	padding: 0 0 0 20px;
 	height: 500px;
+	width: 480px;
+}
+
+.ui-tabs-vertical {
+	width: 660px;
+}
+
+.ui-tabs-vertical .ui-tabs-nav {
+	padding: 3px 2px 3px 3px;
+	float: left;
+	width: 210px;
+}
+
+.ui-tabs-vertical .ui-tabs-nav li {
+	clear: left;
+	width: 100%;
+	border-bottom-width: 1px !important;
+	border-right-width: 0 !important;
+	margin: 0 -1px 3px 0;
+}
+
+.ui-tabs-vertical .ui-tabs-nav li a {
+	display: block;
+	width: 90%;
+}
+
+.ui-tabs-vertical .ui-tabs-nav li.ui-tabs-selected {
+	padding-bottom: 0;
+	margin-bottom: 2px;
+	padding-right: 2px;
+	border-right-width: 1px;
+	border-right-width: 1px;
 }
 
 .ui-tabs-vertical .ui-tabs-panel {
@@ -43,35 +71,41 @@ div#topics {
 	overflow-x: hidden;
 	padding: 0 16px 16px 16px;
 	float: right;
-	width: 430px;
+	width: 410px;
 	min-height: 486px;
 }
 
 .event {
 	margin-top: 10px;
 }
+
 .event h3 {
 	font-size: 12px;
 	margin-bottom: 5px;
 }
 
+
 a.subscribe-button {
 	position: absolute;
 	margin-top: -27px;
-	margin-left: 140px;
+	margin-left: 190px;
 }
+
 a.subscribe-button:hover {
 	color: #EE0;
 }
 
 a.unsubscribe-button {
-	position: absolute;
-	margin-top: 2px;
-	margin-left: 220px;
-	font-size: 55%;
-	text-decoration: none;
-	font-weight: bold;
+ 	display: block;
+    font-size: 70%;
+    font-weight: bold;
+    margin-left: 300px;
+    margin-right: 10px;
+    margin-top: -18px;
+    position: absolute;
+    text-decoration: none;
 }
+
 a.unsubscribe-button:hover {
 	color: #EE0;
 }
@@ -82,81 +116,115 @@ a.unsubscribe-button:hover {
 	text-align: right;
 }
 
-.ui-dialog {
-	font-size: 72.5%;
+/* Dialog panel */
+div.ui-dialog {
+	font-size: 1em;
 }
 </style>
 
 
 #{if fbInfo != null && fbInfo.get("error") == null}
-	<h1>Hello <a href='${fbInfo.get("link").getAsString()}'><img src="http://graph.facebook.com/${fbInfo.get("username").getAsString()}/picture" />${fbInfo.get("name").getAsString()}</a></h1>
-#{/if}
-#{else}
-	<h1 class="pagetitle">Hello ${u.firstname+" "+u.lastname} !</h1>
+<h1>
+	Hello <a href='${fbInfo.get("link").getAsString()}'><img
+		src="http://graph.facebook.com/${fbInfo.get("username").getAsString()}/picture" />${fbInfo.get("name").getAsString()}</a>
+</h1>
+#{/if} #{else}
+<h1 class="pagetitle">Hello ${u.firstname+" "+u.lastname} !</h1>
 #{/else}
-<br/>
+<br />
 
 <div id="available-topics-container">
+	<div id="topic-search-bar" style="margin: 5px 0px 0px 5px">
+		<input name="search"
+			style="width: 80%; float: left;" /> <img
+			src="@{'/public/images/search_ico.png'}"
+			style="height: 23px; float: left; margin-left: 5px;" /><br /> <br />
+	</div>
 	<div id="available-topics">
-	<h3 id="topic-5000"><a href="#">Error Topic</a><a href="#" class="subscribe-button">Subscribe</a></h3>
-	<div id="desc-topic-5000"><p>
-	A topic to generate errors
-	</p></div>
-	%{
-		for(int i=0; i<topics.size(); i++){
-	}%
-		<h3 id="topic-${topics.get(i).id}"><a href="#">${topics.get(i).title}</a><a href="#" class="subscribe-button">Subscribe</a></h3>
-		<div id="desc-topic-${topics.get(i).id}"><p>
-		${topics.get(i).content}
+		<h3 id="topic-5000">
+			<a href="#">Error Topic</a><a href="#" class="subscribe-button">Sub</a>
+		</h3>
+		<div id="desc-topic-5000">
+			<p>A topic to generate errors</p>
+		</div>
+		%{ for(int i=0; i < topics.size(); i++){
+		}%
+		<h3 id="topic-${topics.get(i).getId()}">
+			<a href="#">${topics.get(i).getId()}</a><a href="#"
+				class="subscribe-button">Sub</a>
+		</h3>
+		<div id="desc-topic-${topics.get(i).getId()}"><p>
+			Title : ${topics.get(i).title}<br/>
+			Content : ${topics.get(i).content}
 		</p></div>
-	%{	
-		}
-	%}
+		%{	
+			}
+		%}
 	</div>
 </div>
 
 <div id="topics">
 	<div id="tabs">
 		<ul id="topic-tabs">
-			<li><a href="#tab-alltopics"><span id="unread-all" class="unread-count">0</span>All topics</a></li>
-			%{
-				for(int i=0; i<userTopics.size(); i++){
+			<li><a href="#tab-alltopics"><span id="unread-all"
+					class="unread-count">0</span>All topics</a>
+			</li> 
+			%{ for(int i=0; i < userTopics.size(); i++){
 			}%
-					<li><a href="#tab-topic-${userTopics.get(i).id}"><span id="unread-${userTopics.get(i).id}" class="unread-count">0</span>${userTopics.get(i).title}</a></li>
+			<li><a href="#tab-topic-${userTopics.get(i).getId()}"><span
+					id="unread-${userTopics.get(i).getId()}" class="unread-count">0</span>${userTopics.get(i).getId()}</a>
+			</li>
 			%{
 				}
 			}%
 		</ul>
 		<div id="tab-alltopics">
 			<h2>All topics</h2>
-			<div id="alltopics-events">
-			</div>
+			<div id="alltopics-events"></div>
 		</div>
-		%{
-			for(int i=0; i<userTopics.size(); i++){
+		%{ for(int i=0; i<userTopics.size(); i++){
 		}%
-			<div id="tab-topic-${userTopics.get(i).id}">
-				<h2>${userTopics.get(i).title}<a href="#" id="unsubscribe-button-${userTopics.get(i).id}" class="unsubscribe-button">Unsubscribe</a></h2>
-				<div id="topic-events-${userTopics.get(i).id}">
-				</div>
-			</div>
+
+		<div id="tab-topic-${userTopics.get(i).getId()}">
+			<h2>
+				${userTopics.get(i).getId()}<a href="#"
+					id="unsubscribe-button-${userTopics.get(i).getId()}"
+					class="unsubscribe-button">Unsubscribe</a>
+			</h2>
+			<div id="topic-events-${userTopics.get(i).getId()}"></div>
+		</div>
 		%{
 			}
 		}%
 	</div>
-	
-	<div id="error1" title="Error"><br/><span class="ui-icon ui-icon-alert" style="float:left; margin:-2px 30px 0 15px;"></span>Error : topic not found</div>
-	<div id="error2" title="Error"><br/><span class="ui-icon ui-icon-alert" style="float:left; margin:-2px 30px 0 15px;"></span>Error : subscription failed</div>
-	<div id="error3" title="Error"><br/><span class="ui-icon ui-icon-alert" style="float:left; margin:-2px 30px 0 15px;"></span>Error : unsubscription failed</div>
-	<div id="error4" title="Error"><br/><span class="ui-icon ui-icon-alert" style="float:left; margin:-2px 30px 0 15px;"></span>Error : disconnected</div>
+
+	<div id="error1" title="Error">
+		<br /> <span class="ui-icon ui-icon-alert"
+			style="float: left; margin: -2px 30px 0 15px;"></span>Error : topic
+		not found
+	</div>
+	<div id="error2" title="Error">
+		<br /> <span class="ui-icon ui-icon-alert"
+			style="float: left; margin: -2px 30px 0 15px;"></span>Error :
+		subscription failed
+	</div>
+	<div id="error3" title="Error">
+		<br /> <span class="ui-icon ui-icon-alert"
+			style="float: left; margin: -2px 30px 0 15px;"></span>Error :
+		unsubscription failed
+	</div>
+	<div id="error4" title="Error">
+		<br /> <span class="ui-icon ui-icon-alert"
+			style="float: left; margin: -2px 30px 0 15px;"></span>Error :
+		disconnected
+	</div>
 </div>
 
-<div style="clear:left; padding-top:30px;">
-	<input id="send0" type="button" value="Send event on Topic 1" /><br/>
-	<input id="send1" type="button" value="Send event on Topic 2" /><br/>
-	<input id="send2" type="button" value="Send event on Topic 3" /><br/>
-	<input id="send3" type="button" value="Send event on Topic 4" /><br/><br/>
-	<input id="test" type="button" value="Test" /><br/><br/>
+<div style="clear: left; padding-top: 30px;">
+	<input id="send0" type="button" value="Send event on internalns_rootTopic1" /><br />
+	<input id="send1" type="button" value="Send event on internalns_childTopic1" /><br />
+	<input id="send2" type="button" value="Send event on internalns_grandChildTopic21" /><br />
+	<input id="send3" type="button" value="Send event on internalns_childTopic3" /><br />
 </div>
 
 <script type="text/javascript">
@@ -225,15 +293,15 @@ $(function() {
 	            $(results).each(function() {
 		            if(this.id != "-1"){
 						$("#available-topics").accordion("destroy");
-						$('#topic-'+this.id).remove();
-						$('#desc-topic-'+this.id).remove();
+						$('#topic-'+this.id+'').remove();
+						$('#desc-topic-'+this.id+'').remove();
 						$("#available-topics").accordion({
 							autoHeight: false,
 							navigation: true,
 							collapsible: true
 						});
-						$('#tabs').tabs('add','#tab-topic-'+this.id,'<span id="unread-'+this.id+'" class="unread-count">0</span>'+this.title);
-						$('#tab-topic-'+this.id).html('<h2>'+this.title+'<a href="#" id="unsubscribe-button-'+this.id+'" class="unsubscribe-button">Unsubscribe</a></h2><div id="topic-events-'+this.id+'"></div>');
+						$('#tabs').tabs('add','#tab-topic-'+this.id+'','<span id="unread-'+this.id+'" class="unread-count">0</span>'+this.id);
+						$('#tab-topic-'+this.id).html('<h2>'+this.id+'<a href="#" id="unsubscribe-button-'+this.id+'" class="unsubscribe-button">Unsubscribe</a></h2><div id="topic-events-'+this.id+'"></div>');
 					} else {
 						$("#error2").dialog("open");
 					}
@@ -259,7 +327,7 @@ $(function() {
 		            if(this.id != "-1"){
 						$("#available-topics")
 							.accordion("destroy")
-							.append('<h3 id="topic-'+this.id+'"><a href="#">'+this.title+'</a><a href="#" class="subscribe-button">Subscribe</a></h3><div id="desc-topic-'+this.id+'"><p>'+this.content+'</p></div>')
+							.append('<h3 id="topic-'+this.id+'"><a href="#">'+this.id+'</a><a href="#" class="subscribe-button">Sub</a></h3><div id="desc-topic-'+this.id+'"><p>Title: '+this.title+'<br/>Content: '+this.content+'</p></div>')
 							.accordion({
 									autoHeight: false,
 									navigation: true,
@@ -283,10 +351,10 @@ var waitEvents = #{jsAction @waitEvents(':lastReceived') /}
 %{
 	String txt = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ullamcorper laoreet fermentum. Cras placerat dui pharetra arcu ultricies sit amet commodo tortor molestie.";
 }%
-var send0 = #{jsAction @sendEvent('Event !', txt, 'topic1') /}
-var send1 = #{jsAction @sendEvent('Event !', txt, 'topic2') /}
-var send2 = #{jsAction @sendEvent('Event !', txt, 'topic3') /}
-var send3 = #{jsAction @sendEvent('Event !', txt, 'topic4') /}
+var send0 = #{jsAction @sendEvent('Event !', txt, 'internalns_rootTopic1') /}
+var send1 = #{jsAction @sendEvent('Event !', txt, 'internalns_childTopic1') /}
+var send2 = #{jsAction @sendEvent('Event !', txt, 'internalns_grandChildTopic21') /}
+var send3 = #{jsAction @sendEvent('Event !', txt, 'internalns:childTopic3') /}
 
 $("#send0").click(function(e) {
 	$.post(send0())
@@ -299,11 +367,6 @@ $("#send2").click(function(e) {
 });
 $("#send3").click(function(e) {
 	$.post(send3())
-});
-
-$("#test").click(function(e) {
-	var $selectedTab = $("#tabs").tabs('option', 'selected');
-	alert($selectedTab);
 });
 
 var getEvents = function() {

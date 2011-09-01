@@ -6,13 +6,17 @@
 GET     /								Application.index
 GET		/login							Application.login
 POST	/proclog						Application.processLogin
+GET		/logout							Application.logout
+
 GET		/register						Application.register
 POST	/procreg						Application.processRegistration
-GET		/fbauth							Application.facebookAuth
 
-GET		/logout							Application.logout
-GET		/test							Application.test
-GET		/test2							Application.test2
+GET		/fbauth							Application.facebookAuth
+GET		/googleauth						Application.googleAuth
+
+GET		/captcha						Application.captcha
+
+GET		/topics							Application.getSupportedTopics
 
 # Event push
 GET		/waitevents						Application.waitEvents

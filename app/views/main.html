@@ -1,36 +1,149 @@
 <!DOCTYPE html>
 
 <html>
-    <head>
-        <title>#{get 'title' /}</title>
-        <meta charset="utf-8">
-        <link rel="stylesheet" media="screen" href="@{'/public/stylesheets/main.css'}">
-        <link rel="stylesheet" media="screen" href="@{'/public/stylesheets/jquery-ui-1.8.14.custom.css'}">
-        #{get 'moreStyles' /}
-        <link rel="shortcut icon" type="image/png" href="@{'/public/images/favicon.png'}">
-        <script src="@{'/public/javascripts/jquery-1.5.2.min.js'}" type="text/javascript" charset="utf-8"></script>
-        <script src="@{'/public/javascripts/jquery-ui-1.8.14.custom.min.js'}" type="text/javascript" charset="utf-8"></script>
-        #{get 'moreScripts' /}
-    </head>
-    <body>
-	    <div id="top">
-			<div id="logo">
-				<a href="/">
-					<img id="logo-img" src="@{'/public/images/play.png'}">
-				</a>
+
+<head>
+<title>#{get 'title' /}</title>
+<meta charset="utf-8">
+<link rel="stylesheet" media="screen"
+	href="@{'/public/stylesheets/template.css'}">
+<link rel="stylesheet" media="screen"
+	href="@{'/public/stylesheets/green.css'}">
+<link rel="stylesheet" media="screen"
+	href="@{'/public/stylesheets/jquery-ui-1.8.14.custom.css'}">
+<link rel="stylesheet" media="screen"
+	href="@{'/public/stylesheets/formular.css'}">
+<link rel="stylesheet" media="screen"
+	href="@{'/public/stylesheets/validationEngine.jquery.css'}">
+#{get 'moreStyles' /}
+
+<link rel="shortcut icon" type="image/png"
+	href="@{'/public/images/favicon.png'}">
+
+<script src="@{'/public/javascripts/jquery-1.6.2.min.js'}"
+	type="text/javascript" charset="utf-8"></script>
+<script src="@{'/public/javascripts/jquery-ui-1.8.14.custom.min.js'}"
+	type="text/javascript" charset="utf-8"></script>
+<script src="@{'/public/javascripts/jquery.validationEngine.js'}"
+	type="text/javascript" charset="utf-8"></script>
+<script
+	src="@{'/public/javascripts/languages/jquery.validationEngine-en.js'}"
+	type="text/javascript" charset="utf-8"></script>
+#{get 'moreScripts' /}
+</head>
+
+<body id="page_bg">
+	<div id="main_bg">
+		<div id="top">
+			<img alt="top" src="@{'/public/images/top.png'}">
+			<div id="logo_bg">
+				<a href="/"> <img hspace="5" align="left" alt="logo"
+					src="@{'/public/images/logo.png'}"> </a>
+				<div id="user4"></div>
+				<br clear="all">
+			</div>
+			<div id="banner2" style="margin: auto; text-align: center;">
+				<object width="980" height="131"
+					codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0"
+					classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000">
+					<param value="@{'/public/swf/flash_banner2.swf'}" name="movie">
+					<embed width="980" height="131"
+						src="@{'/public/swf/flash_banner2.swf'}"
+						type="application/x-shockwave-flash">
+				</object>
 			</div>
 		</div>
-		<div id="header" class="sectionbottom ">
-			<span class="topBarDiv">Play</span>
+		<div id="maincolumn">
+			<div class="nopad">#{doLayout /}</div>
+
+			%{ if(session.get("userid") != null) { }% <a
+				href="@{Application.logout()}">Logout</a> %{ } }%
 		</div>
-		<div id="content">
-       		#{doLayout /}
-        </div>
-        
-        <div id="footer">
-			%{ if(session.get("userid") != null) { }%
-			<a href="@{Application.logout()}">Logout</a>
-			%{ } }%
-        </div>
-    </body>
+		<div>
+			<div class="module">
+				<div>
+					<div>
+						<div>
+							<div id="footer">
+								<div id="footer-wrap">
+									<!-- columns starts here-->
+									<div id="columns">
+										<br>
+										<table cellspacing="0" cellpadding="0" border="0"
+											style="width: 100%;">
+											<tbody>
+												<tr>
+													<td width="200px" align="center" rowspan="5"><img
+														width="145" height="119" border="0"
+														src="@{'/public/images/fp7.png'}">
+													</td>
+													<td>MOST READ</td>
+													<td>FOLLOW US</td>
+													<td>CONTACT US</td>
+												</tr>
+												<tr>
+													<td><a href="http://www.play-project.eu/">Home</a>
+													</td>
+													<td><a href="https://twitter.com/#!/play_fp7">&nbsp;<img
+															width="16" height="16" border="0" title="Twitter"
+															alt="Twitter"
+															src="http://www.play-project.eu/images/stories/icon_twitter.png"
+															style="border: 0;"> Twitter</a>
+													</td>
+													<td>Project Coordinator: <a
+														href="mailto:nenad.stojanovic%20%5Bat%5D%20fzi.de">nenad.stojanovic
+															[AT] fzi.de</a>
+													</td>
+												</tr>
+												<tr>
+													<td><a
+														href="http://www.play-project.eu/index.php/news.html">News</a>
+													</td>
+													<td><a href="http://news.play-project.eu/">&nbsp;<img
+															width="16" height="16" border="0" title="Posterous"
+															alt="Posterous"
+															src="http://www.play-project.eu/images/stories/icon_posterous.png"
+															style="border: 0;"> Posterous</a>
+													</td>
+													<td><a href="http://news.play-project.eu/"></a>
+													</td>
+												</tr>
+												<tr>
+													<td><a
+														href="http://www.play-project.eu/index.php/solutions.html">Solutions</a>
+													</td>
+													<td>&nbsp;<a
+														href="http://feeds.feedburner.com/playprojectnews"><img
+															width="16" height="16"
+															src="http://www.play-project.eu/images/stories/icon_rss.jpg"
+															alt="rss"> RSS</a>
+													</td>
+													<td></td>
+												</tr>
+												<tr>
+													<td><a
+														href="http://www.play-project.eu/index.php/partners.html">Partners</a>
+													</td>
+													<td><a
+														href="http://www.play-project.eu/index.php/newsletter-subscription.html">&nbsp;<img
+															width="16" height="16"
+															src="http://www.play-project.eu/images/stories/icon_email_famfam.gif">&nbsp;Newsletter</a>
+													</td>
+													<td></td>
+												</tr>
+											</tbody>
+										</table>
+										<!-- columns ends -->
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br clear="all"> <img id="main_bottom" align="bottom"
+			alt="bottom" src="@{'/public/images/bottom.png'}">
+	</div>
+</body>
 </html>

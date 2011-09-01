@@ -9,14 +9,16 @@ import play.db.jpa.*;
 import play.libs.F.*;
 
 public class EventTopic {
-	public String id;
 	public String source;
+	public String name;
+	public String namespace;
 	public String title;
 	public String content;
 	public List<User> subscribingUsers;
 
-	public EventTopic(String id, String source, String title, String content) {
-		this.id = id;
+	public EventTopic(String namespace, String name, String source, String title, String content) {
+		this.namespace = namespace;
+		this.name = name;
 		this.source = source;
 		this.title = title;
 		this.content = content;
@@ -32,10 +34,14 @@ public class EventTopic {
 	}
 
 	public void multicast(Event e) {
-		e.setTopicId(id);
+		e.setTopicId(getId());
 		for (User u : subscribingUsers) {
 			u.getEventBuffer().publish(e);
 		}
+	}
+
+	public String getId() {
+		return namespace + "_" + name;
 	}
 
 	@Override
@@ -45,7 +51,7 @@ public class EventTopic {
 		if (!(o instanceof EventTopic))
 			return false;
 		EventTopic u = (EventTopic) o;
-		if (u.id.equals(id) && u.source.equals(source)) {
+		if (u.namespace.equals(namespace) && u.name.equals(name)) {
 			return true;
 		}
 		return false;

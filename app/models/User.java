@@ -19,27 +19,30 @@ public class User extends Model {
 	public String lastname;
 	public String gender;
 	public String fbId;
+	public String googleId;
 	@ElementCollection
 	public List<String> eventTopicIds;
 	@Transient
 	UserEventBuffer eventBuffer;
 	@Transient
 	public String fbAccessToken;
+	public String googleAccessToken;
 
-	public User(String email, String password, String firstname, String lastname, String gender, String fbId,
+	public User(String email, String password, String firstname, String lastname, String gender,
 			ArrayList<String> eventTopicIds) {
 		this.email = email;
 		this.password = password;
 		this.firstname = firstname;
 		this.lastname = lastname;
 		this.gender = gender;
-		this.fbId = fbId;
+		this.fbId = null;
+		this.googleId = null;
 		this.eventTopicIds = eventTopicIds;
 		UserEventBuffer eventBuffer = new UserEventBuffer();
 	}
 
-	public User(String email, String password, String firstname, String lastname, String gender, String fbId) {
-		this(email, password, firstname, lastname, gender, fbId, new ArrayList<String>());
+	public User(String email, String password, String firstname, String lastname, String gender) {
+		this(email, password, firstname, lastname, gender, new ArrayList<String>());
 	}
 
 	public EventTopic subscribe(String topicId) {
@@ -49,7 +52,7 @@ public class User extends Model {
 		EventTopic eb = ModelManager.get().getTopicById(topicId);
 		if (eb != null) {
 			eb.addUser(this);
-			eventTopicIds.add(eb.id);
+			eventTopicIds.add(eb.getId());
 			Collections.sort(eventTopicIds);
 			update();
 			return eb;
@@ -64,7 +67,7 @@ public class User extends Model {
 		EventTopic eb = ModelManager.get().getTopicById(topicId);
 		if (eb != null) {
 			eb.removeUser(this);
-			eventTopicIds.remove(eb.id);
+			eventTopicIds.remove(eb.getId());
 			update();
 			return eb;
 		}

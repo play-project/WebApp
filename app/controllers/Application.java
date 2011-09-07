@@ -26,7 +26,7 @@ public class Application extends Controller {
 	/**
 	 * Action to call before each action requiring the user to be connected
 	 */
-	@Before(only = { "index", "sendEvent", "waitEvents", "subscribe", "unsubscribe" })
+	@Before(only = { "index", "sendEvent", "waitEvents", "subscribe", "unsubscribe", "getTopics" })
 	private static void checkAuthentification() {
 		if (session.get("userid") == null) {
 			login();
@@ -175,6 +175,16 @@ public class Application extends Controller {
 		index();
 	}
 
+	/**
+	 * Captcha generator
+	 */
+	public static void captcha(String id) {
+		Images.Captcha captcha = Images.captcha();
+		String code = captcha.getText("#33FF6F");
+		Cache.set(id, code, "10mn");
+		renderBinary(captcha);
+	}
+
 	/*************************
 	 ** Facebook login **
 	 *************************/
@@ -206,7 +216,7 @@ public class Application extends Controller {
 						// Find user by Facebook id
 						User uByFbId = User.find("byFbId", fbId).first();
 						User uByFbEmail = User.find("byEmail", fbEmail).first();
-						// If user is already facebook-registered
+						// If user is already fb-registered
 						if (uByFbId != null) {
 							// Connect and update his access token
 							User u = ModelManager.get().connect(uByFbId.email, uByFbId.password);
@@ -216,19 +226,21 @@ public class Application extends Controller {
 								session.put("userid", u.id);
 								index();
 							}
-							// Else : first time connecting with facebook
-							// -> redirect to registration page with infos in
-							// session
+							// Already registered with fb email, but first time
+							// connecting with fb
 						} else if (uByFbEmail != null) {
 							User u = ModelManager.get().connect(uByFbEmail.email, uByFbEmail.password);
 							u.fbId = fbId;
+							u.save();
 							u.fbAccessToken = fbAccessToken;
 							if (u != null) {
 								Logger.info("User connected with facebook : " + u);
 								session.put("userid", u.id);
 								index();
 							}
-
+							// Else : first time connecting with fb
+							// -> redirect to registration page with infos in
+							// session
 						} else {
 							session.put("fbAccessToken", fbAccessToken);
 							session.put("fbId", fbId);
@@ -247,8 +259,6 @@ public class Application extends Controller {
 			"https://accounts.google.com/o/oauth2/token", "554450533169.apps.googleusercontent.com",
 			"4wCqvN8pIPoPjNAI-YnV565J",
 			"https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email");
-
-	// https://www.googleapis.com/auth/userinfo#email
 
 	public static void googleAuth() {
 		Logger.info("googleAuth");
@@ -370,8 +380,8 @@ public class Application extends Controller {
 		if (u != null) {
 			EventTopic sd = u.subscribe(topicId);
 			if (sd != null) {
-				result = "{\"id\":\"" + sd.getId() + "\",\"title\":\"" + sd.title
-						+ "\",\"content\":\"" + sd.content + "\"}";
+				result = "{\"id\":\"" + sd.getId() + "\",\"title\":\"" + sd.title + "\",\"content\":\""
+						+ sd.content + "\"}";
 			}
 		}
 		renderJSON(result);
@@ -396,13 +406,43 @@ public class Application extends Controller {
 		renderJSON(result);
 	}
 
-	/**
-	 * Captcha generator
-	 */
-	public static void captcha(String id) {
-		Images.Captcha captcha = Images.captcha();
-		String code = captcha.getText("#33FF6F");
-		Cache.set(id, code, "10mn");
-		renderBinary(captcha);
+	public static void searchTopics(String search, String title, String content) {
+		ArrayList<EventTopic> topics = ModelManager.get().getTopics();
+		boolean searchTitle = Boolean.parseBoolean(title);
+		boolean searchContent = Boolean.parseBoolean(content);
+		Long id = Long.parseLong(session.get("userid"));
+		User u = ModelManager.get().getUserById(id);
+		ArrayList<EventTopic> result = new ArrayList<EventTopic>();
+		ArrayList<EventTopic> userTopics = u.getTopics();
+		for (int i = 0; i < topics.size(); i++) {
+			EventTopic currentTopic = topics.get(i);
+			if (!userTopics.contains(currentTopic)) {
+				if (search.equals("")) {
+					result.add(topics.get(i));
+					continue;
+				} else {
+					if (searchTitle) {
+						if (BoyerMoore.match(search, currentTopic.getId()).size() > 0) {
+							result.add(topics.get(i));
+							continue;
+						}
+					}
+					if (searchContent) {
+						if (BoyerMoore.match(search, currentTopic.content).size() > 0) {
+							result.add(topics.get(i));
+							continue;
+						}
+					}
+				}
+			}
+		}
+		render(result);
+	}
+
+	public static void test() {
+		List<User> u = User.find(
+				"Select u from User as u inner join u.eventTopicIds as strings where ? in strings",
+				"internalns_rootTopic1").fetch();
+		Logger.info("Found : " + u);
 	}
 }

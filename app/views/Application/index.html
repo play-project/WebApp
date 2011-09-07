@@ -3,15 +3,35 @@
 <style type="text/css">
 /* Accordion
 ----------------------------------*/
+div#left-panel {
+	float: left;
+	width: 272px;
+}
+
+div#topic-search-bar {
+	border: 1px solid #DDDDDD;
+	border-radius: 2px;
+	diplay: block;
+	width: 256px;
+	float: left;
+	padding: 10px;
+	margin-bottom: 10px;
+}
+
+#search-button {
+	height: 23px;
+	float: left; 
+	margin-left: 5px;
+}
+
 div#available-topics-container {
 	border: 1px solid #DDDDDD;
 	border-radius: 2px;
 	diplay: block;
-	height: 500px;
+	height: 482px;
 	width: 270px;
 	overflow-y: scroll;
 	overflow-x: hidden;
-	float: left;
 	padding: 3px;
 }
 
@@ -31,7 +51,7 @@ div#topics {
 	font-size: 80%;
 	float: left;
 	padding: 0 0 0 20px;
-	height: 500px;
+	height: 550px;
 	width: 480px;
 }
 
@@ -72,7 +92,7 @@ div#topics {
 	padding: 0 16px 16px 16px;
 	float: right;
 	width: 410px;
-	min-height: 486px;
+	min-height: 550px;
 }
 
 .event {
@@ -126,40 +146,39 @@ div.ui-dialog {
 #{if fbInfo != null && fbInfo.get("error") == null}
 <h1>
 	Hello <a href='${fbInfo.get("link").getAsString()}'><img
-		src="http://graph.facebook.com/${fbInfo.get("username").getAsString()}/picture" />${fbInfo.get("name").getAsString()}</a>
+		src="http://graph.facebook.com/${fbInfo.get("id").getAsString()}/picture" />${fbInfo.get("name").getAsString()}</a>
 </h1>
 #{/if} #{else}
 <h1 class="pagetitle">Hello ${u.firstname+" "+u.lastname} !</h1>
 #{/else}
 <br />
 
-<div id="available-topics-container">
-	<div id="topic-search-bar" style="margin: 5px 0px 0px 5px">
-		<input name="search"
-			style="width: 80%; float: left;" /> <img
+<div id="left-panel">
+	<div id="topic-search-bar">
+		<input id="search" name="search"
+			style="width: 80%; float: left;" />
+			<input type="image"
 			src="@{'/public/images/search_ico.png'}"
-			style="height: 23px; float: left; margin-left: 5px;" /><br /> <br />
+			id="search-button" /><br /><br />
+		Title: <input type="checkbox" name="search-title" id="search-title" />
+		Content: <input type="checkbox" name="search-content" id="search-content" />
 	</div>
-	<div id="available-topics">
-		<h3 id="topic-5000">
-			<a href="#">Error Topic</a><a href="#" class="subscribe-button">Sub</a>
-		</h3>
-		<div id="desc-topic-5000">
-			<p>A topic to generate errors</p>
+	<div id="available-topics-container">
+		<div id="available-topics">
+			%{ for(int i=0; i < topics.size(); i++){
+			}%
+			<h3 id="topic-${topics.get(i).getId()}">
+				<a href="#">${topics.get(i).getId()}</a><a href="#"
+					class="subscribe-button">Sub</a>
+			</h3>
+			<div id="desc-topic-${topics.get(i).getId()}"><p>
+				Title : ${topics.get(i).title}<br/>
+				Content : ${topics.get(i).content}
+			</p></div>
+			%{	
+				}
+			%}
 		</div>
-		%{ for(int i=0; i < topics.size(); i++){
-		}%
-		<h3 id="topic-${topics.get(i).getId()}">
-			<a href="#">${topics.get(i).getId()}</a><a href="#"
-				class="subscribe-button">Sub</a>
-		</h3>
-		<div id="desc-topic-${topics.get(i).getId()}"><p>
-			Title : ${topics.get(i).title}<br/>
-			Content : ${topics.get(i).content}
-		</p></div>
-		%{	
-			}
-		%}
 	</div>
 </div>
 
@@ -234,16 +253,6 @@ $(function() {
 			navigation: true,
 			collapsible: true
 	});
-	/*
-	$("#available-topics").sortable({
-            delay: 300,
-            opacity: 0.7,
-            revert: 100,
-            scroll: true,
-            helper: 'original',
-            zIndex: 50000
-    });
-	*/
     $("#topic-tabs").sortable({
             distance: 10,
             opacity: 0.7,
@@ -354,7 +363,7 @@ var waitEvents = #{jsAction @waitEvents(':lastReceived') /}
 var send0 = #{jsAction @sendEvent('Event !', txt, 'internalns_rootTopic1') /}
 var send1 = #{jsAction @sendEvent('Event !', txt, 'internalns_childTopic1') /}
 var send2 = #{jsAction @sendEvent('Event !', txt, 'internalns_grandChildTopic21') /}
-var send3 = #{jsAction @sendEvent('Event !', txt, 'internalns:childTopic3') /}
+var send3 = #{jsAction @sendEvent('Event !', txt, 'internalns_childTopic3') /}
 
 $("#send0").click(function(e) {
 	$.post(send0())
@@ -417,6 +426,26 @@ var display = function(event, blink) {
 	$('#alltopics-events')
 		.prepend('<div id="eventall-'+event.id+'" class="event"><h3>'+event.id+' : '+event.data.title+'</h3><p>'+event.data.content+'</p></div>');
 	$('#eventall-'+event.id).hide().fadeIn();
+}
+
+var searchAction = #{jsAction @searchTopics() /}
+$('#search-button').bind("click","search");
+
+var search = function() {
+	$.post(
+		searchAction(),
+		{search:$("#search").prop("value"), title:$("#search-title").prop("checked"), content:$("#search-content").prop("checked")},
+		function(data) {
+			$("#available-topics")
+				.accordion("destroy")
+				.html(data)
+				.accordion({
+					autoHeight: false,
+					navigation: true,
+					collapsible: true
+				});
+		},
+		'html');
 }
 
 $(document).ready(function(){

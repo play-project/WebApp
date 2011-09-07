@@ -34,31 +34,7 @@ public class ModelManager {
 	 */
 	public ModelManager() {
 		Logger.info("MODELMANAGER INITIALIZED");
-		/*
-		 * EventTopic et1 = new EventTopic("topic1",
-		 * "http://www.wservice.com/topic1", "Topic 1",
-		 * "A first topic for tests"); EventTopic et2 = new EventTopic("topic2",
-		 * "http://www.wservice.com/topic1", "Topic 2",
-		 * "A second Topic for tests"); EventTopic et3 = new
-		 * EventTopic("topic3", "http://www.wservice.com/topic1", "Topic 3",
-		 * "A third Topic for tests"); EventTopic et4 = new EventTopic("topic4",
-		 * "http://www.wservice.com/topic1", "Topic 4",
-		 * "A fourth Topic for tests"); EventTopic et5 = new
-		 * EventTopic("topic5", "http://www.wservice.com/topic1", "Topic 5",
-		 * "A fourth Topic for tests"); EventTopic et6 = new
-		 * EventTopic("topic6", "http://www.wservice.com/topic1", "Topic 6",
-		 * "A sixth Topic for tests"); EventTopic et7 = new EventTopic("topic7",
-		 * "http://www.wservice.com/topic1", "Topic 7",
-		 * "A seventh Topic for tests"); EventTopic et8 = new
-		 * EventTopic("topic8", "http://www.wservice.com/topic1", "Topic 8",
-		 * "A eighth Topic for tests"); EventTopic et9 = new
-		 * EventTopic("topic9", "http://www.wservice.com/topic1", "Topic 9",
-		 * "A ninth Topic for tests");
-		 * 
-		 * topics.add(et1); topics.add(et2); topics.add(et3); topics.add(et4);
-		 * topics.add(et5); topics.add(et6); topics.add(et7); topics.add(et8);
-		 * topics.add(et9);
-		 */
+		
 		topics = SupportedTopicsXML.getSupportedTopics();
 	}
 

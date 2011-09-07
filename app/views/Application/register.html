@@ -26,7 +26,7 @@
 	<fieldset>
 		<legend>Password</legend>
 		<label><span>Password: </span><input
-			name="password" id="password" class="validate[required] text-input"
+			name="password" id="password" class="validate[required],minSize[6] text-input"
 			type="password" /> </label><br />
 		<label><span>Confirm password: </span><input name="passwordconf" id="passwordconf"
 			class="validate[required],equals[password] text-input"
@@ -44,13 +44,14 @@
 	M <input type="radio" name="gender" value="M" #{if fbInfo.get("gender").getAsString().equals("male")}checked#{/if}/>
 	F <input type="radio" name="gender" value="F" #{if fbInfo.get("gender").getAsString().equals("female")}checked#{/if}/></label>
 	</fieldset>
-	<p>
+	<fieldset>
+		<legend>Are you human ?</legend>
 	    <label for="code">Please type the code below: </label>
 	    <img src="@{Application.captcha(randomID)}" />
 	    <br />
 	    <input type="text" name="code" id="code" size="18" value="" />
 	    <input type="hidden" name="randomID" value="${randomID}" />
-	</p>
+	</fieldset>
 	<hr/>
 	<input type="submit" class="submit" value="Register" /><br />
 </form>
@@ -71,7 +72,7 @@
 	<fieldset>
 		<legend>Password</legend>
 		<label><span>Password: </span><input
-			name="password" id="password" class="validate[required] text-input"
+			name="password" id="password" class="validate[required],minSize[6] text-input"
 			type="password" /> </label><br />
 		<label><span>Confirm password: </span><input name="passwordconf" id="passwordconf"
 			class="validate[required],equals[password] text-input"

@@ -16,7 +16,7 @@ GET		/googleauth						Application.googleAuth
 
 GET		/captcha						Application.captcha
 
-GET		/topics							Application.getSupportedTopics
+POST	/searchtopics					Application.searchTopics
 
 # Event push
 GET		/waitevents						Application.waitEvents

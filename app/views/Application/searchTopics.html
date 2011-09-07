@@ -1,0 +1,22 @@
+%{
+	if(result.size() > 0){
+		for(int i=0; i < result.size(); i++){
+}%
+			<h3 id="topic-${result.get(i).getId()}">
+				<a href="#">${result.get(i).getId()}</a>
+				<a href="#" class="subscribe-button">Sub</a>
+			</h3>
+			<div id="desc-topic-${result.get(i).getId()}">
+			<p>
+				Title : ${result.get(i).title}<br/>
+				Content : ${result.get(i).content}
+			</p>
+			</div>
+%{	
+		}
+	} else {
+%}
+			<p>No result found.</p>
+%{
+	}
+%}

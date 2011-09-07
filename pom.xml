@@ -75,7 +75,13 @@
 			<groupId>org.petalslink.dsb</groupId>
 			<artifactId>dsb-notification-httpclient</artifactId>
 			<version>1.0-SNAPSHOT</version>
-		</dependency>		
+		</dependency>
+		
+		<dependency>
+   			<groupId>com.google.code.gson</groupId>
+   			<artifactId>gson</artifactId>
+  			<version>1.7.1</version>
+		</dependency>	
 	</dependencies>
 
 	<build>

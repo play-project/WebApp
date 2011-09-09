@@ -8,15 +8,19 @@ GET		/login							Application.login
 POST	/proclog						Application.processLogin
 GET		/logout							Application.logout
 
+GET		/settings						Application.settings
+POST	/updatesettings					Application.updateSettings
+
+GET		/historical						Application.historicalEvents
+
 GET		/register						Application.register
 POST	/procreg						Application.processRegistration
-
-GET		/fbauth							Application.facebookAuth
-GET		/googleauth						Application.googleAuth
-
 GET		/captcha						Application.captcha
 
 POST	/searchtopics					Application.searchTopics
+
+GET		/fbauth							Authentifier.facebookAuth
+GET		/googleauth						Authentifier.googleAuth
 
 # Event push
 GET		/waitevents						Application.waitEvents
@@ -34,6 +38,3 @@ GET     /favicon.ico                    404
 
 # Map static resources from the /app/public folder to the /public path
 GET     /public/                        staticDir:public
-
-# Catch all
-*       /{controller}/{action}			{controller}.{action}

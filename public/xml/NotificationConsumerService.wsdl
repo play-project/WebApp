@@ -1,0 +1,700 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions name="NotificationConsumerService" targetNamespace="http://docs.oasis-open.org/wsn/bw-2" xmlns:ns1="http://docs.oasis-open.org/wsn/b-2" xmlns:ns2="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://docs.oasis-open.org/wsn/bw-2" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"> 
+  <wsdl:types> 
+<xs:schema elementFormDefault="qualified" targetNamespace="http://docs.oasis-open.org/wsrf/bf-2" version="1.0" xmlns:ns1="http://www.w3.org/2005/08/addressing" xmlns:tns="http://docs.oasis-open.org/wsrf/bf-2" xmlns:xs="http://www.w3.org/2001/XMLSchema"> 
+<xs:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="http://www.w3.org/2006/03/addressing/ws-addr.xsd"/> 
+<xs:element name="BaseFault" type="tns:BaseFaultType"/> 
+<xs:complexType name="BaseFaultType"> 
+<xs:sequence> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+<xs:element name="Timestamp" type="xs:dateTime"/> 
+<xs:element minOccurs="0" name="Originator" type="ns1:EndpointReferenceType"/> 
+<xs:element minOccurs="0" name="ErrorCode"> 
+<xs:complexType mixed="true"> 
+<xs:sequence> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="skip"/> 
+</xs:sequence> 
+<xs:attribute name="dialect" type="xs:anyURI" use="required"/> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:complexType> 
+</xs:element> 
+<xs:element maxOccurs="unbounded" minOccurs="0" name="Description"> 
+<xs:complexType> 
+<xs:simpleContent> 
+<xs:extension base="xs:string"> 
+<xs:attribute ref="xml:lang"/> 
+</xs:extension> 
+</xs:simpleContent> 
+</xs:complexType> 
+</xs:element> 
+<xs:element minOccurs="0" name="FaultCause"> 
+<xs:complexType> 
+<xs:sequence> 
+<xs:any namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+</xs:complexType> 
+</xs:element> 
+</xs:sequence> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:complexType> 
+</xs:schema> 
+<xs:schema elementFormDefault="qualified" targetNamespace="http://docs.oasis-open.org/wsn/t-1" version="1.0" xmlns:tns="http://docs.oasis-open.org/wsn/t-1" xmlns:xs="http://www.w3.org/2001/XMLSchema"> 
+<xs:element name="TopicNamespace" type="tns:TopicNamespaceType"/> 
+<xs:element name="TopicSet" type="tns:TopicSetType"/> 
+<xs:complexType name="TopicSetType"> 
+<xs:complexContent> 
+<xs:extension base="tns:ExtensibleDocumented"> 
+<xs:sequence> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:extension> 
+</xs:complexContent> 
+</xs:complexType> 
+<xs:complexType abstract="true" name="ExtensibleDocumented"> 
+<xs:sequence> 
+<xs:element minOccurs="0" name="documentation" type="tns:Documentation"/> 
+</xs:sequence> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:complexType> 
+<xs:complexType mixed="true" name="QueryExpressionType"> 
+<xs:sequence> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+<xs:attribute name="Dialect" type="xs:anyURI" use="required"/> 
+</xs:complexType> 
+<xs:complexType mixed="true" name="Documentation"> 
+<xs:sequence> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+</xs:complexType> 
+<xs:complexType name="TopicType"> 
+<xs:complexContent> 
+<xs:extension base="tns:ExtensibleDocumented"> 
+<xs:sequence> 
+<xs:element minOccurs="0" name="MessagePattern" type="tns:QueryExpressionType"/> 
+<xs:element maxOccurs="unbounded" minOccurs="0" name="Topic" type="tns:TopicType"/> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+<xs:attribute name="name" type="xs:NCName" use="required"/> 
+<xs:attribute name="messageTypes"> 
+<xs:simpleType> 
+<xs:list itemType="xs:QName"/> 
+</xs:simpleType> 
+</xs:attribute> 
+<xs:attribute name="final" type="xs:boolean"/> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:extension> 
+</xs:complexContent> 
+</xs:complexType> 
+<xs:complexType name="TopicNamespaceType"> 
+<xs:complexContent> 
+<xs:extension base="tns:ExtensibleDocumented"> 
+<xs:sequence> 
+<xs:element maxOccurs="unbounded" minOccurs="0" name="Topic"> 
+<xs:complexType> 
+<xs:complexContent> 
+<xs:extension base="tns:TopicType"> 
+<xs:sequence/> 
+<xs:attribute name="parent" type="xs:string"/> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:extension> 
+</xs:complexContent> 
+</xs:complexType> 
+</xs:element> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+<xs:attribute name="name" type="xs:NCName"/> 
+<xs:attribute name="targetNamespace" type="xs:anyURI" use="required"/> 
+<xs:attribute name="final" type="xs:boolean"/> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:extension> 
+</xs:complexContent> 
+</xs:complexType> 
+</xs:schema> 
+<xs:schema elementFormDefault="qualified" targetNamespace="http://docs.oasis-open.org/wsn/b-2" version="1.0" xmlns:ns1="http://www.w3.org/2005/08/addressing" xmlns:ns2="http://docs.oasis-open.org/wsrf/bf-2" xmlns:ns3="http://docs.oasis-open.org/wsn/t-1" xmlns:tns="http://docs.oasis-open.org/wsn/b-2" xmlns:xs="http://www.w3.org/2001/XMLSchema"> 
+<xs:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="http://www.w3.org/2006/03/addressing/ws-addr.xsd"/> 
+<xs:import namespace="http://docs.oasis-open.org/wsrf/bf-2"/> 
+<xs:import namespace="http://docs.oasis-open.org/wsn/t-1"/> 
+<xs:element name="ConsumerReference" type="ns1:EndpointReferenceType"/> 
+<xs:element name="CreatePullPoint"> 
+<xs:complexType> 
+<xs:sequence> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:complexType> 
+</xs:element> 
+<xs:element name="CreatePullPointResponse"> 
+<xs:complexType> 
+<xs:sequence> 
+<xs:element name="PullPoint" type="ns1:EndpointReferenceType"/> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:complexType> 
+</xs:element> 
+<xs:element name="CreationTime" type="xs:anySimpleType"/> 
+<xs:element name="CurrentTime" type="xs:anySimpleType"/> 
+<xs:element name="DestroyPullPoint"> 
+<xs:complexType> 
+<xs:sequence> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:complexType> 
+</xs:element> 
+<xs:element name="DestroyPullPointResponse"> 
+<xs:complexType> 
+<xs:sequence> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:complexType> 
+</xs:element> 
+<xs:element name="Filter" type="tns:FilterType"/> 
+<xs:element name="FixedTopicSet" type="xs:boolean"/> 
+<xs:element name="GetCurrentMessage"> 
+<xs:complexType> 
+<xs:sequence> 
+<xs:element name="Topic" type="tns:TopicExpressionType"/> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+</xs:complexType> 
+</xs:element> 
+<xs:element name="GetCurrentMessageResponse"> 
+<xs:complexType> 
+<xs:sequence> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+</xs:complexType> 
+</xs:element> 
+<xs:element name="GetMessages"> 
+<xs:complexType> 
+<xs:sequence> 
+<xs:element minOccurs="0" name="MaximumNumber" type="xs:nonNegativeInteger"/> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:complexType> 
+</xs:element> 
+<xs:element name="GetMessagesResponse"> 
+<xs:complexType> 
+<xs:sequence> 
+<xs:element maxOccurs="unbounded" minOccurs="0" name="NotificationMessage" type="tns:NotificationMessageHolderType"/> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:complexType> 
+</xs:element> 
+<xs:element name="InvalidFilterFault" type="tns:InvalidFilterFaultType"/> 
+<xs:element name="InvalidMessageContentExpressionFault" type="tns:InvalidMessageContentExpressionFaultType"/> 
+<xs:element name="InvalidProducerPropertiesExpressionFault" type="tns:InvalidProducerPropertiesExpressionFaultType"/> 
+<xs:element name="InvalidTopicExpressionFault" type="tns:InvalidTopicExpressionFaultType"/> 
+<xs:element name="MessageContent" type="tns:QueryExpressionType"/> 
+<xs:element name="MultipleTopicsSpecifiedFault" type="tns:MultipleTopicsSpecifiedFaultType"/> 
+<xs:element name="NoCurrentMessageOnTopicFault" type="tns:NoCurrentMessageOnTopicFaultType"/> 
+<xs:element name="NotificationMessage" type="tns:NotificationMessageHolderType"/> 
+<xs:element name="NotificationProducerRP"> 
+<xs:complexType> 
+<xs:sequence> 
+<xs:element maxOccurs="unbounded" minOccurs="0" name="TopicExpression" type="tns:TopicExpressionType"/> 
+<xs:element default="true" minOccurs="0" name="FixedTopicSet" type="xs:boolean"/> 
+<xs:element maxOccurs="unbounded" minOccurs="0" name="TopicExpressionDialect" type="xs:anyURI"/> 
+<xs:element minOccurs="0" ref="ns3:TopicSet"/> 
+</xs:sequence> 
+</xs:complexType> 
+</xs:element> 
+<xs:element name="Notify"> 
+<xs:complexType> 
+<xs:sequence> 
+<xs:element maxOccurs="unbounded" name="NotificationMessage" type="tns:NotificationMessageHolderType"/> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+</xs:complexType> 
+</xs:element> 
+<xs:element name="NotifyMessageNotSupportedFault" type="tns:NotifyMessageNotSupportedFaultType"/> 
+<xs:element name="PauseFailedFault" type="tns:PauseFailedFaultType"/> 
+<xs:element name="PauseSubscription"> 
+<xs:complexType> 
+<xs:sequence> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+</xs:complexType> 
+</xs:element> 
+<xs:element name="PauseSubscriptionResponse"> 
+<xs:complexType> 
+<xs:sequence> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+</xs:complexType> 
+</xs:element> 
+<xs:element name="ProducerProperties" type="tns:QueryExpressionType"/> 
+<xs:element name="ProducerReference" type="ns1:EndpointReferenceType"/> 
+<xs:element name="Renew"> 
+<xs:complexType> 
+<xs:sequence> 
+<xs:element name="TerminationTime" nillable="true" type="xs:string"/> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+</xs:complexType> 
+</xs:element> 
+<xs:element name="RenewResponse"> 
+<xs:complexType> 
+<xs:sequence> 
+<xs:element name="TerminationTime" nillable="true" type="xs:dateTime"/> 
+<xs:element minOccurs="0" name="CurrentTime" type="xs:dateTime"/> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+</xs:complexType> 
+</xs:element> 
+<xs:element name="ResumeFailedFault" type="tns:ResumeFailedFaultType"/> 
+<xs:element name="ResumeSubscription"> 
+<xs:complexType> 
+<xs:sequence> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+</xs:complexType> 
+</xs:element> 
+<xs:element name="ResumeSubscriptionResponse"> 
+<xs:complexType> 
+<xs:sequence> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+</xs:complexType> 
+</xs:element> 
+<xs:element name="Subscribe"> 
+<xs:complexType> 
+<xs:sequence> 
+<xs:element name="ConsumerReference" type="ns1:EndpointReferenceType"/> 
+<xs:element minOccurs="0" name="Filter" type="tns:FilterType"/> 
+<xs:element name="InitialTerminationTime" type="xs:string"/> 
+<xs:element minOccurs="0" name="SubscriptionPolicy"> 
+<xs:complexType> 
+<xs:sequence> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+</xs:complexType> 
+</xs:element> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+</xs:complexType> 
+</xs:element> 
+<xs:element name="SubscribeCreationFailedFault" type="tns:SubscribeCreationFailedFaultType"/> 
+<xs:element name="SubscribeResponse"> 
+<xs:complexType> 
+<xs:sequence> 
+<xs:element name="SubscriptionReference" type="ns1:EndpointReferenceType"/> 
+<xs:element minOccurs="0" name="CurrentTime" type="xs:dateTime"/> 
+<xs:element minOccurs="0" name="TerminationTime" nillable="true" type="xs:dateTime"/> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+</xs:complexType> 
+</xs:element> 
+<xs:element name="SubscriptionManagerRP"> 
+<xs:complexType> 
+<xs:sequence> 
+<xs:element name="ConsumerReference" type="ns1:EndpointReferenceType"/> 
+<xs:element minOccurs="0" name="Filter" type="tns:FilterType"/> 
+<xs:element minOccurs="0" name="SubscriptionPolicy" type="tns:SubscriptionPolicyType"/> 
+<xs:element minOccurs="0" name="CreationTime" type="xs:dateTime"/> 
+</xs:sequence> 
+</xs:complexType> 
+</xs:element> 
+<xs:element name="SubscriptionPolicy" type="tns:SubscriptionPolicyType"/> 
+<xs:element name="SubscriptionReference" type="ns1:EndpointReferenceType"/> 
+<xs:element name="TerminationTime" type="xs:anySimpleType"/> 
+<xs:element name="Topic" type="tns:TopicExpressionType"/> 
+<xs:element name="TopicExpression" type="tns:TopicExpressionType"/> 
+<xs:element name="TopicExpressionDialect" type="xs:string"/> 
+<xs:element name="TopicExpressionDialectUnknownFault" type="tns:TopicExpressionDialectUnknownFaultType"/> 
+<xs:element name="TopicNotSupportedFault" type="tns:TopicNotSupportedFaultType"/> 
+<xs:element name="UnableToCreatePullPointFault" type="tns:UnableToCreatePullPointFaultType"/> 
+<xs:element name="UnableToDestroyPullPointFault" type="tns:UnableToDestroyPullPointFaultType"/> 
+<xs:element name="UnableToDestroySubscriptionFault" type="tns:UnableToDestroySubscriptionFaultType"/> 
+<xs:element name="UnableToGetMessagesFault" type="tns:UnableToGetMessagesFaultType"/> 
+<xs:element name="UnacceptableInitialTerminationTimeFault" type="tns:UnacceptableInitialTerminationTimeFaultType"/> 
+<xs:element name="UnacceptableTerminationTimeFault" type="tns:UnacceptableTerminationTimeFaultType"/> 
+<xs:element name="UnrecognizedPolicyRequestFault" type="tns:UnrecognizedPolicyRequestFaultType"/> 
+<xs:element name="Unsubscribe"> 
+<xs:complexType> 
+<xs:sequence> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+</xs:complexType> 
+</xs:element> 
+<xs:element name="UnsubscribeResponse"> 
+<xs:complexType> 
+<xs:sequence> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+</xs:complexType> 
+</xs:element> 
+<xs:element name="UnsupportedPolicyRequestFault" type="tns:UnsupportedPolicyRequestFaultType"/> 
+<xs:element name="UseRaw"> 
+<xs:complexType> 
+<xs:sequence/> 
+</xs:complexType> 
+</xs:element> 
+<xs:complexType name="NotificationMessageHolderType"> 
+<xs:sequence> 
+<xs:element minOccurs="0" name="SubscriptionReference" type="ns1:EndpointReferenceType"/> 
+<xs:element minOccurs="0" name="Topic" type="tns:TopicExpressionType"/> 
+<xs:element minOccurs="0" name="ProducerReference" type="ns1:EndpointReferenceType"/> 
+<xs:element name="Message"> 
+<xs:complexType> 
+<xs:sequence> 
+<xs:any namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+</xs:complexType> 
+</xs:element> 
+</xs:sequence> 
+</xs:complexType> 
+<xs:complexType mixed="true" name="TopicExpressionType"> 
+<xs:sequence> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+<xs:attribute name="Dialect" type="xs:anyURI" use="required"/> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:complexType> 
+<xs:complexType name="UnsupportedPolicyRequestFaultType"> 
+<xs:complexContent> 
+<xs:extension base="ns2:BaseFaultType"> 
+<xs:sequence> 
+<xs:element maxOccurs="unbounded" minOccurs="0" name="UnsupportedPolicy" type="xs:QName"/> 
+</xs:sequence> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:extension> 
+</xs:complexContent> 
+</xs:complexType> 
+<xs:complexType name="PauseFailedFaultType"> 
+<xs:complexContent> 
+<xs:extension base="ns2:BaseFaultType"> 
+<xs:sequence/> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:extension> 
+</xs:complexContent> 
+</xs:complexType> 
+<xs:complexType name="UnacceptableInitialTerminationTimeFaultType"> 
+<xs:complexContent> 
+<xs:extension base="ns2:BaseFaultType"> 
+<xs:sequence> 
+<xs:element name="MinimumTime" type="xs:dateTime"/> 
+<xs:element minOccurs="0" name="MaximumTime" type="xs:dateTime"/> 
+</xs:sequence> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:extension> 
+</xs:complexContent> 
+</xs:complexType> 
+<xs:complexType name="UnableToDestroyPullPointFaultType"> 
+<xs:complexContent> 
+<xs:extension base="ns2:BaseFaultType"> 
+<xs:sequence/> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:extension> 
+</xs:complexContent> 
+</xs:complexType> 
+<xs:complexType name="NotifyMessageNotSupportedFaultType"> 
+<xs:complexContent> 
+<xs:extension base="ns2:BaseFaultType"> 
+<xs:sequence/> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:extension> 
+</xs:complexContent> 
+</xs:complexType> 
+<xs:complexType name="InvalidMessageContentExpressionFaultType"> 
+<xs:complexContent> 
+<xs:extension base="ns2:BaseFaultType"> 
+<xs:sequence/> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:extension> 
+</xs:complexContent> 
+</xs:complexType> 
+<xs:complexType name="TopicNotSupportedFaultType"> 
+<xs:complexContent> 
+<xs:extension base="ns2:BaseFaultType"> 
+<xs:sequence/> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:extension> 
+</xs:complexContent> 
+</xs:complexType> 
+<xs:complexType name="UnableToCreatePullPointFaultType"> 
+<xs:complexContent> 
+<xs:extension base="ns2:BaseFaultType"> 
+<xs:sequence/> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:extension> 
+</xs:complexContent> 
+</xs:complexType> 
+<xs:complexType name="TopicExpressionDialectUnknownFaultType"> 
+<xs:complexContent> 
+<xs:extension base="ns2:BaseFaultType"> 
+<xs:sequence/> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:extension> 
+</xs:complexContent> 
+</xs:complexType> 
+<xs:complexType name="FilterType"> 
+<xs:sequence> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+</xs:complexType> 
+<xs:complexType name="UnableToGetMessagesFaultType"> 
+<xs:complexContent> 
+<xs:extension base="ns2:BaseFaultType"> 
+<xs:sequence/> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:extension> 
+</xs:complexContent> 
+</xs:complexType> 
+<xs:complexType name="ResumeFailedFaultType"> 
+<xs:complexContent> 
+<xs:extension base="ns2:BaseFaultType"> 
+<xs:sequence/> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:extension> 
+</xs:complexContent> 
+</xs:complexType> 
+<xs:complexType name="UnacceptableTerminationTimeFaultType"> 
+<xs:complexContent> 
+<xs:extension base="ns2:BaseFaultType"> 
+<xs:sequence> 
+<xs:element name="MinimumTime" type="xs:dateTime"/> 
+<xs:element minOccurs="0" name="MaximumTime" type="xs:dateTime"/> 
+</xs:sequence> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:extension> 
+</xs:complexContent> 
+</xs:complexType> 
+<xs:complexType mixed="true" name="QueryExpressionType"> 
+<xs:sequence> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+<xs:attribute name="Dialect" type="xs:anyURI" use="required"/> 
+</xs:complexType> 
+<xs:complexType name="SubscriptionPolicyType"> 
+<xs:sequence> 
+<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+</xs:sequence> 
+</xs:complexType> 
+<xs:complexType name="UnrecognizedPolicyRequestFaultType"> 
+<xs:complexContent> 
+<xs:extension base="ns2:BaseFaultType"> 
+<xs:sequence> 
+<xs:element maxOccurs="unbounded" minOccurs="0" name="UnrecognizedPolicy" type="xs:QName"/> 
+</xs:sequence> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:extension> 
+</xs:complexContent> 
+</xs:complexType> 
+<xs:complexType name="SubscribeCreationFailedFaultType"> 
+<xs:complexContent> 
+<xs:extension base="ns2:BaseFaultType"> 
+<xs:sequence/> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:extension> 
+</xs:complexContent> 
+</xs:complexType> 
+<xs:complexType name="MultipleTopicsSpecifiedFaultType"> 
+<xs:complexContent> 
+<xs:extension base="ns2:BaseFaultType"> 
+<xs:sequence/> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:extension> 
+</xs:complexContent> 
+</xs:complexType> 
+<xs:complexType name="InvalidTopicExpressionFaultType"> 
+<xs:complexContent> 
+<xs:extension base="ns2:BaseFaultType"> 
+<xs:sequence/> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:extension> 
+</xs:complexContent> 
+</xs:complexType> 
+<xs:complexType name="UnableToDestroySubscriptionFaultType"> 
+<xs:complexContent> 
+<xs:extension base="ns2:BaseFaultType"> 
+<xs:sequence/> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:extension> 
+</xs:complexContent> 
+</xs:complexType> 
+<xs:complexType name="InvalidProducerPropertiesExpressionFaultType"> 
+<xs:complexContent> 
+<xs:extension base="ns2:BaseFaultType"> 
+<xs:sequence/> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:extension> 
+</xs:complexContent> 
+</xs:complexType> 
+<xs:complexType name="NoCurrentMessageOnTopicFaultType"> 
+<xs:complexContent> 
+<xs:extension base="ns2:BaseFaultType"> 
+<xs:sequence/> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:extension> 
+</xs:complexContent> 
+</xs:complexType> 
+<xs:complexType name="InvalidFilterFaultType"> 
+<xs:complexContent> 
+<xs:extension base="ns2:BaseFaultType"> 
+<xs:sequence> 
+<xs:element maxOccurs="unbounded" name="UnknownFilter" type="xs:QName"/> 
+</xs:sequence> 
+<xs:anyAttribute namespace="##other" processContents="skip"/> 
+</xs:extension> 
+</xs:complexContent> 
+</xs:complexType> 
+</xs:schema> 
+<xs:schema blockDefault="#all" elementFormDefault="qualified" targetNamespace="http://www.w3.org/2005/08/addressing" xmlns:tns="http://www.w3.org/2005/08/addressing" xmlns:xs="http://www.w3.org/2001/XMLSchema"> 
+	
+	<!-- Constructs from the WS-Addressing Core --> 
+ 
+	<xs:element name="EndpointReference" type="tns:EndpointReferenceType"/> 
+	<xs:complexType name="EndpointReferenceType"> 
+		<xs:sequence> 
+			<xs:element name="Address" type="tns:AttributedURIType"/> 
+			<xs:element minOccurs="0" name="ReferenceParameters" type="tns:ReferenceParametersType"/> 
+			<xs:element minOccurs="0" ref="tns:Metadata"/> 
+			<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/> 
+		</xs:sequence> 
+		<xs:anyAttribute namespace="##other" processContents="lax"/> 
+	</xs:complexType> 
+	
+	<xs:complexType name="ReferenceParametersType"> 
+		<xs:sequence> 
+			<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##any" processContents="lax"/> 
+		</xs:sequence> 
+		<xs:anyAttribute namespace="##other" processContents="lax"/> 
+	</xs:complexType> 
+	
+	<xs:element name="Metadata" type="tns:MetadataType"/> 
+	<xs:complexType name="MetadataType"> 
+		<xs:sequence> 
+			<xs:any maxOccurs="unbounded" minOccurs="0" namespace="##any" processContents="lax"/> 
+		</xs:sequence> 
+		<xs:anyAttribute namespace="##other" processContents="lax"/> 
+	</xs:complexType> 
+	
+	<xs:element name="MessageID" type="tns:AttributedURIType"/> 
+	<xs:element name="RelatesTo" type="tns:RelatesToType"/> 
+	<xs:complexType name="RelatesToType"> 
+		<xs:simpleContent> 
+			<xs:extension base="xs:anyURI"> 
+				<xs:attribute default="http://www.w3.org/2005/08/addressing/reply" name="RelationshipType" type="tns:RelationshipTypeOpenEnum" use="optional"/> 
+				<xs:anyAttribute namespace="##other" processContents="lax"/> 
+			</xs:extension> 
+		</xs:simpleContent> 
+	</xs:complexType> 
+	
+	<xs:simpleType name="RelationshipTypeOpenEnum"> 
+		<xs:union memberTypes="tns:RelationshipType xs:anyURI"/> 
+	</xs:simpleType> 
+	
+	<xs:simpleType name="RelationshipType"> 
+		<xs:restriction base="xs:anyURI"> 
+			<xs:enumeration value="http://www.w3.org/2005/08/addressing/reply"/> 
+		</xs:restriction> 
+	</xs:simpleType> 
+	
+	<xs:element name="ReplyTo" type="tns:EndpointReferenceType"/> 
+	<xs:element name="From" type="tns:EndpointReferenceType"/> 
+	<xs:element name="FaultTo" type="tns:EndpointReferenceType"/> 
+	<xs:element name="To" type="tns:AttributedURIType"/> 
+	<xs:element name="Action" type="tns:AttributedURIType"/> 
+ 
+	<xs:complexType name="AttributedURIType"> 
+		<xs:simpleContent> 
+			<xs:extension base="xs:anyURI"> 
+				<xs:anyAttribute namespace="##other" processContents="lax"/> 
+			</xs:extension> 
+		</xs:simpleContent> 
+	</xs:complexType> 
+	
+	<!-- Constructs from the WS-Addressing SOAP binding --> 
+ 
+	<xs:attribute name="IsReferenceParameter" type="xs:boolean"/> 
+	
+	<xs:simpleType name="FaultCodesOpenEnumType"> 
+		<xs:union memberTypes="tns:FaultCodesType xs:QName"/> 
+	</xs:simpleType> 
+	
+	<xs:simpleType name="FaultCodesType"> 
+		<xs:restriction base="xs:QName"> 
+			<xs:enumeration value="tns:InvalidAddressingHeader"/> 
+			<xs:enumeration value="tns:InvalidAddress"/> 
+			<xs:enumeration value="tns:InvalidEPR"/> 
+			<xs:enumeration value="tns:InvalidCardinality"/> 
+			<xs:enumeration value="tns:MissingAddressInEPR"/> 
+			<xs:enumeration value="tns:DuplicateMessageID"/> 
+			<xs:enumeration value="tns:ActionMismatch"/> 
+			<xs:enumeration value="tns:MessageAddressingHeaderRequired"/> 
+			<xs:enumeration value="tns:DestinationUnreachable"/> 
+			<xs:enumeration value="tns:ActionNotSupported"/> 
+			<xs:enumeration value="tns:EndpointUnavailable"/> 
+		</xs:restriction> 
+	</xs:simpleType> 
+	
+	<xs:element name="RetryAfter" type="tns:AttributedUnsignedLongType"/> 
+	<xs:complexType name="AttributedUnsignedLongType"> 
+		<xs:simpleContent> 
+			<xs:extension base="xs:unsignedLong"> 
+				<xs:anyAttribute namespace="##other" processContents="lax"/> 
+			</xs:extension> 
+		</xs:simpleContent> 
+	</xs:complexType> 
+	
+	<xs:element name="ProblemHeaderQName" type="tns:AttributedQNameType"/> 
+	<xs:complexType name="AttributedQNameType"> 
+		<xs:simpleContent> 
+			<xs:extension base="xs:QName"> 
+				<xs:anyAttribute namespace="##other" processContents="lax"/> 
+			</xs:extension> 
+		</xs:simpleContent> 
+	</xs:complexType> 
+	
+	<xs:element name="ProblemHeader" type="tns:AttributedAnyType"/> 
+	<xs:complexType name="AttributedAnyType"> 
+		<xs:sequence> 
+			<xs:any namespace="##any" processContents="lax"/> 
+		</xs:sequence> 
+		<xs:anyAttribute namespace="##other" processContents="lax"/> 
+	</xs:complexType> 
+	
+	<xs:element name="ProblemIRI" type="tns:AttributedURIType"/> 
+	
+	<xs:element name="ProblemAction" type="tns:ProblemActionType"/> 
+	<xs:complexType name="ProblemActionType"> 
+		<xs:sequence> 
+			<xs:element minOccurs="0" ref="tns:Action"/> 
+			<xs:element minOccurs="0" name="SoapAction" type="xs:anyURI"/> 
+		</xs:sequence> 
+		<xs:anyAttribute namespace="##other" processContents="lax"/> 
+	</xs:complexType> 
+	
+</xs:schema> 
+  </wsdl:types> 
+  <wsdl:message name="Notify"> 
+    <wsdl:part element="ns1:Notify" name="Notify"> 
+    </wsdl:part> 
+  </wsdl:message> 
+  <wsdl:portType name="NotificationConsumer"> 
+    <wsdl:operation name="Notify"> 
+      <wsdl:input message="tns:Notify" name="Notify"> 
+    </wsdl:input> 
+    </wsdl:operation> 
+  </wsdl:portType> 
+  <wsdl:binding name="NotificationConsumerServiceSoapBinding" type="tns:NotificationConsumer"> 
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/> 
+    <wsdl:operation name="Notify"> 
+      <soap:operation soapAction="http://com.ebmwebsourcing.easyesb/soa/model/endpoint/notification/Notify" style="document"/> 
+      <wsdl:input name="Notify"> 
+        <soap:body use="literal"/> 
+      </wsdl:input> 
+    </wsdl:operation> 
+  </wsdl:binding> 
+  <wsdl:service name="NotificationConsumerService"> 
+    <wsdl:port binding="tns:NotificationConsumerServiceSoapBinding" name="NotificationConsumerPort"> 
+      <soap:address location="http://localhost:8889/foo/bar/Service"/> 
+    </wsdl:port> 
+  </wsdl:service> 
+</wsdl:definitions>

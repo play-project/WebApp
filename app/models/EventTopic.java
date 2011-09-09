@@ -4,22 +4,24 @@ import java.util.*;
 
 import javax.persistence.*;
 
+import notifiers.Mails;
+
 import play.Logger;
 import play.db.jpa.*;
 import play.libs.F.*;
 
 public class EventTopic {
-	public String source;
 	public String name;
 	public String namespace;
+	public String uri;
 	public String title;
 	public String content;
 	public List<User> subscribingUsers;
 
-	public EventTopic(String namespace, String name, String source, String title, String content) {
+	public EventTopic(String namespace, String name, String uri, String title, String content) {
 		this.namespace = namespace;
 		this.name = name;
-		this.source = source;
+		this.uri = uri;
 		this.title = title;
 		this.content = content;
 		this.subscribingUsers = new ArrayList<User>();
@@ -35,8 +37,17 @@ public class EventTopic {
 
 	public void multicast(Event e) {
 		e.setTopicId(getId());
-		for (User u : subscribingUsers) {
-			u.getEventBuffer().publish(e);
+		List<User> subscribers = User.find(
+				"Select u from User as u inner join u.eventTopicIds as strings where ? in strings", getId())
+				.fetch();
+		for (User uSub : subscribers) {
+			User uCon = ModelManager.get().getUserById(uSub.id);
+			if (uCon != null) {
+				uCon.getEventBuffer().publish(e);
+			} else {
+				Logger.info("Mailing to:" + uSub.email);
+				Mails.mailEvent(e, uSub);
+			}
 		}
 	}
 

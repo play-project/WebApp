@@ -37,7 +37,6 @@ public class SupportedTopicsXML {
 		try {
 			xml = sxb.build(new File("/root/webapp/public/xml/SupportedTopicsSet.xml"));
 			root = xml.getRootElement();
-			Logger.info("racine : \n" + root.toString());
 		} catch (Exception e) {
 			Logger.error("Error while parsing XML document");
 		}
@@ -47,19 +46,20 @@ public class SupportedTopicsXML {
 
 	private static void parseXMLTree(ArrayList<EventTopic> result, Element node, String path) {
 		String id = node.getNamespacePrefix() + ":" + node.getName();
+		path += " > " + id;
 		List<Attribute> att = node.getAttributes();
 		if (att != null) {
 			for (Attribute a : att) {
 				if (a.getName().equals("topic") && a.getNamespacePrefix().equals("wstop")
 						&& a.getValue().equals("true")) {
-					result.add(new EventTopic(node.getNamespacePrefix(), node.getName(), "", "Sample title",
-							"Path : " + path));
+					result.add(new EventTopic(node.getNamespacePrefix(), node.getName(), node.getNamespace()
+							.getURI(), node.getName(), "Path : " + path));
 				}
 			}
 		}
 		List<Element> el = node.getChildren();
 		for (Element e : el) {
-			parseXMLTree(result, e, path + " > " + id);
+			parseXMLTree(result, e, path);
 		}
 	}
 

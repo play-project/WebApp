@@ -6,8 +6,6 @@
 <title>#{get 'title' /}</title>
 <meta charset="utf-8">
 <link rel="stylesheet" media="screen"
-	href="@{'/public/stylesheets/template.css'}">
-<link rel="stylesheet" media="screen"
 	href="@{'/public/stylesheets/green.css'}">
 <link rel="stylesheet" media="screen"
 	href="@{'/public/stylesheets/jquery-ui-1.8.14.custom.css'}">
@@ -15,6 +13,8 @@
 	href="@{'/public/stylesheets/formular.css'}">
 <link rel="stylesheet" media="screen"
 	href="@{'/public/stylesheets/validationEngine.jquery.css'}">
+<link rel="stylesheet" media="screen"
+	href="@{'/public/stylesheets/template.css'}">
 #{get 'moreStyles' /}
 
 <link rel="shortcut icon" type="image/png"
@@ -42,6 +42,7 @@
 				<div id="user4"></div>
 				<br clear="all">
 			</div>
+			#{if !nobanner}
 			<div id="banner2" style="margin: auto; text-align: center;">
 				<object width="980" height="131"
 					codebase="http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,40,0"
@@ -52,12 +53,22 @@
 						type="application/x-shockwave-flash">
 				</object>
 			</div>
+			#{/if}
+			%{ if(session.get("userid") != null) { }%
+				<div id="menubar">
+					<div id="menutabs">
+						  <a id="myevents-tab" href="@{Application.index()}">My Events</a>
+						  <a id="historical-tab" href="@{Application.historicalEvents()}">Historical</a>
+						  <a id="settings-tab" href="@{Application.settings()}">Settings</a> 
+						  <a id="logout-tab" href="@{Application.logout()}">Logout</a> 
+					</div>
+				</div>
+		    %{ 
+			   }
+			}%
 		</div>
 		<div id="maincolumn">
 			<div class="nopad">#{doLayout /}</div>
-
-			%{ if(session.get("userid") != null) { }% <a
-				href="@{Application.logout()}">Logout</a> %{ } }%
 		</div>
 		<div>
 			<div class="module">

@@ -26,7 +26,7 @@ public class Application extends Controller {
 	/**
 	 * Action to call before each action requiring the user to be connected
 	 */
-	@Before(only = { "index", "sendEvent", "waitEvents", "subscribe", "unsubscribe", "getTopics" })
+	@Before(only = { "index", "settings", "updateSettings", "sendEvent", "waitEvents", "subscribe", "unsubscribe", "getTopics" })
 	private static void checkAuthentification() {
 		if (session.get("userid") == null) {
 			login();
@@ -46,7 +46,6 @@ public class Application extends Controller {
 	public static void index() {
 		User u = ModelManager.get().getUserById(Long.parseLong(session.get("userid")));
 		if (u == null) {
-			Logger.info("uid : " + session.get("userid"));
 			logout();
 		}
 		JsonObject fbInfo = null;
@@ -55,7 +54,7 @@ public class Application extends Controller {
 			fbInfo = WS.url("https://graph.facebook.com/me?access_token=%s", WS.encode(u.fbAccessToken))
 					.get().getJson().getAsJsonObject();
 			if (fbInfo.get("error") != null) {
-				refreshFbAccessToken(u, fullURL());
+				Authentifier.refreshFbAccessToken(u, fullURL());
 				fbInfo = WS.url("https://graph.facebook.com/me?access_token=%s", WS.encode(u.fbAccessToken))
 						.get().getJson().getAsJsonObject();
 			}
@@ -65,7 +64,7 @@ public class Application extends Controller {
 					.url("https://www.googleapis.com/userinfo/email?access_token==%s",
 							WS.encode(u.googleAccessToken)).get().getJson().getAsJsonObject();
 			if (googleInfo.get("error") != null) {
-				refreshGoogleAccessToken(u, fullURL());
+				Authentifier.refreshGoogleAccessToken(u, fullURL());
 				googleInfo = WS
 						.url("https://www.googleapis.com/userinfo/email?access_token==%s",
 								WS.encode(u.googleAccessToken)).get().getJson().getAsJsonObject();
@@ -78,6 +77,15 @@ public class Application extends Controller {
 			topics.remove(userTopics.get(i));
 		}
 		render(u, fbInfo, topics, userTopics);
+	}
+	
+	private static String fullURL() {
+		String url = "Application." + Thread.currentThread().getStackTrace()[2].getMethodName();
+		return play.mvc.Router.getFullUrl(url);
+	}
+
+	private static String fullURL(String url) {
+		return play.mvc.Router.getFullUrl(url);
 	}
 
 	/**
@@ -184,160 +192,12 @@ public class Application extends Controller {
 		Cache.set(id, code, "10mn");
 		renderBinary(captcha);
 	}
-
-	/*************************
-	 ** Facebook login **
-	 *************************/
-
-	public static OAuth2 FACEBOOK = new OAuth2("https://www.facebook.com/dialog/oauth",
-			"https://graph.facebook.com/oauth/access_token", "235987216437776",
-			"f2a40e9775f5244924188445fff09d27", "email");
-
+	
 	/**
-	 * Authentification via Facebook
+	 * Historical events
 	 */
-
-	public static void facebookAuth() {
-		if (OAuth2.isCodeResponse()) {
-			OAuth2.Response response = FACEBOOK.retrieveAccessToken(fullURL());
-			String fbAccessToken = response.accessToken;
-			JsonObject fbInfo = null;
-			String fbId = null;
-			String fbEmail = null;
-			// If user allows application to access his data
-			if (fbAccessToken != null) {
-				// Get his info
-				fbInfo = WS.url("https://graph.facebook.com/me?access_token=%s", WS.encode(fbAccessToken))
-						.get().getJson().getAsJsonObject();
-				if (fbInfo != null) {
-					fbId = fbInfo.get("id").getAsString();
-					fbEmail = fbInfo.get("email").getAsString();
-					if (fbId != null) {
-						// Find user by Facebook id
-						User uByFbId = User.find("byFbId", fbId).first();
-						User uByFbEmail = User.find("byEmail", fbEmail).first();
-						// If user is already fb-registered
-						if (uByFbId != null) {
-							// Connect and update his access token
-							User u = ModelManager.get().connect(uByFbId.email, uByFbId.password);
-							u.fbAccessToken = fbAccessToken;
-							if (u != null) {
-								Logger.info("User connected with facebook : " + u);
-								session.put("userid", u.id);
-								index();
-							}
-							// Already registered with fb email, but first time
-							// connecting with fb
-						} else if (uByFbEmail != null) {
-							User u = ModelManager.get().connect(uByFbEmail.email, uByFbEmail.password);
-							u.fbId = fbId;
-							u.save();
-							u.fbAccessToken = fbAccessToken;
-							if (u != null) {
-								Logger.info("User connected with facebook : " + u);
-								session.put("userid", u.id);
-								index();
-							}
-							// Else : first time connecting with fb
-							// -> redirect to registration page with infos in
-							// session
-						} else {
-							session.put("fbAccessToken", fbAccessToken);
-							session.put("fbId", fbId);
-							register();
-						}
-					}
-				}
-			}
-			flash.error("Facebook login procedure has encountered an error.");
-			login();
-		}
-		FACEBOOK.retrieveVerificationCode(fullURL());
-	}
-
-	public static OAuth2 GOOGLE = new OAuth2("https://accounts.google.com/o/oauth2/auth",
-			"https://accounts.google.com/o/oauth2/token", "554450533169.apps.googleusercontent.com",
-			"4wCqvN8pIPoPjNAI-YnV565J",
-			"https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email");
-
-	public static void googleAuth() {
-		Logger.info("googleAuth");
-		if (OAuth2.isCodeResponse()) {
-			OAuth2.Response response = GOOGLE.retrieveAccessToken(fullURL());
-			Logger.info("response : " + response.httpResponse.getString());
-			String googleAccessToken = response.accessToken;
-			Logger.info("GAT : " + googleAccessToken);
-			JsonObject googleInfo = null;
-			String googleId = null;
-			// If user allows application to access his data
-			if (googleAccessToken != null) {
-				// Get his info
-				Logger.info("GAT != NULL");
-				googleInfo = WS
-						.url("https://www.googleapis.com/userinfo/email?access_token=%s",
-								WS.encode(googleAccessToken)).get().getJson().getAsJsonObject();
-				if (googleInfo != null) {
-					Logger.info("<googleInfo>");
-					Logger.info(googleInfo.getAsString());
-					Logger.info("</googleInfo>");
-					googleId = googleInfo.get("id").getAsString();
-					if (googleId != null) {
-						// Find user by Facebook id
-						User uByGoogleId = User.find("byGoogleId", googleId).first();
-						// If user is already facebook-registered
-						if (uByGoogleId != null) {
-							// Connect and update his access token
-							User u = ModelManager.get().connect(uByGoogleId.email, uByGoogleId.password);
-							u.googleAccessToken = googleAccessToken;
-							if (u != null) {
-								Logger.info("User connected with google : " + u);
-								session.put("userid", u.id);
-								index();
-							}
-							// Else : first time connecting with google
-							// -> redirect to registration page with infos in
-							// session
-						} else {
-							session.put("googleAccessToken", googleAccessToken);
-							session.put("googleId", googleId);
-							register();
-						}
-					}
-				}
-			}
-			flash.error("Google login procedure has encountered an error.");
-			login();
-		}
-		GOOGLE.retrieveVerificationCode(fullURL());
-	}
-
-	private static String fullURL() {
-		String url = "Application." + Thread.currentThread().getStackTrace()[2].getMethodName();
-		return play.mvc.Router.getFullUrl(url);
-	}
-
-	private static String fullURL(String url) {
-		return play.mvc.Router.getFullUrl(url);
-	}
-
-	private static void refreshFbAccessToken(User u, String url) {
-		if (OAuth2.isCodeResponse()) {
-			OAuth2.Response response = FACEBOOK.retrieveAccessToken(url);
-			if (response.accessToken != null) {
-				u.fbAccessToken = response.accessToken;
-			}
-		}
-		FACEBOOK.retrieveVerificationCode(url);
-	}
-
-	private static void refreshGoogleAccessToken(User u, String url) {
-		if (OAuth2.isCodeResponse()) {
-			OAuth2.Response response = GOOGLE.retrieveAccessToken(url);
-			if (response.accessToken != null) {
-				u.googleAccessToken = response.accessToken;
-			}
-		}
-		GOOGLE.retrieveVerificationCode(url);
+	public static void historicalEvents() {
+		render();
 	}
 
 	/**
@@ -345,7 +205,6 @@ public class Application extends Controller {
 	 */
 
 	public static void sendEvent(@Required String title, @Required String content, @Required String topic) {
-		Logger.info("Event: " + title + "\nContent: " + content + "\nTopic " + topic);
 		ModelManager.get().getTopicById(topic).multicast(new Event(title, content));
 	}
 
@@ -406,10 +265,10 @@ public class Application extends Controller {
 		renderJSON(result);
 	}
 
-	public static void searchTopics(String search, String title, String content) {
+	public static void searchTopics(String search, String title, String desc) {
 		ArrayList<EventTopic> topics = ModelManager.get().getTopics();
 		boolean searchTitle = Boolean.parseBoolean(title);
-		boolean searchContent = Boolean.parseBoolean(content);
+		boolean searchContent = Boolean.parseBoolean(desc);
 		Long id = Long.parseLong(session.get("userid"));
 		User u = ModelManager.get().getUserById(id);
 		ArrayList<EventTopic> result = new ArrayList<EventTopic>();
@@ -438,11 +297,24 @@ public class Application extends Controller {
 		}
 		render(result);
 	}
+	
+	public static void settings() {
+		Long id = Long.parseLong(session.get("userid"));
+		User u = ModelManager.get().getUserById(id);
+		render(u);
+	}
+	
+	public static void updateSettings(){
+		settings();
+	}
 
 	public static void test() {
+		/*
+		Event e = new Event("Sample title for test event", "A blablabla content for my test event");
 		List<User> u = User.find(
 				"Select u from User as u inner join u.eventTopicIds as strings where ? in strings",
 				"internalns_rootTopic1").fetch();
-		Logger.info("Found : " + u);
+		ModelManager.get().getTopicById("internalns_rootTopic1").multicast(e);
+		*/
 	}
 }

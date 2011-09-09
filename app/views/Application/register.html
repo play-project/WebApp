@@ -1,4 +1,5 @@
-#{extends 'main.html' /} #{set title:'Registration' /}
+#{extends 'main.html' /}
+#{set title:'Registration' /}
 
 <h1>Registration</h1>
 
@@ -24,7 +25,7 @@
 			value="${fbInfo.get("email").getAsString()}" /> </label>
 	</fieldset>
 	<fieldset>
-		<legend>Password</legend>
+		<legend>Password (required in case you want to log in while you are logged out of your Facebook account)</legend>
 		<label><span>Password: </span><input
 			name="password" id="password" class="validate[required],minSize[6] text-input"
 			type="password" /> </label><br />
@@ -79,7 +80,7 @@
 			type="password" /> </label><br />
 	</fieldset>
 	<fieldset>
-		<legend>Personnel information</legend>
+		<legend>Personnal information</legend>
 	<label><span>First name : </span><input type="text" name="firstname" id="firstname"
 		class="validate[required],custom[onlyLetterSp] text-input"
 		value="${firstname}" /></label>

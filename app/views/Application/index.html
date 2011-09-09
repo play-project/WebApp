@@ -1,153 +1,12 @@
-#{extends 'main.html' /} #{set title:'Play Project Web Demo' /}
-
-<style type="text/css">
-/* Accordion
-----------------------------------*/
-div#left-panel {
-	float: left;
-	width: 272px;
-}
-
-div#topic-search-bar {
-	border: 1px solid #DDDDDD;
-	border-radius: 2px;
-	diplay: block;
-	width: 256px;
-	float: left;
-	padding: 10px;
-	margin-bottom: 10px;
-}
-
-#search-button {
-	height: 23px;
-	float: left; 
-	margin-left: 5px;
-}
-
-div#available-topics-container {
-	border: 1px solid #DDDDDD;
-	border-radius: 2px;
-	diplay: block;
-	height: 482px;
-	width: 270px;
-	overflow-y: scroll;
-	overflow-x: hidden;
-	padding: 3px;
-}
-
-div#available-topics {
-	font-size: 95%;
-	float: left;
-	width: 250px;
-}
-
-div#available-topics div {
-	font-size: 110%;
-}
-
-/* Vertical Tabs
-----------------------------------*/
-div#topics {
-	font-size: 80%;
-	float: left;
-	padding: 0 0 0 20px;
-	height: 550px;
-	width: 480px;
-}
-
-.ui-tabs-vertical {
-	width: 660px;
-}
-
-.ui-tabs-vertical .ui-tabs-nav {
-	padding: 3px 2px 3px 3px;
-	float: left;
-	width: 210px;
-}
-
-.ui-tabs-vertical .ui-tabs-nav li {
-	clear: left;
-	width: 100%;
-	border-bottom-width: 1px !important;
-	border-right-width: 0 !important;
-	margin: 0 -1px 3px 0;
-}
-
-.ui-tabs-vertical .ui-tabs-nav li a {
-	display: block;
-	width: 90%;
-}
-
-.ui-tabs-vertical .ui-tabs-nav li.ui-tabs-selected {
-	padding-bottom: 0;
-	margin-bottom: 2px;
-	padding-right: 2px;
-	border-right-width: 1px;
-	border-right-width: 1px;
-}
-
-.ui-tabs-vertical .ui-tabs-panel {
-	overflow-y: scroll;
-	overflow-x: hidden;
-	padding: 0 16px 16px 16px;
-	float: right;
-	width: 410px;
-	min-height: 550px;
-}
-
-.event {
-	margin-top: 10px;
-}
-
-.event h3 {
-	font-size: 12px;
-	margin-bottom: 5px;
-}
-
-
-a.subscribe-button {
-	position: absolute;
-	margin-top: -27px;
-	margin-left: 190px;
-}
-
-a.subscribe-button:hover {
-	color: #EE0;
-}
-
-a.unsubscribe-button {
- 	display: block;
-    font-size: 70%;
-    font-weight: bold;
-    margin-left: 300px;
-    margin-right: 10px;
-    margin-top: -18px;
-    position: absolute;
-    text-decoration: none;
-}
-
-a.unsubscribe-button:hover {
-	color: #EE0;
-}
-
-.unread-count {
-	float: right;
-	width: 100px;
-	text-align: right;
-}
-
-/* Dialog panel */
-div.ui-dialog {
-	font-size: 1em;
-}
-</style>
-
+#{extends 'main.html' /}
+#{set title:'Play Project Web Demo' /}
+#{set nobanner:true /}
 
 #{if fbInfo != null && fbInfo.get("error") == null}
-<h1>
-	Hello <a href='${fbInfo.get("link").getAsString()}'><img
-		src="http://graph.facebook.com/${fbInfo.get("id").getAsString()}/picture" />${fbInfo.get("name").getAsString()}</a>
-</h1>
+<div id="indextitle">
+	<img id="profilepic" src="http://graph.facebook.com/${fbInfo.get("id").getAsString()}/picture" />
+	<span class="valign-middle">Hello <a href='${fbInfo.get("link").getAsString()}'>${fbInfo.get("name").getAsString()}</a></span>
+</div>
 #{/if} #{else}
 <h1 class="pagetitle">Hello ${u.firstname+" "+u.lastname} !</h1>
 #{/else}
@@ -160,20 +19,20 @@ div.ui-dialog {
 			<input type="image"
 			src="@{'/public/images/search_ico.png'}"
 			id="search-button" /><br /><br />
-		Title: <input type="checkbox" name="search-title" id="search-title" />
-		Content: <input type="checkbox" name="search-content" id="search-content" />
+		<a href="#"><span id="searchin-title" class="search-option search-option-checked">Titles</span></a>
+		<a href="#"><span id="searchin-desc" class="search-option">Descriptions</span></a>
 	</div>
 	<div id="available-topics-container">
 		<div id="available-topics">
 			%{ for(int i=0; i < topics.size(); i++){
 			}%
 			<h3 id="topic-${topics.get(i).getId()}">
-				<a href="#">${topics.get(i).getId()}</a><a href="#"
+				<a href="#">${topics.get(i).title}</a><a href="#"
 					class="subscribe-button">Sub</a>
 			</h3>
 			<div id="desc-topic-${topics.get(i).getId()}"><p>
-				Title : ${topics.get(i).title}<br/>
-				Content : ${topics.get(i).content}
+				<b>Id:</b><br/> ${topics.get(i).id}<br/>
+				<b>Description:</b><br/> ${topics.get(i).content}
 			</p></div>
 			%{	
 				}
@@ -191,7 +50,7 @@ div.ui-dialog {
 			%{ for(int i=0; i < userTopics.size(); i++){
 			}%
 			<li><a href="#tab-topic-${userTopics.get(i).getId()}"><span
-					id="unread-${userTopics.get(i).getId()}" class="unread-count">0</span>${userTopics.get(i).getId()}</a>
+					id="unread-${userTopics.get(i).getId()}" class="unread-count">0</span>${userTopics.get(i).title}</a>
 			</li>
 			%{
 				}
@@ -206,7 +65,7 @@ div.ui-dialog {
 
 		<div id="tab-topic-${userTopics.get(i).getId()}">
 			<h2>
-				${userTopics.get(i).getId()}<a href="#"
+				${userTopics.get(i).title}<a href="#"
 					id="unsubscribe-button-${userTopics.get(i).getId()}"
 					class="unsubscribe-button">Unsubscribe</a>
 			</h2>
@@ -309,8 +168,8 @@ $(function() {
 							navigation: true,
 							collapsible: true
 						});
-						$('#tabs').tabs('add','#tab-topic-'+this.id+'','<span id="unread-'+this.id+'" class="unread-count">0</span>'+this.id);
-						$('#tab-topic-'+this.id).html('<h2>'+this.id+'<a href="#" id="unsubscribe-button-'+this.id+'" class="unsubscribe-button">Unsubscribe</a></h2><div id="topic-events-'+this.id+'"></div>');
+						$('#tabs').tabs('add','#tab-topic-'+this.id+'','<span id="unread-'+this.id+'" class="unread-count">0</span>'+this.title);
+						$('#tab-topic-'+this.id).html('<h2>'+this.title+'<a href="#" id="unsubscribe-button-'+this.id+'" class="unsubscribe-button">Unsubscribe</a></h2><div id="topic-events-'+this.id+'"></div>');
 					} else {
 						$("#error2").dialog("open");
 					}
@@ -336,7 +195,7 @@ $(function() {
 		            if(this.id != "-1"){
 						$("#available-topics")
 							.accordion("destroy")
-							.append('<h3 id="topic-'+this.id+'"><a href="#">'+this.id+'</a><a href="#" class="subscribe-button">Sub</a></h3><div id="desc-topic-'+this.id+'"><p>Title: '+this.title+'<br/>Content: '+this.content+'</p></div>')
+							.append('<h3 id="topic-'+this.id+'"><a href="#">'+this.title+'</a><a href="#" class="subscribe-button">Sub</a></h3><div id="desc-topic-'+this.id+'"><p><b>Id:</b><br/> '+this.id+'<br/><b>Description:</b><br/> '+this.content+'</p></div>')
 							.accordion({
 									autoHeight: false,
 									navigation: true,
@@ -429,12 +288,22 @@ var display = function(event, blink) {
 }
 
 var searchAction = #{jsAction @searchTopics() /}
-$('#search-button').bind("click","search");
+$('#search-button').bind("click", function(){
+	search();
+});
+$('#search').bind('keypress', function(e) {
+	if ((e.keyCode || e.which) == 13){
+		search();
+	}
+});
+
 
 var search = function() {
+	var searchtitle = $('#searchin-title').hasClass('search-option-checked');
+	var searchdesc = $('#searchin-desc').hasClass('search-option-checked');
 	$.post(
 		searchAction(),
-		{search:$("#search").prop("value"), title:$("#search-title").prop("checked"), content:$("#search-content").prop("checked")},
+		{search:$("#search").prop("value"), title:searchtitle, desc:searchdesc},
 		function(data) {
 			$("#available-topics")
 				.accordion("destroy")
@@ -447,6 +316,15 @@ var search = function() {
 		},
 		'html');
 }
+
+$('.search-option').bind('click', function(){
+	if($(this).hasClass('search-option-checked')){
+		$(this).removeClass('search-option-checked');
+	} else {
+		$(this).addClass('search-option-checked');
+	}
+	search();
+});
 
 $(document).ready(function(){
 	getEvents();

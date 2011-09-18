@@ -14,6 +14,7 @@ import org.jdom.input.SAXBuilder;
 
 import play.Logger;
 import play.Play;
+import play.mvc.Router;
 
 public class SupportedTopicsXML {
 
@@ -35,7 +36,7 @@ public class SupportedTopicsXML {
 		Document xml = new Document();
 		Element root = null;
 		try {
-			xml = sxb.build(new File("/root/webapp/public/xml/SupportedTopicsSet.xml"));
+			xml = sxb.build(new File("/root/webapp/public/xml/supportedTopicSet.xml"));
 			root = xml.getRootElement();
 		} catch (Exception e) {
 			Logger.error("Error while parsing XML document");
@@ -45,21 +46,40 @@ public class SupportedTopicsXML {
 	}
 
 	private static void parseXMLTree(ArrayList<EventTopic> result, Element node, String path) {
-		String id = node.getNamespacePrefix() + ":" + node.getName();
-		path += " > " + id;
-		List<Attribute> att = node.getAttributes();
-		if (att != null) {
-			for (Attribute a : att) {
-				if (a.getName().equals("topic") && a.getNamespacePrefix().equals("wstop")
-						&& a.getValue().equals("true")) {
+		if (node != null) {
+			String id = node.getNamespacePrefix() + ":" + node.getName();
+			path += " > " + id;
+			List<Attribute> att = node.getAttributes();
+			Boolean isTopic = false;
+			String title = node.getName();
+			String desc = "No description available.";
+			String icon = "/images/noicon.png";
+			if (att != null) {
+				isTopic = false;
+				for (Attribute a : att) {
+					if (a.getName().equals("topic") && a.getNamespacePrefix().equals("wstop")
+							&& a.getValue().equals("true")) {
+						isTopic = true;
+					}
+					if (a.getName().equals("icon") && a.getNamespacePrefix().equals("xhtml")) {
+						icon = a.getValue();
+					}
+					if (a.getName().equals("title") && a.getNamespacePrefix().equals("dcterms")) {
+						title = a.getValue();
+					}
+					if (a.getName().equals("description") && a.getNamespacePrefix().equals("dcterms")) {
+						desc = a.getValue();
+					}
+				}
+				if (isTopic) {
 					result.add(new EventTopic(node.getNamespacePrefix(), node.getName(), node.getNamespace()
-							.getURI(), node.getName(), "Path : " + path));
+							.getURI(), title, icon, desc, path));
 				}
 			}
-		}
-		List<Element> el = node.getChildren();
-		for (Element e : el) {
-			parseXMLTree(result, e, path);
+			List<Element> el = node.getChildren();
+			for (Element e : el) {
+				parseXMLTree(result, e, path);
+			}
 		}
 	}
 

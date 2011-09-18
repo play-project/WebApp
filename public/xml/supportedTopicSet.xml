@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wstop:TopicSet xmlns:wstop="http://docs.oasis-open.org/wsn/t-1"
+	xmlns:s="http://streams.event-processing.org/ids/"
+	xmlns:externalns="http://petals.ow2.org/topicNamespace/sample/External"
+	xmlns:genesis="http://petals.ow2.org/topicNamespace/GenesisDemonstrator"
+	xmlns:internalns="http://petals.ow2.org/topicNamespace/sample/Internal"
+	xmlns:petals="http://petals.ow2.org/topic" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xhtml="http://www.w3.org/1999/xhtml#">
+	<internalns:rootTopic1 wstop:topic="true">
+		<internalns:childTopic1 wstop:topic="true" />
+		<internalns:childTopic2>
+			<internalns:grandChildTopic21 wstop:topic="true" />
+		</internalns:childTopic2>
+		<internalns:childTopic3 wstop:topic="true" />
+	</internalns:rootTopic1>
+	<externalns:rootTopic2>
+		<externalns:childTopic1>
+			<externalns:grandChildTopic11 wstop:topic="true">
+				<externalns:grandGrandChildTopic111 wstop:topic="true" />
+				<externalns:grandGrandChildTopic112 wstop:topic="true" />
+			</externalns:grandChildTopic11>
+		</externalns:childTopic1>
+		<externalns:childTopic2 wstop:topic="true">
+			<externalns:grandChildTopic21 wstop:topic="true" />
+			<externalns:grandChildTopic22 wstop:topic="true" />
+		</externalns:childTopic2>
+	</externalns:rootTopic2>
+	<genesis:rootTopic>
+		<genesis:childTopic1>
+			<genesis:grandChildTopic1 wstop:topic="true">
+				<genesis:grandGrandChildTopic1 wstop:topic="true" />
+				<genesis:grandGrandChildTopic2 wstop:topic="true" />
+			</genesis:grandChildTopic1>
+		</genesis:childTopic1>
+		<genesis:childTopic2 wstop:topic="true">
+			<genesis:grandChildTopic1 wstop:topic="true" />
+			<genesis:grandChildTopic2 wstop:topic="true" />
+		</genesis:childTopic2>
+	</genesis:rootTopic>
+	<petals:component>
+		<petals:cdk>
+			<petals:producer>
+				<petals:in wstop:topic="true" />
+				<petals:out wstop:topic="true" />
+				<petals:status wstop:topic="true" />
+				<petals:fault wstop:topic="true" />
+			</petals:producer>
+		</petals:cdk>
+		<petals:bc-soap>
+			<petals:soapfault wstop:topic="true" />
+		</petals:bc-soap>
+		<petals:bc-mail>
+			<petals:smtpfault wstop:topic="true" />
+		</petals:bc-mail>
+	</petals:component>
+	<petals:kernel>
+		<petals:routagefault wstop:topic="true" />
+		<petals:transporterfault wstop:topic="true" />
+	</petals:kernel>
+	<s:NiceTempStream wstop:topic="true"
+		xhtml:icon="http://www.ville-nice.fr/design/standard/images/favicon.ico"
+		dcterms:title="Nice Temperatures"
+		dcterms:description="A stream of temperature readings.">
+	</s:NiceTempStream>
+	<s:NiceWeatherStream wstop:topic="true"
+		xhtml:icon="http://www.ville-nice.fr/design/standard/images/favicon.ico"
+		dcterms:title="Nice aggregated Weather"
+		dcterms:description="A stream of complex events.">
+	</s:NiceWeatherStream>
+	<s:FacebookStatusFeed wstop:topic="true"
+		xhtml:icon="https://s-static.ak.facebook.com/rsrc.php/yi/r/q9U99v3_saj.ico"
+		dcterms:title="Facebook Status Feed"
+		dcterms:description="A stream of Facebook Wall updates.">
+	</s:FacebookStatusFeed>
+</wstop:TopicSet> 

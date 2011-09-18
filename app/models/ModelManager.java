@@ -36,8 +36,8 @@ public class ModelManager {
 		Logger.info("MODELMANAGER INITIALIZED");
 		
 		topics = SupportedTopicsXML.getSupportedTopics();
-		User u = new User("abourdin@polytech.unice.fr", "666666", "Alex", "Claw", "M");
-		User u2 = new User("claw21@live.fr", "666666", "Alex", "Claw", "M");
+		User u = new User("abourdin@polytech.unice.fr", "666666", "Alex", "Claw", "M", "N");
+		User u2 = new User("claw21@live.fr", "666666", "Alex", "Claw", "M", "N");
 		u2.eventTopicIds.add("internalns_rootTopic1");
 		u.create();
 		u2.create();

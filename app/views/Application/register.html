@@ -34,16 +34,30 @@
 			type="password" /> </label><br />
 	</fieldset>
 	<fieldset>
-		<legend>Personnel information</legend>
+		<legend>Personal information</legend>
 	<label><span>First name: </span><input type="text" name="firstname" id="firstname"
 		class="validate[required],custom[onlyLetterSp] text-input"
 		value="${fbInfo.get("first_name").getAsString()}" /></label>
 	<label><span>Last name: </span><input type="text" name="lastname"  id="lastname"
 		class="validate[required],custom[onlyLetterSp] text-input"
 		value="${fbInfo.get("last_name").getAsString()}" /></label>
-	<label><span>Gender:<br/></span>
-	M <input type="radio" name="gender" value="M" #{if fbInfo.get("gender").getAsString().equals("male")}checked#{/if}/>
-	F <input type="radio" name="gender" value="F" #{if fbInfo.get("gender").getAsString().equals("female")}checked#{/if}/></label>
+	<span>Gender:<br/></span>
+	<label>M <input type="radio" name="gender" value="M" #{if fbInfo.get("gender").getAsString().equals("male")}checked#{/if}/></label>
+	<label>F <input type="radio" name="gender" value="F" #{if fbInfo.get("gender").getAsString().equals("female")}checked#{/if}/></label>
+	</fieldset>
+	<fieldset>
+		<legend>Account settings</legend>
+		<span>Receive events by email:<br/></span>
+		<label>Always: <input type="radio" id="mailnotifalways" name="mailnotif" 
+			class="validate[required] radio"
+			value="A" checked/></label>
+		<label>Only when disconnected: <input type="radio" id="mailnotifyes" name="mailnotif" 
+			class="validate[required] radio"
+			value="Y"/></label>
+		<label>Never: <input type="radio" id="mailnotifno" name="mailnotif" 
+			class="validate[required] radio"
+			value="N" checked/></label>
+		</label>
 	</fieldset>
 	<fieldset>
 		<legend>Are you human ?</legend>
@@ -80,20 +94,33 @@
 			type="password" /> </label><br />
 	</fieldset>
 	<fieldset>
-		<legend>Personnal information</legend>
-	<label><span>First name : </span><input type="text" name="firstname" id="firstname"
+		<legend>Personal information</legend>
+	<label><span>First name: </span><input type="text" name="firstname" id="firstname"
 		class="validate[required],custom[onlyLetterSp] text-input"
 		value="${firstname}" /></label>
 	<label><span>Last name: </span><input type="text" name="lastname"  id="lastname"
 		class="validate[required],custom[onlyLetterSp] text-input"
 		value="${lastname}" /></label>
-	<label><span>Gender:<br/></span>
-		M <input type="radio" id="gender1" name="gender" 
+	<span>Gender:<br/></span>
+		<label>M <input type="radio" id="gender1" name="gender" 
 			class="validate[required] radio"
-			value="M" #{if gender.equals("M")}checked#{/if}/>
-		F <input type="radio" id="gender2" name="gender" 
+			value="M" #{if gender.equals("M")}checked#{/if}/></label>
+		<label>F <input type="radio" id="gender2" name="gender" 
 			class="validate[required] radio"
 			value="F" #{if gender.equals("F")}checked#{/if}/></label>
+	</fieldset>
+	<fieldset>
+		<legend>Account settings</legend>
+		<span>Receive events by email:<br/></span>
+		<label>Always: <input type="radio" id="mailnotifalways" name="mailnotif" 
+			class="validate[required] radio"
+			value="A" #{if mailnotif.equals("Y")}checked#{/if}/></label>
+		<label>Only when disconnected: <input type="radio" id="mailnotifyes" name="mailnotif" 
+			class="validate[required] radio"
+			value="Y" #{if mailnotif.equals("Y")}checked#{/if}/></label>
+		<label>Never: <input type="radio" id="mailnotifno" name="mailnotif" 
+			class="validate[required] radio"
+			value="N" #{if mailnotif.equals("N")}checked#{/if} #{if mailnotif == null}checked#{/if}/></label>
 	</fieldset>
 	<fieldset>
 		<legend>Are you human ?</legend>
@@ -111,8 +138,7 @@
 </div>
 
 <script type="text/javascript">
-	jQuery(document).ready(function() {
-		// binds form submission and fields to the validation engine
-		jQuery("#registerform").validationEngine();
+	$(document).ready(function() {
+		$("#registerform").validationEngine();
 	});
 </script>

@@ -5,7 +5,7 @@ html {
 	margin-bottom: 1px;
 }
 
-body, td {
+body,td {
 	font-family: Helvetica, Arial, Verdana, sans-serif;
 	color: #333;
 	line-height: 1.3em;
@@ -29,16 +29,17 @@ img {
 	border: 0 none;
 }
 
-h1, h2, h3, h4, h5, h6 {
-    color: #6B9E31;
+h1,h2,h3,h4,h5,h6 {
+	color: #6B9E31;
 }
 
 h1 {
-    line-height: 1em;
-    margin: 10px 0 6px 0;
-    width: 100%;
-    font-weight: bold;
-    font-size: 1.6em;
+	line-height: 1em;
+	margin: 10px 0 6px 0;
+	width: 100%;
+	font-weight: bold;
+	font-size: 1.6em;
+	padding: 15px;
 }
 
 a {
@@ -46,17 +47,16 @@ a {
 }
 
 h2 {
-    border-bottom: 1px solid;
-    font-size: 1.5em;
-    margin-bottom: 8px;
-    margin-left: 10px;
-    margin-top: 10px;
+	border-bottom: 1px solid;
+	font-size: 1.5em;
+	margin-bottom: 8px;
+	margin-left: 10px;
+	margin-top: 10px;
 	padding-bottom: 5px;
 }
 
 /* Index elements
 ----------------------------------*/
-
 #profilepic {
 	padding: 3px;
 	border: 1px solid #D3D3D3;
@@ -129,7 +129,7 @@ div#topic-search-bar {
 
 #search-button {
 	height: 23px;
-	float: left; 
+	float: left;
 	margin-left: 5px;
 }
 
@@ -152,6 +152,17 @@ div#available-topics {
 
 div#available-topics div {
 	font-size: 110%;
+}
+
+span.topic-tech-desc {
+	font-size : 75%;
+}
+
+img.available-topic-icon {
+	width:16px;
+	height:16px;
+	position:absolute;
+	margin-left: 10px;
 }
 
 /* Vertical Tabs
@@ -204,6 +215,11 @@ div#topics {
 	min-height: 550px;
 }
 
+.ui-helper-reset {
+    font-size: 100%;
+    line-height: 16px;
+}
+
 .event {
 	margin-top: 10px;
 }
@@ -212,7 +228,6 @@ div#topics {
 	font-size: 12px;
 	margin-bottom: 5px;
 }
-
 
 a.subscribe-button {
 	position: absolute;
@@ -225,14 +240,14 @@ a.subscribe-button:hover {
 }
 
 a.unsubscribe-button {
- 	display: block;
-    font-size: 70%;
-    font-weight: bold;
-    margin-left: 300px;
-    margin-right: 10px;
-    margin-top: -18px;
-    position: absolute;
-    text-decoration: none;
+	display: block;
+	font-size: 70%;
+	font-weight: bold;
+	margin-left: 300px;
+	margin-right: 10px;
+	margin-top: -18px;
+	position: absolute;
+	text-decoration: none;
 }
 
 a.unsubscribe-button:hover {
@@ -245,16 +260,21 @@ a.unsubscribe-button:hover {
 	text-align: right;
 }
 
+img.tab-topic-icon {
+	position:absolute;
+	width:16px;
+	height:16px;
+	margin-left: 10px;
+}
+
 /* Dialog panels
 ----------------------------------*/
-
 div.ui-dialog {
 	font-size: 1em;
 }
 
 /* Main Layout
 ----------------------------------*/
-
 #menubar {
 	height: 40px;
 	width: 980px;
@@ -270,22 +290,71 @@ div.ui-dialog {
 	border-left: 1px solid #4F7425;
 	height: 31px;
 	width: auto;
-	position: absolute;
-	margin: 8px 0 0 600px;
+	float: right;
+	margin: 8px 50px 0 0;
 	padding-left: 20px;
-	padding-right: 20px;
-}
-
-#logout-tab, #settings-tab, #historical-tab, #myevents-tab {
-	font-weight: bold;
-	padding: 8px;
-	color: #FFFFFF;
-	display: block;
-	float: left;
+	padding-right: 0px;
 }
 
 #menutabs a:hover {
 	background-color: #94C55D;
+}
+
+.menubar-tab {
+	font-weight: bold;
+	padding: 8px 12px;
+	color: #FFFFFF;
+	display: block;
+	float: left;
+	width: auto;
+}
+
+#account-tab-open {
+	color: #000000;
+	font-weight: bold;
+	background-color: #FFFFFF;
+	border-top: 1px solid black;
+	border-left: 1px solid black;
+	border-right: 1px solid black;
+	padding: 9px 12px 8px 12px;
+	visibility: hidden;
+	z-index: 11;
+	font-weight: bold;
+	height: 20px;
+}
+
+#account-tab-nav {
+	background-color: #FFFFFF;
+	border: 1px solid black;
+	width: 150px;
+	height: auto;
+	display: block;
+	position: absolute;
+	visibility: hidden;
+	margin-top: 29px;
+	z-index: 10;
+	padding: 5px 0;
+}
+
+.account-icon {
+	display: inline-block;
+	height: 10px;
+	margin-top: -6px;
+}
+
+a.account-nav-link {
+	display: block;
+	border-top: 1px solid #FFFFFF;
+	border-bottom: 1px solid #FFFFFF;
+	padding: 4px 6px 4px 10px;;
+	color: #4F7425;
+}
+
+a.account-nav-link:hover {
+	border-top: 1px solid #4F7425;
+	border-bottom: 1px solid #4F7425;
+	color: #FFFFFF;
+	background-color: #60C45D;
 }
 
 #page_bg {

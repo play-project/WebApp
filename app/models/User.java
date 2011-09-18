@@ -20,6 +20,7 @@ public class User extends Model {
 	public String gender;
 	public String fbId;
 	public String googleId;
+	public String mailnotif;
 	@ElementCollection
 	public List<String> eventTopicIds;
 	@Transient
@@ -28,7 +29,7 @@ public class User extends Model {
 	public String fbAccessToken;
 	public String googleAccessToken;
 
-	public User(String email, String password, String firstname, String lastname, String gender,
+	public User(String email, String password, String firstname, String lastname, String gender, String mailnotif,
 			ArrayList<String> eventTopicIds) {
 		this.email = email;
 		this.password = password;
@@ -38,11 +39,12 @@ public class User extends Model {
 		this.fbId = null;
 		this.googleId = null;
 		this.eventTopicIds = eventTopicIds;
+		this.mailnotif = mailnotif;
 		UserEventBuffer eventBuffer = new UserEventBuffer();
 	}
 
-	public User(String email, String password, String firstname, String lastname, String gender) {
-		this(email, password, firstname, lastname, gender, new ArrayList<String>());
+	public User(String email, String password, String firstname, String lastname, String gender, String mailnotif) {
+		this(email, password, firstname, lastname, gender, mailnotif, new ArrayList<String>());
 	}
 
 	public EventTopic subscribe(String topicId) {
@@ -94,13 +96,14 @@ public class User extends Model {
 		}
 	}
 
-	private void update() {
+	public void update() {
 		User u = User.find("byId", this.id).first();
 		u.email = email;
 		u.password = password;
 		u.firstname = firstname;
 		u.lastname = lastname;
 		u.gender = gender;
+		u.mailnotif = mailnotif;
 		u.eventTopicIds = eventTopicIds;
 		u.save();
 	}

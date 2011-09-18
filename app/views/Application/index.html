@@ -1,6 +1,7 @@
 #{extends 'main.html' /}
 #{set title:'Play Project Web Demo' /}
 #{set nobanner:true /}
+#{set nofooter:true /}
 
 #{if fbInfo != null && fbInfo.get("error") == null}
 <div id="indextitle">
@@ -27,12 +28,15 @@
 			%{ for(int i=0; i < topics.size(); i++){
 			}%
 			<h3 id="topic-${topics.get(i).getId()}">
-				<a href="#">${topics.get(i).title}</a><a href="#"
-					class="subscribe-button">Sub</a>
+				<a href="#">${topics.get(i).title} <img src="${topics.get(i).icon}" class="available-topic-icon"></a>
+				<a href="#"	class="subscribe-button">Sub</a>
 			</h3>
 			<div id="desc-topic-${topics.get(i).getId()}"><p>
-				<b>Id:</b><br/> ${topics.get(i).id}<br/>
-				<b>Description:</b><br/> ${topics.get(i).content}
+				${topics.get(i).content.raw()}<br/><br/>
+				<span class="topic-tech-desc">
+					<br/><b>Id: </b> ${topics.get(i).id}
+					<br/><b>Path: </b> ${topics.get(i).path}
+				</span>
 			</p></div>
 			%{	
 				}
@@ -50,7 +54,8 @@
 			%{ for(int i=0; i < userTopics.size(); i++){
 			}%
 			<li><a href="#tab-topic-${userTopics.get(i).getId()}"><span
-					id="unread-${userTopics.get(i).getId()}" class="unread-count">0</span>${userTopics.get(i).title}</a>
+					id="unread-${userTopics.get(i).getId()}" class="unread-count">0</span>${userTopics.get(i).title}
+				<img src="${userTopics.get(i).icon}" class="tab-topic-icon"></a>
 			</li>
 			%{
 				}
@@ -65,8 +70,8 @@
 
 		<div id="tab-topic-${userTopics.get(i).getId()}">
 			<h2>
-				${userTopics.get(i).title}<a href="#"
-					id="unsubscribe-button-${userTopics.get(i).getId()}"
+				${userTopics.get(i).title}
+				<a href="#" id="unsubscribe-button-${userTopics.get(i).getId()}"
 					class="unsubscribe-button">Unsubscribe</a>
 			</h2>
 			<div id="topic-events-${userTopics.get(i).getId()}"></div>
@@ -168,7 +173,7 @@ $(function() {
 							navigation: true,
 							collapsible: true
 						});
-						$('#tabs').tabs('add','#tab-topic-'+this.id+'','<span id="unread-'+this.id+'" class="unread-count">0</span>'+this.title);
+						$('#tabs').tabs('add','#tab-topic-'+this.id+'','<span id="unread-'+this.id+'" class="unread-count">0</span>'+this.title+'<img src="'+this.icon+'" class="tab-topic-icon">');
 						$('#tab-topic-'+this.id).html('<h2>'+this.title+'<a href="#" id="unsubscribe-button-'+this.id+'" class="unsubscribe-button">Unsubscribe</a></h2><div id="topic-events-'+this.id+'"></div>');
 					} else {
 						$("#error2").dialog("open");
@@ -195,7 +200,8 @@ $(function() {
 		            if(this.id != "-1"){
 						$("#available-topics")
 							.accordion("destroy")
-							.append('<h3 id="topic-'+this.id+'"><a href="#">'+this.title+'</a><a href="#" class="subscribe-button">Sub</a></h3><div id="desc-topic-'+this.id+'"><p><b>Id:</b><br/> '+this.id+'<br/><b>Description:</b><br/> '+this.content+'</p></div>')
+							.append('<h3 id="topic-'+this.id+'"><a href="#">'+this.title+'<img src="'+this.icon+'" class="available-topic-icon"/></a><a href="#" class="subscribe-button">Sub</a></h3><div id="desc-topic-'+this.id+'"><p>'
+									+ this.content + '<br/><br/><span class="topic-tech-desc"><br/><b>Id: </b>'+this.id+'<br/><b>Path: </b>'+this.path+'</span></p></div>')
 							.accordion({
 									autoHeight: false,
 									navigation: true,

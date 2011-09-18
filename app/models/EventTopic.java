@@ -15,15 +15,19 @@ public class EventTopic {
 	public String namespace;
 	public String uri;
 	public String title;
+	public String icon;
 	public String content;
+	public String path;
 	public List<User> subscribingUsers;
 
-	public EventTopic(String namespace, String name, String uri, String title, String content) {
+	public EventTopic(String namespace, String name, String uri, String title, String icon, String content, String path) {
 		this.namespace = namespace;
 		this.name = name;
 		this.uri = uri;
 		this.title = title;
+		this.icon = icon;
 		this.content = content;
+		this.path = path;
 		this.subscribingUsers = new ArrayList<User>();
 	}
 
@@ -44,8 +48,10 @@ public class EventTopic {
 			User uCon = ModelManager.get().getUserById(uSub.id);
 			if (uCon != null) {
 				uCon.getEventBuffer().publish(e);
-			} else {
-				Logger.info("Mailing to:" + uSub.email);
+				if(uSub.mailnotif.equals("A")){
+					Mails.mailEvent(e, uSub);
+				}
+			} else if(uSub.mailnotif.equals("Y")){
 				Mails.mailEvent(e, uSub);
 			}
 		}

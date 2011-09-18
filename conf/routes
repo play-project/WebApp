@@ -7,11 +7,11 @@ GET     /								Application.index
 GET		/login							Application.login
 POST	/proclog						Application.processLogin
 GET		/logout							Application.logout
+GET		/about							Application.about
 
 GET		/settings						Application.settings
 POST	/updatesettings					Application.updateSettings
 
-GET		/historical						Application.historicalEvents
 
 GET		/register						Application.register
 POST	/procreg						Application.processRegistration
@@ -22,11 +22,12 @@ POST	/searchtopics					Application.searchTopics
 GET		/fbauth							Authentifier.facebookAuth
 GET		/googleauth						Authentifier.googleAuth
 
-# Event push
+# Events
 GET		/waitevents						Application.waitEvents
 POST	/subscribe						Application.subscribe
 POST	/unsubscribe					Application.unsubscribe
 POST    /sendevent             		 	Application.sendEvent
+GET		/historical						Application.historicalEvents
 
 # WS Test
 POST	/webservice/soapnotifendpoint				WebService.soapNotifEndPoint
@@ -37,4 +38,5 @@ GET		/webservice/subscribe						WebService.subscribe
 GET     /favicon.ico                    404
 
 # Map static resources from the /app/public folder to the /public path
-GET     /public/                        staticDir:public
+GET     /public-v003/						staticDir:public
+GET		/images/							staticDir:public/images

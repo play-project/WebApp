@@ -54,23 +54,59 @@
 				</object>
 			</div>
 			#{/if}
-			%{ if(session.get("userid") != null) { }%
 				<div id="menubar">
 					<div id="menutabs">
-						  <a id="myevents-tab" href="@{Application.index()}">My Events</a>
-						  <a id="historical-tab" href="@{Application.historicalEvents()}">Historical</a>
-						  <a id="settings-tab" href="@{Application.settings()}">Settings</a> 
-						  <a id="logout-tab" href="@{Application.logout()}">Logout</a> 
+						#{if session.get("userid") != null}
+						  	<a class="menubar-tab" href="@{Application.index()}">My Events</a>
+						  	<a class="menubar-tab" href="@{Application.historicalEvents()}">Historical</a>
+						#{/if}
+					  	<a class="menubar-tab" href="@{Application.about()}">About</a>
+					  	<a id="account-tab" class="menubar-tab" href="#">Account <span class="account-icon ui-icon ui-icon-triangle-1-s"></span></a>
+					</div>
+					<a id="account-tab-open" href="#">Account <span class="account-icon ui-icon ui-icon-triangle-1-s"></span></a>
+					<div id="account-tab-nav">
+						#{if session.get("userid") != null}
+							<a class="account-nav-link" href="@{Application.settings()}">Settings</a> 
+							<a class="account-nav-link" href="@{Application.logout()}">Logout</a>
+						#{/if}
+						#{else}
+							<a class="account-nav-link" href="@{Application.login()}">Login</a>
+							<a class="account-nav-link" href="@{Authentifier.facebookAuth()}">Login with Facebook</a>
+							<a class="account-nav-link" href="@{Application.register()}">Register</a>
+						#{/else}
 					</div>
 				</div>
-		    %{ 
-			   }
-			}%
+				<script type="text/javascript">
+					$(document).ready(function() {
+						$('#account-tab-open').offset({
+							top: $('#account-tab').offset().top-1,
+							left: $('#account-tab').offset().left-1
+						});
+						$('#account-tab-nav').offset({
+							top: $('#account-tab').offset().top + $('#menutabs').height() - 1,
+							left: $('#account-tab').offset().left - $('#account-tab-nav').width() + $('#account-tab').width() + 24
+						});
+					});
+				
+					$('#account-tab').bind('click', function(){
+						$(this).css('visibility', 'hidden');
+						$('#account-tab-open').css('visibility', 'visible');
+						$('#account-tab-nav').css('visibility', 'visible');
+					});
+
+					$('#account-tab-open').bind('click', function(){
+						$(this).css('visibility', 'hidden');
+						$('#account-tab').css('visibility', 'visible');
+						$('#account-tab-nav').css('visibility', 'hidden');
+					});
+				</script>
 		</div>
 		<div id="maincolumn">
 			<div class="nopad">#{doLayout /}</div>
 		</div>
+		
 		<div>
+			#{if !nofooter}
 			<div class="module">
 				<div>
 					<div>
@@ -152,6 +188,81 @@
 					</div>
 				</div>
 			</div>
+			#{/if}
+			#{else}
+			<div class="module">
+				<div>
+					<div>
+						<div>
+							<div id="footer">
+								<div id="footer-wrap">
+									<!-- columns starts here-->
+									<div id="columns">
+										<br>
+										<table cellspacing="0" cellpadding="0" border="0"
+											style="width: 100%;">
+											<tbody>
+												<tr>
+													<td width="200px" align="center" rowspan="5">
+													</td>
+													<td></td>
+													<td>FOLLOW US</td>
+													<td>CONTACT US</td>
+												</tr>
+												<tr>
+													<td></td>
+													<td><a href="https://twitter.com/#!/play_fp7">&nbsp;<img
+															width="16" height="16" border="0" title="Twitter"
+															alt="Twitter"
+															src="http://www.play-project.eu/images/stories/icon_twitter.png"
+															style="border: 0;"> Twitter</a>
+													</td>
+													<td>Project Coordinator: <a
+														href="mailto:nenad.stojanovic%20%5Bat%5D%20fzi.de">nenad.stojanovic
+															[AT] fzi.de</a>
+													</td>
+												</tr>
+												<tr>
+													<td></td>
+													<td><a href="http://news.play-project.eu/">&nbsp;<img
+															width="16" height="16" border="0" title="Posterous"
+															alt="Posterous"
+															src="http://www.play-project.eu/images/stories/icon_posterous.png"
+															style="border: 0;"> Posterous</a>
+													</td>
+													<td><a href="http://news.play-project.eu/"></a>
+													</td>
+												</tr>
+												<tr>
+													<td></td>
+													<td>&nbsp;<a
+														href="http://feeds.feedburner.com/playprojectnews"><img
+															width="16" height="16"
+															src="http://www.play-project.eu/images/stories/icon_rss.jpg"
+															alt="rss"> RSS</a>
+													</td>
+													<td></td>
+												</tr>
+												<tr>
+													<td></td>
+													<td><a
+														href="http://www.play-project.eu/index.php/newsletter-subscription.html">&nbsp;<img
+															width="16" height="16"
+															src="http://www.play-project.eu/images/stories/icon_email_famfam.gif">&nbsp;Newsletter</a>
+													</td>
+													<td></td>
+												</tr>
+											</tbody>
+										</table>
+										<!-- columns ends -->
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			#{/else}
 		</div>
 		<br clear="all"> <img id="main_bottom" align="bottom"
 			alt="bottom" src="@{'/public/images/bottom.png'}">

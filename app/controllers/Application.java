@@ -11,13 +11,20 @@ import play.libs.Images;
 import play.libs.WS;
 import play.mvc.*;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
+import com.ebmwebsourcing.easycommons.xml.XMLHelper;
 import org.w3c.dom.Document;
 
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+
+import fr.inria.eventcloud.translators.wsnotif.WsNotificationTranslator;
+import fr.inria.eventcloud.translators.wsnotif.WsNotificationTranslatorImpl;
 
 import models.*;
 
@@ -26,9 +33,11 @@ public class Application extends Controller {
 	/**
 	 * Action to call before each action requiring the user to be connected
 	 */
-	@Before(only = { "index", "settings", "updateSettings", "sendEvent", "waitEvents", "subscribe", "unsubscribe", "getTopics" })
+	@Before(only = { "index", "settings", "updateSettings", "sendEvent", "subscribe", "unsubscribe",
+			"getTopics" })
 	private static void checkAuthentification() {
-		if (session.get("userid") == null) {
+		String uid = session.get("userid");
+		if (uid == null) {
 			login();
 		}
 	}
@@ -78,7 +87,7 @@ public class Application extends Controller {
 		}
 		render(u, fbInfo, topics, userTopics);
 	}
-	
+
 	private static String fullURL() {
 		String url = "Application." + Thread.currentThread().getStackTrace()[2].getMethodName();
 		return play.mvc.Router.getFullUrl(url);
@@ -156,6 +165,7 @@ public class Application extends Controller {
 			@Required(message = "First name is required") String firstname,
 			@Required(message = "Last name is required") String lastname,
 			@Required(message = "Gender is required") String gender,
+			@Required(message = "Mail notification choice is required") String mailnotif,
 			@Required(message = "Please type the code") String code, String randomID) {
 		validation.equals(code, Cache.get(randomID)).message("Invalid code. Please type it again");
 		validation.isTrue(User.find("byEmail", email).first() == null).message("Email already in use");
@@ -166,10 +176,10 @@ public class Application extends Controller {
 			}
 			flash.put("error", errorMsg);
 			renderTemplate("Application/register.html", email, emailconf, firstname, lastname, gender,
-					randomID);
+					mailnotif, randomID);
 		}
 		Cache.delete(randomID);
-		User u = new User(email, password, firstname, lastname, gender);
+		User u = new User(email, password, firstname, lastname, gender, mailnotif);
 		u.fbId = session.get("fbId");
 		u.googleId = session.get("googleId");
 		u.create();
@@ -192,7 +202,50 @@ public class Application extends Controller {
 		Cache.set(id, code, "10mn");
 		renderBinary(captcha);
 	}
-	
+
+	/**
+	 * Settings page
+	 */
+	public static void settings() {
+		Long id = Long.parseLong(session.get("userid"));
+		User u = ModelManager.get().getUserById(id);
+		render(u);
+	}
+
+	/**
+	 * Update settings
+	 */
+	public static void updateSettings(String password, String newpassword, String newpasswordconf,
+			@Required(message = "First name is required") String firstname,
+			@Required(message = "Last name is required") String lastname,
+			@Required(message = "Gender is required") String gender,
+			@Required(message = "Mail notification choice is required") String mailnotif) {
+		Long id = Long.parseLong(session.get("userid"));
+		User u = ModelManager.get().getUserById(id);
+		if (!newpassword.equals("")) {
+			validation.equals(password, u.password).message("Wrong password");
+			validation.equals(newpassword, newpasswordconf).message(
+					"New password and confirmation don't match.");
+			if (!validation.hasErrors()) {
+				u.password = newpassword;
+			}
+		}
+		if (validation.hasErrors()) {
+			ArrayList<String> errorMsg = new ArrayList<String>();
+			for (Error error : validation.errors()) {
+				errorMsg.add(error.message());
+			}
+			flash.put("error", errorMsg);
+			settings();
+		}
+		u.firstname = firstname;
+		u.lastname = lastname;
+		u.gender = gender;
+		u.mailnotif = mailnotif;
+		u.update();
+		settings();
+	}
+
 	/**
 	 * Historical events
 	 */
@@ -239,8 +292,8 @@ public class Application extends Controller {
 		if (u != null) {
 			EventTopic sd = u.subscribe(topicId);
 			if (sd != null) {
-				result = "{\"id\":\"" + sd.getId() + "\",\"title\":\"" + sd.title + "\",\"content\":\""
-						+ sd.content + "\"}";
+				result = "{\"id\":\"" + sd.getId() + "\",\"title\":\"" + sd.title + "\",\"icon\":\""
+						+ sd.icon + "\",\"content\":\"" + sd.content + "\",\"path\":\"" + sd.path + "\"}";
 			}
 		}
 		renderJSON(result);
@@ -258,8 +311,8 @@ public class Application extends Controller {
 		if (u != null) {
 			EventTopic sd = u.unsubscribe(topicId);
 			if (sd != null) {
-				result = "{\"id\":\"" + sd.getId() + "\",\"title\":\"" + sd.title + "\",\"content\":\""
-						+ sd.content + "\"}";
+				result = "{\"id\":\"" + sd.getId() + "\",\"title\":\"" + sd.title + "\",\"icon\":\""
+						+ sd.icon + "\",\"content\":\"" + sd.content + "\",\"path\":\"" + sd.path + "\"}";
 			}
 		}
 		renderJSON(result);
@@ -297,24 +350,8 @@ public class Application extends Controller {
 		}
 		render(result);
 	}
-	
-	public static void settings() {
-		Long id = Long.parseLong(session.get("userid"));
-		User u = ModelManager.get().getUserById(id);
-		render(u);
-	}
-	
-	public static void updateSettings(){
-		settings();
-	}
 
-	public static void test() {
-		/*
-		Event e = new Event("Sample title for test event", "A blablabla content for my test event");
-		List<User> u = User.find(
-				"Select u from User as u inner join u.eventTopicIds as strings where ? in strings",
-				"internalns_rootTopic1").fetch();
-		ModelManager.get().getTopicById("internalns_rootTopic1").multicast(e);
-		*/
+	public static void about() {
+		render();
 	}
 }

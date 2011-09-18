@@ -1,45 +1,70 @@
 #{extends 'main.html' /}
 #{set title:'Play Project Web Demo' /}
 #{set nobanner:true /}
+#{set nofooter:true /}
 
 <h1>Account settings</h1>
 
-<form id="settingsform" action="@{Application.updateSettings()}"
-	method="POST" class="formular">
-	<fieldset>
-		<legend>Account information</legend>
-		<label><span>Email: </span><input type="text" name="email"
-			id="email" class="validate[custom[email]] text-input"
-			value="${u.email}" /> </label><br />
-		<label><span>Current password: </span><input
-			name="currpassword" id="currpassword" class="validate[required] text-input"
-			type="password" /> </label>
-		<label><span>New password: </span><input
-			name="newpassword" id="newpassword" class="minSize[6] text-input"
-			type="password" /> </label>
-		<label><span>Confirm password: </span><input name="confpassword" id="confpassword"
-			class="equals[newpassword] text-input"
-			type="password" /> </label>
-	</fieldset>
-	<fieldset>
-		<legend>Personnal information</legend>
-	<label><span>First name : </span><input type="text" name="firstname" id="firstname"
-		class="validate[required],custom[onlyLetterSp] text-input"
-		value="${u.firstname}" /></label>
-	<label><span>Last name: </span><input type="text" name="lastname"  id="lastname"
-		class="validate[required],custom[onlyLetterSp] text-input"
-		value="${u.lastname}" /></label>
-	<label><span>Gender:<br/></span>
-		M <input type="radio" id="gender1" name="gender" 
-			class="validate[required] radio"
-			value="M" #{if u.gender.equals("M")}checked#{/if}/>
-		F <input type="radio" id="gender2" name="gender" 
-			class="validate[required] radio"
-			value="F" #{if u.gender.equals("F")}checked#{/if}/></label>
-	</fieldset>
-	<hr/>
-	<input type="submit" class="submit" value="Update information" /><br />
-</form>
+#{if flash.get("error")}
+<p class="errors">
+	%{ String[] errors = flash.get("error"); for(String e : errors){
+	if(!e.equals("[") && !e.equals("]")){ out.print(e); }
+	if(e.equals(",")){ out.println("<br />"); } } %}
+</p>
+%{ out.print("<br />"); %} #{/if}
+
+	<div style="margin-left:50px; margin-top:20px;">
+	<form id="settingsform" action="@{Application.updateSettings()}"
+		method="POST" class="formular">
+		<fieldset>
+			<legend>Account information</legend>
+			<label><span>Email: </span><input type="text" name="email"
+				id="email" class="validate[custom[email]] text-input"
+				value="${u.email}" READONLY /> </label><br />
+			<label><span>Current password: </span><input
+				name="password" id="password" class="minSize[6] text-input"
+				type="password" /> </label>
+			<label><span>New password: </span><input
+				name="newpassword" id="newpassword" class="minSize[6] text-input"
+				type="password" /> </label>
+			<label><span>Confirm password: </span><input name="newpasswordconf" id="newpasswordconf"
+				class="equals[newpassword] text-input"
+				type="password" /> </label>
+		</fieldset>
+		<fieldset>
+			<legend>Personnal information</legend>
+		<label><span>First name: </span><input type="text" name="firstname" id="firstname"
+			class="validate[required],custom[onlyLetterSp] text-input"
+			value="${u.firstname}" /></label>
+		<label><span>Last name: </span><input type="text" name="lastname"  id="lastname"
+			class="validate[required],custom[onlyLetterSp] text-input"
+			value="${u.lastname}" /></label>
+		<span>Gender:<br/></span>
+			<label>M <input type="radio" id="gender1" name="gender" 
+				class="validate[required] radio"
+				value="M" #{if u.gender.equals("M")}checked#{/if}/></label>
+			<label>F <input type="radio" id="gender2" name="gender" 
+				class="validate[required] radio"
+				value="F" #{if u.gender.equals("F")}checked#{/if}/></label>
+		</fieldset>
+		<fieldset>
+			<legend>Account settings</legend>
+			<span>Receive events by email:<br/></span>
+			<label>Always: <input type="radio" id="mailnotifalways" name="mailnotif" 
+				class="validate[required] radio"
+				value="A" #{if u.mailnotif.equals("A")}checked#{/if}/></label>
+			<label>Only when disconnected: <input type="radio" id="mailnotifyes" name="mailnotif" 
+				class="validate[required] radio"
+				value="Y" #{if u.mailnotif.equals("Y")}checked#{/if}/></label>
+			<label>Never: <input type="radio" id="mailnotifno" name="mailnotif" 
+				class="validate[required] radio"
+				value="N" #{if u.mailnotif.equals("N")}checked#{/if}/></label>
+			</label>
+		</fieldset>
+		<hr/>
+		<input type="submit" class="submit" value="Update information" /><br />
+	</form>
+</div>
 
 <script type="text/javascript">
 	jQuery(document).ready(function() {

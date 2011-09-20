@@ -1,7 +1,0 @@
-07 juil. 2011 23:14:40,462 INFO  ~ Starting E:\workspace\webapp
-07 juil. 2011 23:14:40,467 WARN  ~ Declaring modules in application.conf is deprecated. Use dependencies.yml instead (module.crud)
-07 juil. 2011 23:14:40,468 INFO  ~ Module crud is available (E:\workspace\play-1.2.1\modules\crud)
-07 juil. 2011 23:14:41,185 WARN  ~ You're running Play! in DEV mode
-07 juil. 2011 23:14:41,330 INFO  ~ Listening for HTTP on port 9000 (Waiting a first request to start) ...
-07 juil. 2011 23:14:51,100 INFO  ~ Connected to jdbc:h2:mem:play;MODE=MYSQL;LOCK_MODE=0
-07 juil. 2011 23:14:51,941 INFO  ~ Application 'webapp' is now started !

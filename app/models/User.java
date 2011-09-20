@@ -11,6 +11,12 @@ import com.google.gson.JsonObject;
 import play.Logger;
 import play.db.jpa.*;
 
+/**
+ * User model and Entity class, used by JPA to save user data into the connected database
+ * 
+ * @author Alexandre Bourdin
+ *
+ */
 @Entity
 public class User extends Model {
 	public String email;
@@ -47,13 +53,17 @@ public class User extends Model {
 		this(email, password, firstname, lastname, gender, mailnotif, new ArrayList<String>());
 	}
 
+	/**
+	 * Subscribe to a topic
+	 * @param topicId
+	 * @return
+	 */
 	public EventTopic subscribe(String topicId) {
 		if (eventTopicIds.contains(topicId)) {
 			return null;
 		}
 		EventTopic eb = ModelManager.get().getTopicById(topicId);
 		if (eb != null) {
-			eb.addUser(this);
 			eventTopicIds.add(eb.getId());
 			Collections.sort(eventTopicIds);
 			update();
@@ -62,13 +72,17 @@ public class User extends Model {
 		return null;
 	}
 
+	/**
+	 * Unsubscribe to a topic
+	 * @param topicId
+	 * @return
+	 */
 	public EventTopic unsubscribe(String topicId) {
 		if (!eventTopicIds.contains(topicId)) {
 			return null;
 		}
 		EventTopic eb = ModelManager.get().getTopicById(topicId);
 		if (eb != null) {
-			eb.removeUser(this);
 			eventTopicIds.remove(eb.getId());
 			update();
 			return eb;
@@ -76,6 +90,10 @@ public class User extends Model {
 		return null;
 	}
 
+	/**
+	 * Get topics the user has subscribed to
+	 * @return
+	 */
 	public ArrayList<EventTopic> getTopics() {
 		ArrayList<EventTopic> result = new ArrayList<EventTopic>();
 		for (String sid : eventTopicIds) {
@@ -87,14 +105,19 @@ public class User extends Model {
 		return result;
 	}
 
-	public void doSubscribtions() {
+	/**
+	 * Do subscriptions to all topics
+	 * Called on user connection to add user to the subscribing user list
+	 * of all topics he has subscribed to (avoids database calls)
+	 
+	public void doSubscriptions() {
 		for (String esid : eventTopicIds) {
 			EventTopic eb = ModelManager.get().getTopicById(esid);
 			if (eb != null) {
 				eb.addUser(this);
 			}
 		}
-	}
+	}*/
 
 	public void update() {
 		User u = User.find("byId", this.id).first();

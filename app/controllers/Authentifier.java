@@ -4,16 +4,25 @@ import models.ModelManager;
 import models.OAuth2;
 import models.User;
 import play.Logger;
+import play.Play;
 import play.libs.WS;
 import play.mvc.Controller;
 
 import com.google.gson.JsonObject;
 
+/**
+ * Authentification controller Handles OAuth exchanges between third part
+ * authentification services (Facebook, Google, ...)
+ * 
+ * @author Alexandre Bourdin
+ * 
+ */
 public class Authentifier extends Controller {
 
 	public static OAuth2 FACEBOOK = new OAuth2("https://www.facebook.com/dialog/oauth",
-			"https://graph.facebook.com/oauth/access_token", "235987216437776",
-			"f2a40e9775f5244924188445fff09d27", "email");
+			"https://graph.facebook.com/oauth/access_token",
+			Play.configuration.getProperty("facebook.clientid"),
+			Play.configuration.getProperty("facebook.secret"), "email");
 
 	/**
 	 * Authentification via Facebook
@@ -78,8 +87,8 @@ public class Authentifier extends Controller {
 	}
 
 	public static OAuth2 GOOGLE = new OAuth2("https://accounts.google.com/o/oauth2/auth",
-			"https://accounts.google.com/o/oauth2/token", "554450533169.apps.googleusercontent.com",
-			"4wCqvN8pIPoPjNAI-YnV565J",
+			"https://accounts.google.com/o/oauth2/token", Play.configuration.getProperty("google.clientid"),
+			Play.configuration.getProperty("google.secret"),
 			"https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email");
 
 	public static void googleAuth() {

@@ -17,17 +17,41 @@ import java.io.OutputStream;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
+import javax.xml.namespace.QName;
+import javax.xml.transform.TransformerException;
+
 import com.ebmwebsourcing.easycommons.xml.XMLHelper;
+import com.ebmwebsourcing.wsstar.basefaults.datatypes.impl.impl.WsrfbfModelFactoryImpl;
+import com.ebmwebsourcing.wsstar.basenotification.datatypes.api.abstraction.Subscribe;
+import com.ebmwebsourcing.wsstar.basenotification.datatypes.api.abstraction.SubscribeResponse;
+import com.ebmwebsourcing.wsstar.basenotification.datatypes.api.refinedabstraction.RefinedWsnbFactory;
+import com.ebmwebsourcing.wsstar.basenotification.datatypes.api.utils.WsnbException;
+import com.ebmwebsourcing.wsstar.basenotification.datatypes.impl.impl.WsnbModelFactoryImpl;
+import com.ebmwebsourcing.wsstar.resource.datatypes.impl.impl.WsrfrModelFactoryImpl;
+import com.ebmwebsourcing.wsstar.resourcelifetime.datatypes.impl.impl.WsrfrlModelFactoryImpl;
+import com.ebmwebsourcing.wsstar.resourceproperties.datatypes.impl.impl.WsrfrpModelFactoryImpl;
+import com.ebmwebsourcing.wsstar.topics.datatypes.impl.impl.WstopModelFactoryImpl;
+import com.ebmwebsourcing.wsstar.wsnb.services.INotificationProducer;
+import com.ebmwebsourcing.wsstar.wsnb.services.impl.util.Wsnb4ServUtils;
+import com.ebmwebsourcing.wsstar.wsrfbf.services.faults.AbsWSStarFault;
+
+import org.petalslink.dsb.notification.client.http.HTTPNotificationProducerClient;
+import org.petalslink.dsb.notification.commons.NotificationException;
+import org.petalslink.dsb.notification.commons.NotificationHelper;
 import org.w3c.dom.Document;
 
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
-import fr.inria.eventcloud.translators.wsnotif.WsNotificationTranslator;
-import fr.inria.eventcloud.translators.wsnotif.WsNotificationTranslatorImpl;
-
 import models.*;
 
+/**
+ * The Application controller is the main controller in charge of all basic
+ * tasks and page rendering.
+ * 
+ * @author Alexandre Bourdin
+ * 
+ */
 public class Application extends Controller {
 
 	/**
@@ -165,9 +189,13 @@ public class Application extends Controller {
 			@Required(message = "First name is required") String firstname,
 			@Required(message = "Last name is required") String lastname,
 			@Required(message = "Gender is required") String gender,
-			@Required(message = "Mail notification choice is required") String mailnotif,
-			@Required(message = "Please type the code") String code, String randomID) {
-		validation.equals(code, Cache.get(randomID)).message("Invalid code. Please type it again");
+			@Required(message = "Mail notification choice is required") String mailnotif, String code,
+			String randomID) {
+		String fbId = session.get("fbId");
+		String googleId = session.get("googleId");
+		if (fbId == null && googleId == null) {
+			validation.equals(code, Cache.get(randomID)).message("Invalid code. Please type it again");
+		}
 		validation.isTrue(User.find("byEmail", email).first() == null).message("Email already in use");
 		if (validation.hasErrors()) {
 			ArrayList<String> errorMsg = new ArrayList<String>();
@@ -180,8 +208,8 @@ public class Application extends Controller {
 		}
 		Cache.delete(randomID);
 		User u = new User(email, password, firstname, lastname, gender, mailnotif);
-		u.fbId = session.get("fbId");
-		u.googleId = session.get("googleId");
+		u.fbId = fbId;
+		u.googleId = googleId;
 		u.create();
 		// Connect
 		User uc = ModelManager.get().connect(u.email, u.password);
@@ -258,7 +286,7 @@ public class Application extends Controller {
 	 */
 
 	public static void sendEvent(@Required String title, @Required String content, @Required String topic) {
-		ModelManager.get().getTopicById(topic).multicast(new Event(title, content));
+		ModelManager.get().getTopicById(topic).multicast(new models.Event(title, content));
 	}
 
 	/**
@@ -278,44 +306,6 @@ public class Application extends Controller {
 		List events = await(u.getEventBuffer().nextEvents(lastReceived));
 		renderJSON(events, new TypeToken<List<IndexedEvent<Event>>>() {
 		}.getType());
-	}
-
-	/**
-	 * Subscription action
-	 * 
-	 * @param topicId
-	 */
-	public static void subscribe(@Required String topicId) {
-		Long id = Long.parseLong(session.get("userid"));
-		User u = ModelManager.get().getUserById(id);
-		String result = "{\"id\":\"-1\"}";
-		if (u != null) {
-			EventTopic sd = u.subscribe(topicId);
-			if (sd != null) {
-				result = "{\"id\":\"" + sd.getId() + "\",\"title\":\"" + sd.title + "\",\"icon\":\""
-						+ sd.icon + "\",\"content\":\"" + sd.content + "\",\"path\":\"" + sd.path + "\"}";
-			}
-		}
-		renderJSON(result);
-	}
-
-	/**
-	 * Unsubscription action
-	 * 
-	 * @param topicId
-	 */
-	public static void unsubscribe(@Required String topicId) {
-		Long id = Long.parseLong(session.get("userid"));
-		User u = ModelManager.get().getUserById(id);
-		String result = "{\"id\":\"-1\"}";
-		if (u != null) {
-			EventTopic sd = u.unsubscribe(topicId);
-			if (sd != null) {
-				result = "{\"id\":\"" + sd.getId() + "\",\"title\":\"" + sd.title + "\",\"icon\":\""
-						+ sd.icon + "\",\"content\":\"" + sd.content + "\",\"path\":\"" + sd.path + "\"}";
-			}
-		}
-		renderJSON(result);
 	}
 
 	public static void searchTopics(String search, String title, String desc) {
@@ -349,6 +339,54 @@ public class Application extends Controller {
 			}
 		}
 		render(result);
+	}
+
+	/**
+	 * Subscription action
+	 * 
+	 * @param topicId
+	 */
+	public static void subscribe(@Required String topicId) {
+		Long id = Long.parseLong(session.get("userid"));
+		User u = ModelManager.get().getUserById(id);
+		String result = "{\"id\":\"-1\"}";
+		if (u != null) {
+			EventTopic et = u.subscribe(topicId);
+			if (et != null) {
+				if (et.subscribersCount < 1) {
+					WebService.subscribe(et);
+				}
+				et.subscribersCount++;
+				result = "{\"id\":\"" + et.getId() + "\",\"title\":\"" + et.title + "\",\"icon\":\""
+						+ et.icon + "\",\"content\":\"" + et.content + "\",\"path\":\"" + et.path + "\"}";
+			}
+		}
+		renderJSON(result);
+	}
+
+	/**
+	 * Unsubscription action
+	 * 
+	 * @param topicId
+	 */
+	public static void unsubscribe(@Required String topicId) {
+		Long id = Long.parseLong(session.get("userid"));
+		User u = ModelManager.get().getUserById(id);
+		String result = "{\"id\":\"-1\"}";
+		if (u != null) {
+			EventTopic et = u.unsubscribe(topicId);
+			if (et != null) {
+				et.subscribersCount--;
+				/*
+				 * TODO : ADD WHEN WE HAVE UNSUBSCRIPTIONS TO THE DSB
+				 * if(et.subscribersCount < 1){
+				 * WebService.unsubscribe(topicId); }
+				 */
+				result = "{\"id\":\"" + et.getId() + "\",\"title\":\"" + et.title + "\",\"icon\":\""
+						+ et.icon + "\",\"content\":\"" + et.content + "\",\"path\":\"" + et.path + "\"}";
+			}
+		}
+		renderJSON(result);
 	}
 
 	public static void about() {

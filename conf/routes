@@ -12,27 +12,27 @@ GET		/about							Application.about
 GET		/settings						Application.settings
 POST	/updatesettings					Application.updateSettings
 
-
 GET		/register						Application.register
 POST	/procreg						Application.processRegistration
 GET		/captcha						Application.captcha
 
 POST	/searchtopics					Application.searchTopics
+POST	/subscribe						Application.subscribe
+POST	/unsubscribe					Application.unsubscribe
 
 GET		/fbauth							Authentifier.facebookAuth
 GET		/googleauth						Authentifier.googleAuth
 
 # Events
 GET		/waitevents						Application.waitEvents
-POST	/subscribe						Application.subscribe
-POST	/unsubscribe					Application.unsubscribe
 POST    /sendevent             		 	Application.sendEvent
 GET		/historical						Application.historicalEvents
 
-# WS Test
-POST	/webservice/soapnotifendpoint				WebService.soapNotifEndPoint
-GET		/webservice/notif							WebService.notif
-GET		/webservice/subscribe						WebService.subscribe
+# WS
+POST	/webservice/soapnotifendpoint/{topicId}		WebService.soapNotifEndPoint
+POST	/webservice/notif							WebService.notif
+GET		/webservice/topics							WebService.getSupportedTopics
+GET		/webservice/test							WebService.notifTest
 
 # Ignore favicon requests
 GET     /favicon.ico                    404

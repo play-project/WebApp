@@ -98,17 +98,18 @@
 	</div>
 	<div id="error4" title="Error">
 		<br /> <span class="ui-icon ui-icon-alert"
-			style="float: left; margin: -2px 30px 0 15px;"></span>Error :
-		disconnected
+			style="float: left; margin: -2px 30px 0 15px;"></span>Disconnected
 	</div>
 </div>
 
+<!--  
 <div style="clear: left; padding-top: 30px;">
 	<input id="send0" type="button" value="Send event on internalns_rootTopic1" /><br />
 	<input id="send1" type="button" value="Send event on internalns_childTopic1" /><br />
 	<input id="send2" type="button" value="Send event on internalns_grandChildTopic21" /><br />
 	<input id="send3" type="button" value="Send event on internalns_childTopic3" /><br />
 </div>
+-->
 
 <script type="text/javascript">
 $(function() {
@@ -154,7 +155,7 @@ $(function() {
 		}
 	});
 	
-	var subAction = #{jsAction @subscribe(':topicId') /}
+	var subAction = #{jsAction @Application.subscribe(':topicId') /}
 	$("a.subscribe-button").live('click', function() {
 		var $id = $(this).parent().attr('id');
 		var $sid = $id.substring($id.lastIndexOf('-') + 1);
@@ -187,7 +188,7 @@ $(function() {
 	    });
 	});
 	
-	var unsubAction = #{jsAction @unsubscribe(':topicId') /}
+	var unsubAction = #{jsAction @Application.unsubscribe(':topicId') /}
 	$("a.unsubscribe-button").live('click', function() {
 		var $id = $(this).attr('id');
 		var $sid = $id.substring($id.lastIndexOf('-') + 1);
@@ -230,8 +231,10 @@ var send1 = #{jsAction @sendEvent('Event !', txt, 'internalns_childTopic1') /}
 var send2 = #{jsAction @sendEvent('Event !', txt, 'internalns_grandChildTopic21') /}
 var send3 = #{jsAction @sendEvent('Event !', txt, 'internalns_childTopic3') /}
 
+var sendfb = #{jsAction @WebService.notif('Name1', 'Status1', 'Location1', 'internalns_rootTopic1') /}
+
 $("#send0").click(function(e) {
-	$.post(send0())
+	$.post(sendfb())
 });
 $("#send1").click(function(e) {
 	$.post(send1())

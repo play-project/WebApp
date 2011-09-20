@@ -129,10 +129,8 @@ public class Main {
 		} catch (InterruptedException e) {
 		}
 
-		/*
 		System.out.println("****** GET RESOURCE PROPERTIES ******");
 
-		// getting resources
 		INotificationProducerRP resourceClient = new HTTPNotificationProducerRPClient(dsbSubscribe);
 		try {
 			QName qname = WstopConstants.TOPIC_SET_QNAME;
@@ -146,7 +144,6 @@ public class Main {
 		}
 
 		System.out.println("-Bye");
-		*/
 
 	}
 

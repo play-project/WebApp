@@ -1,0 +1,29 @@
+<wsnt:Notify xmlns:wsnt="http://docs.oasis-open.org/wsn/b-2"
+        xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:ebm="http://www.petalslink.org/notification"
+        xmlns:fireman_event="http://www.soceda.org/crisis/v1/deliver_iodine/Fireman">
+        <wsnt:NotificationMessage>
+                <wsnt:SubscriptionReference>
+                        <wsa:Address>http://localhost:9111/PrefetEndpoint</wsa:Address>
+                </wsnt:SubscriptionReference>
+                <wsnt:Topic>fireman_event:cardiacRythmFiremanTopic</wsnt:Topic>
+                <wsnt:ProducerReference>
+                        <wsa:Address>http://localhost:9112/FiremanEndpoint</wsa:Address>
+                        <wsa:Metadata>
+                                <ebm:emissionDate>2011-02-07T12:24:13.671+01:00</ebm:emissionDate>
+                        </wsa:Metadata>
+                </wsnt:ProducerReference>
+                <wsnt:Message>
+                        <p:cardiacRythm
+                                xmlns:p="http://www.soceda.org/crisis/v1/deliver_iodine/Fireman"
+                                xmlns:tns="http://www.soceda.org/crisis/v1/shared-data" xmlns:tns1="http://www.w3.org/2005/08/addressing">
+                                <fireman>
+                                        <tns:name>Captain Zebulon</tns:name>
+                                        <tns1:EndpointReference>
+                                                <tns1:Address>http://localhost:9112/FiremanEndpoint</tns1:Address>
+                                        </tns1:EndpointReference>
+                                </fireman>
+                                <value>90</value>
+                        </p:cardiacRythm>
+                </wsnt:Message>
+        </wsnt:NotificationMessage>
+</wsnt:Notify>

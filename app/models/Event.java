@@ -1,9 +1,16 @@
 package models;
 
+/**
+ * Simple event class used to display events on the web page
+ * 
+ * @author Alexandre Bourdin
+ *
+ */
 public class Event {
 	private String topicId;
 	private String title;
 	private String content;
+	private String icon;
 
 	public Event(String title, String content) {
 		super();

@@ -2,14 +2,18 @@ package models;
 
 import java.util.*;
 
-import javax.persistence.*;
-
 import notifiers.Mails;
 
 import play.Logger;
 import play.db.jpa.*;
 import play.libs.F.*;
 
+/**
+ * Class in charge of multicasting events to subscribers
+ * 
+ * @author Alexandre Bourdin
+ * 
+ */
 public class EventTopic {
 	public String name;
 	public String namespace;
@@ -18,9 +22,12 @@ public class EventTopic {
 	public String icon;
 	public String content;
 	public String path;
-	public List<User> subscribingUsers;
+	public long subscribersCount;
+	// TODO : WAITING FOR BEING ABLE TO SEND UNSUBSCRIBE NOTIFICATIONS TO THE DSB
+	public boolean alreadySubscribedDSB;
 
-	public EventTopic(String namespace, String name, String uri, String title, String icon, String content, String path) {
+	public EventTopic(String namespace, String name, String uri, String title, String icon, String content,
+			String path) {
 		this.namespace = namespace;
 		this.name = name;
 		this.uri = uri;
@@ -28,17 +35,17 @@ public class EventTopic {
 		this.icon = icon;
 		this.content = content;
 		this.path = path;
-		this.subscribingUsers = new ArrayList<User>();
+		this.subscribersCount = 0;
+		this.alreadySubscribedDSB = false;
 	}
 
-	public void addUser(User u) {
-		subscribingUsers.add(u);
-	}
-
-	public void removeUser(User u) {
-		subscribingUsers.remove(u);
-	}
-
+	/**
+	 * Multicasts events to subscribing users. Pushes the event to the web
+	 * application for connected users, and/or sends an email if specified in
+	 * the account preferences.
+	 * 
+	 * @param e
+	 */
 	public void multicast(Event e) {
 		e.setTopicId(getId());
 		List<User> subscribers = User.find(
@@ -46,12 +53,15 @@ public class EventTopic {
 				.fetch();
 		for (User uSub : subscribers) {
 			User uCon = ModelManager.get().getUserById(uSub.id);
-			if (uCon != null) {
+			if (uCon != null) { // if the user is connected
 				uCon.getEventBuffer().publish(e);
-				if(uSub.mailnotif.equals("A")){
+				if (uSub.mailnotif.equals("A")) { // if user always wants to
+													// receive mails
 					Mails.mailEvent(e, uSub);
 				}
-			} else if(uSub.mailnotif.equals("Y")){
+			} else if (uSub.mailnotif.equals("Y")) { // if user wants to receive
+														// mails when
+														// disconnected
 				Mails.mailEvent(e, uSub);
 			}
 		}

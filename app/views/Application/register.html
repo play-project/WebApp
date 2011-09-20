@@ -59,14 +59,6 @@
 			value="N" checked/></label>
 		</label>
 	</fieldset>
-	<fieldset>
-		<legend>Are you human ?</legend>
-	    <label for="code">Please type the code below: </label>
-	    <img src="@{Application.captcha(randomID)}" />
-	    <br />
-	    <input type="text" name="code" id="code" size="18" value="" />
-	    <input type="hidden" name="randomID" value="${randomID}" />
-	</fieldset>
 	<hr/>
 	<input type="submit" class="submit" value="Register" /><br />
 </form>

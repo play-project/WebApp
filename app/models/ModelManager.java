@@ -9,6 +9,8 @@ import java.util.Map;
 
 import com.google.gson.JsonObject;
 
+import controllers.WebService;
+
 import play.Logger;
 import play.db.jpa.JPA;
 import play.db.jpa.Model;
@@ -34,20 +36,34 @@ public class ModelManager {
 	 */
 	public ModelManager() {
 		Logger.info("MODELMANAGER INITIALIZED");
-		
-		topics = SupportedTopicsXML.getSupportedTopics();
-		User u = new User("abourdin@polytech.unice.fr", "666666", "Alex", "Claw", "M", "N");
+
+		topics = WebService.getSupportedTopics();
+		User u = new User("abourdin@polytech.unice.fr", "666666", "Alexandre", "Bourdin", "M", "N");
 		User u2 = new User("claw21@live.fr", "666666", "Alex", "Claw", "M", "N");
-		u2.eventTopicIds.add("internalns_rootTopic1");
+		User u3 = new User("fb@roland-stuehmer.de", "666666", "Roland", "Stuehmer", "M", "N");
 		u.create();
 		u2.create();
+		u3.create();
 	}
 
 	public static ModelManager get() {
 		if (instance == null) {
 			instance = new ModelManager();
+	        instance.initializeSubscriptions();
 		}
 		return instance;
+	}
+
+	public void initializeSubscriptions() {
+		for (EventTopic et : topics) {
+			et.subscribersCount = User
+					.count("Select count(*) from User as u inner join u.eventTopicIds as strings where ? in strings",
+							et.getId());
+			if (et.subscribersCount > 0) {
+				et.alreadySubscribedDSB = true;
+				WebService.subscribe(et);
+			}
+		}
 	}
 
 	/**
@@ -63,7 +79,6 @@ public class ModelManager {
 			disconnect(u);
 			connectedUsers.add(u);
 			Collections.sort(u.eventTopicIds);
-			u.doSubscribtions();
 			u.setEventBuffer(new UserEventBuffer());
 		}
 		return u;
@@ -77,12 +92,6 @@ public class ModelManager {
 	 */
 	public boolean disconnect(User user) {
 		if (user != null && connectedUsers.contains(user)) {
-			for (int i = 0; i < user.eventTopicIds.size(); i++) {
-				EventTopic es = getTopicById(user.eventTopicIds.get(i));
-				if (es != null) {
-					es.removeUser(user);
-				}
-			}
 			connectedUsers.remove(user);
 			return true;
 		}

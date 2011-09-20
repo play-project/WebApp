@@ -1,6 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
->
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -53,19 +52,51 @@
 			<id>event-cloud-snapshots</id>
 			<url>http://maven.event-cloud.googlecode.com/hg/snapshots</url>
 		</repository>
+		<repository>
+			<id>sti2-archiva-external</id>
+			<url>http://maven.sti2.at/archiva/repository/external</url>
+		</repository>
+		<repository>
+			<id>sti2-archiva-snapshot</id>
+			<url>http://maven.sti2.at/archiva/repository/snapshots</url>
+		</repository>
+		<repository>
+			<id>dspace-releases</id>
+			<name>dspace releases repository</name>
+			<url>http://dspace.gforge.inria.fr/maven2/repository/releases</url>
+		</repository>
+
+		<repository>
+			<id>test-rep-at-hska</id>
+			<url>http://www.home.hs-karlsruhe.de/~obst1011/maven2/</url>
+		</repository>
+
+		<repository>
+			<id>semweb4j-snapshots</id>
+			<name>FZI Maven Snapshot Repository</name>
+			<url>http://mavenrepo.fzi.de/semweb4j.org/snapshots</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
 	</repositories>
 
 	<dependencies>
 		<dependency>
-			<groupId>fr.inria.eventcloud</groupId>
-			<artifactId>event-cloud-core</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
 			<groupId>org.petalslink.dsb</groupId>
 			<artifactId>dsb-soap</artifactId>
 			<version>1.0-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>logback-classic</artifactId>
+					<groupId>ch.qos.logback</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
+
 		<dependency>
 			<groupId>org.petalslink.dsb</groupId>
 			<artifactId>dsb-notification-commons</artifactId>
@@ -76,12 +107,41 @@
 			<artifactId>dsb-notification-httpclient</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>1.7.1</version>
+		</dependency>
+
+		<dependency>
+			<artifactId>wsn-b-services-impl</artifactId>
+			<groupId>com.ebmwebsourcing.deprecated.oasis-ws-basenotification</groupId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.ebmwebsourcing.easybox</groupId>
+			<artifactId>easybox-api</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<artifactId>play-platformservices-eventformat</artifactId>
+			<groupId>eu.play-project</groupId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
 		
 		<dependency>
-   			<groupId>com.google.code.gson</groupId>
-   			<artifactId>gson</artifactId>
-  			<version>1.7.1</version>
-		</dependency>	
+			<groupId>org.semweb4j</groupId>
+			<artifactId>rdf2go.impl.jena26</artifactId>
+			<version>4.7.3</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -101,4 +161,23 @@
 		</plugins>
 	</build>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>xerces</groupId>
+				<artifactId>xercesImpl</artifactId>
+				<version>2.10.0</version>
+			</dependency>
+			<dependency>
+				<groupId>xerces</groupId>
+				<artifactId>xmlParserAPIs</artifactId>
+				<version>2.6.2</version>
+			</dependency>
+			<dependency>
+				<groupId>xml-apis</groupId>
+				<artifactId>xml-apis</artifactId>
+				<version>1.4.01</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>

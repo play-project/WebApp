@@ -22,7 +22,7 @@ import play.mvc.Scope.Session;
  * application's MVC pattern. It handles the lists of connected users and
  * available topics.
  * 
- * @author Claw
+ * @author Alexandre Bourdin
  * 
  */
 public class ModelManager {
@@ -38,9 +38,9 @@ public class ModelManager {
 		Logger.info("MODELMANAGER INITIALIZED");
 
 		topics = WebService.getSupportedTopics();
-		User u = new User("abourdin@polytech.unice.fr", "666666", "Alexandre", "Bourdin", "M", "N");
-		User u2 = new User("claw21@live.fr", "666666", "Alex", "Claw", "M", "N");
-		User u3 = new User("fb@roland-stuehmer.de", "666666", "Roland", "Stuehmer", "M", "N");
+		User u = new User("xxx@xxx.xx", "666666", "Alexandre", "Bourdin", "M", "N");
+		User u2 = new User("xxx@xxx.xx", "666666", "Alex", "Claw", "M", "N");
+		User u3 = new User("xxx@xxx.xx", "666666", "Roland", "Stuehmer", "M", "N");
 		u.create();
 		u2.create();
 		u3.create();

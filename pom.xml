@@ -65,12 +65,6 @@
 			<name>dspace releases repository</name>
 			<url>http://dspace.gforge.inria.fr/maven2/repository/releases</url>
 		</repository>
-
-		<repository>
-			<id>test-rep-at-hska</id>
-			<url>http://www.home.hs-karlsruhe.de/~obst1011/maven2/</url>
-		</repository>
-
 		<repository>
 			<id>semweb4j-snapshots</id>
 			<name>FZI Maven Snapshot Repository</name>
@@ -83,7 +77,6 @@
 			</snapshots>
 		</repository>
 	</repositories>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.petalslink.dsb</groupId>

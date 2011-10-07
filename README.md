@@ -24,21 +24,19 @@ information between heterogeneous services, providing the possibilities to adapt
 and personalize their execution, resulting in the so-called situational-driven
 process adaptivity.																 
 
-The WebApp uses the [Play framework](www.playframework.org) (no affiliated with
+The WebApp uses the [Play! framework](www.playframework.org) (no affiliated with
 the research project of same name). See the installation section on how to get
 everything running including Eclipse integration.
 
 Installation
 -------------																 
-1. Install the playframework from www.playframework.org. We tested v. 1.2.x
+1. Install the Play! framework from www.playframework.org. We tested v. 1.2.x
 
 2. Install the Play! Maven plugin:
 
         $ play install maven
 
 3. Clone the WebApp e.g. into your Eclipse workspace:
-
-        $
 
 4. Fetch all Maven dependencies for WebApp:
 

@@ -75,9 +75,7 @@ import com.ebmwebsourcing.wsstar.wsrfbf.services.faults.AbsWSStarFault;
 import com.google.gson.reflect.TypeToken;
 import com.hp.hpl.jena.graph.Triple;
 
-import fr.inria.eventcloud.api.Collection;
 import fr.inria.eventcloud.api.Event;
-import fr.inria.eventcloud.api.Quadruple;
 import fr.inria.eventcloud.translators.wsnotif.WsNotificationTranslator;
 import fr.inria.eventcloud.translators.wsnotif.WsNotificationTranslatorImpl;
 

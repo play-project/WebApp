@@ -7,7 +7,7 @@ GET     /								Application.index
 GET		/login							Application.login
 POST	/proclog						Application.processLogin
 GET		/logout							Application.logout
-GET		/about							Application.about
+GET		/faq							Application.faq
 
 GET		/settings						Application.settings
 POST	/updatesettings					Application.updateSettings
@@ -40,3 +40,5 @@ GET     /favicon.ico                    404
 # Map static resources from the /app/public folder to the /public path
 GET     /public-v003/						staticDir:public
 GET		/images/							staticDir:public/images
+
+GET 	/histo							WebService.getHistorical

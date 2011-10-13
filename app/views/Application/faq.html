@@ -1,0 +1,194 @@
+#{extends 'main.html' /}
+#{set title:'Play Project Web Demo' /}
+#{set nobanner:true /}
+#{set nofooter:true /}
+
+<link rel="stylesheet" media="screen"
+	href="@{'/public/stylesheets/tabshowto.css'}">
+
+<h1>How to</h1>
+
+<div id="howto">
+	<div id="howto-tabs">
+		<ul id="tabs">
+			<li><a href="#tab-create-account">Create an account</a></li>
+			<li><a href="#tab-login">Login</a></li>
+			<li><a href="#tab-use-application">Use the application</a></li>
+			<li><a href="#tab-historical-events">Historical events</a></li>
+			<li><a href="#tab-about-play">About PLAY EU Project</a></li>
+			<li><a href="#tab-play-architecture">PLAY Architecture</a></li>
+		</ul>
+		<div id="tab-create-account">
+			<h2>Create an account</h2>
+			<div>
+				To use the web application, you first need to create an account. On
+				your first connexion, you have the choice to perform a standard
+				registration ("Create an account now") or to register using your
+				Facebook account ("Login with Facebook").<br /> <br /> In the
+				first case, you have to fill himself all informations required in
+				the registration form. <br /> <br /> In the case you register with
+				Facebook, you are asked to allow the application to access to your
+				Facebook information (basic information and email address). If you
+				grant the application access to your Facebook information, all
+				fields are pre-filled using this information, except for your
+				password (used in case you want to connect while logged out from
+				Facebook). <br /> <br />You can also choose if you want to receive
+				events by mail or not. You can receive then only when you are
+				disconnected from the web application, always or never. If you have
+				chosen 1 of the 2 first options, you will receive mails containing
+				events to the mail address you are registering with.
+			</div>
+		</div>
+		<div id="tab-login">
+			<h2>Login</h2>
+			<div>
+				To connect, you can choose to connect using standard login (login &
+				password) or to connect using Facebook. If you registered using
+				Facebook and are still connected to Facebook with the same account,
+				you just have to click "Login using Facebook" and are automatically
+				connected. <br /> <br />Also, if you registered with standard
+				registration using your Facebook-linked email address, you can also
+				click on "Connect using Facebook", and then will be prompted to
+				grant the application access to your data, and your "standard"
+				account will be upgraded to a Facebook-linked account.
+			</div>
+		</div>
+		<div id="tab-use-application">
+			<h2>Using the application</h2>
+			<div>
+				The application is quite simple to use : on the left side, you can
+				find a list of available topics you can subscribe to. Each bar with
+				a title and icon represents a topic (i.e. a stream of events you can
+				select), and you can click it to display some additional
+				information, including a description. On each bar is placed a "Sub"
+				button in order to subscribe to a given topic. <br /> <br />Subscribed
+				topics are displayed in tabs on the right side. Events incoming on
+				each topic are displayed on that tab in real-time, making the tab
+				header blink on each new event. <br /> <br />You can also
+				unsubscribe from a topic by going into this topic's tab and and
+				clicking the "Unsubscribe" button. You will no longer be notified of
+				incoming events, even by email.
+			</div>
+		</div>
+		<div id="tab-historical-events">
+			<h2>Historical events</h2>
+			<div>On this tab, you can see the historical list of events on
+				each topic you are currently subscribing to, in a chronological
+				order. Here you are not notified of real time events, you can only
+				see a snapshot of past events.</div>
+		</div>
+		<div id="tab-about-play">
+			<h2>About PLAY EU Project</h2>
+			<div>
+				In an event-driven world services exchange events asynchronously.
+				Events are output and input for services. As such, they serve as an
+				important conduit of data and control flow. Services themselves are
+				tradable and there is a lot of research and development being
+				conducted to improve this. Just as services should be tradable, so
+				should events in order to find and exchange meaningful data. To
+				receive and to use events, their sources must be known. A
+				marketplace, like a search engine, provides visibility to
+				distributed sources of events. A large scale event-based system such
+				as PLAY will have numerous event sources which emit a high number of
+				which must be discovered by potential sinks. <br /> <br />To bring
+				together the senders and receivers of events, a marketplace is
+				required. Its functionalities include offering and finding sources
+				of events. These functionalities can be broken down as follows: <br />
+				<br />Offering events:
+				<ul>
+					<li>Having a well-known place to advertise ones events</li>
+					<li>Ability to describe ones events, metadata</li>
+					<li>APIs to supply events (data integration, standards)</li>
+				</ul>
+				Finding events:
+				<ul>
+					<li>Having a well-known place to look for events</li>
+					<li>Ability to search through events or metadata</li>
+					<li>APIs to consume events (data integration, standards)</li>
+				</ul>
+				On the other hand, PLAY is not only a marketplace but aims at
+				providing sophisticated processing and storage of events: The
+				marketplace can satisfy more than just simple event needs, complex
+				subscriptions can be filled. Events per se might not be meaningful,
+				but meaningful situations can be derived from the available events.
+				The marketplace can readily detect such situations, because it has
+				knowledge of all events. Moreover, the detection can efficiently be
+				done on the marketplace because e.g. multiple, similar event needs
+				must be computed only once. <br /> <br />As a conclusion, PLAY
+				focuses on processing and disseminating events themselves but also
+				on creating a rich, user-editable directory of metadata about
+				events. The whole functionality of the PLAY platform will be
+				explained in more detail in the following sections by explaining the
+				overall architecture followed by the individual components.
+			</div>
+		</div>
+		<div id="tab-play-architecture">
+			<h2>PLAY Architecture</h2>
+			<div>
+				The PLAY platform is divided into the following functional
+				components: <br />
+				<img src="@{'/public/images/play_architecture.png'}"
+					style="margin-left: 20%; margin-right: 20%;" />
+				<ul>
+					<li>The Distributed Service Bus (DSB) provides the SOA and EDA
+						infrastructure for components and end user services</li>
+					<li>The Governance component allows users to get information
+						about services and events, as well as specifying QoS requirements
+						as SLA contracts</li>
+					<li>The Event Cloud provides storage and forwarding of events</li>
+					<li>The Distributed Complex Event Processing (DCEP) component
+						has the role of detecting complex events and reasoning over events</li>
+					<li>The Platform Services component incorporates several
+						functional additions to the platform as a whole:
+						<ul>
+							<li>Query Dispatcher has the role of decomposing and
+								deploying user subscriptions</li>
+							<li>Event Metadata component stores information about
+								events, such as source descriptions, etc.</li>
+							<li>ESR and SAR component contains the Event Subscription
+								Recommender (ESR) to provide dynamic subscriptions and the
+								Service Adaptation Recommender (SAR) to facilitate service
+								adaptation, respectively.</li>
+						</ul>
+					</li>
+					<li>The WebApp is the Web-based user interface to browse the
+						Event Marketplace and experience real-time updates.</li>
+				</ul>
+				In a typical use case these components are invoked in a certain
+				order. A user with role "PLAY Editor" registers a new streaming
+				query (pattern) through the component Distributed Service Bus by
+				invoking component Governance. Governance then checks the user's
+				permissions and the uniqueness of the pattern. After that the
+				request is delegated to component Query Dispatcher to split the
+				query into its historic and real-time parts. These are further
+				delegated to register a complex event pattern (CEPAT) in component
+				DCEP and to create a new space in component Event Cloud to hold
+				historic events. Finally, a topic is created in the Distributed
+				Service Bus. After that has happened, users with role "Event
+				Subscriber" can sign up for events with the new topic through the
+				Distributed Service Bus. Events created by "Event Publishers" with
+				the same topic will then be automatically distributed to the
+				subscribers. Such events are created on the DSB and forwarded to the
+				Event Cloud for storage and real-time forwarding. If the DCEP is a
+				subscriber the event will be forwarded to DCEP to fulfil a complex
+				event pattern. After such a pattern is fulfilled, any historical
+				part of the same query is evaluated. On success, a new complex event
+				is created by DCEP. This closes the cycle from DSB through Event
+				Cloud and DCEP back to the DSB.
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(
+			function() {
+				$("#howto-tabs").tabs().addClass(
+						'ui-tabs-vertical ui-helper-clearfix');
+				$("#howto-tabs li").removeClass('ui-corner-top').addClass(
+						'ui-corner-left');
+				$(".ui-tabs-vertical .ui-tabs-panel").height(
+						$(".ui-tabs-nav").first().height());
+			});
+</script>

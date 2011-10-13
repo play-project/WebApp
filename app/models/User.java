@@ -18,6 +18,7 @@ import play.db.jpa.*;
  *
  */
 @Entity
+@Table(name="users")
 public class User extends Model {
 	public String email;
 	public String password;
@@ -25,7 +26,7 @@ public class User extends Model {
 	public String lastname;
 	public String gender;
 	public String fbId;
-	public String googleId;
+	public String googleEmail;
 	public String mailnotif;
 	@ElementCollection
 	public List<String> eventTopicIds;
@@ -43,7 +44,7 @@ public class User extends Model {
 		this.lastname = lastname;
 		this.gender = gender;
 		this.fbId = null;
-		this.googleId = null;
+		this.googleEmail = null;
 		this.eventTopicIds = eventTopicIds;
 		this.mailnotif = mailnotif;
 		UserEventBuffer eventBuffer = new UserEventBuffer();
@@ -159,7 +160,7 @@ public class User extends Model {
 
 	@Override
 	public String toString() {
-		return "User id=" + id + " [email=" + email + ", password=" + password + ", firstname=" + firstname
+		return "User id=" + id + " [email=" + email + ", firstname=" + firstname
 				+ ", lastname=" + lastname + ", gender=" + gender + ", eventTopicIds=" + eventTopicIds + "]";
 	}
 

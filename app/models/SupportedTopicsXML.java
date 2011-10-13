@@ -41,7 +41,7 @@ public class SupportedTopicsXML {
 		Document xml = new Document();
 		Element root = null;
 		try {
-			xml = sxb.build(new File("/root/webapp/public/xml/supportedTopicSet.xml"));
+			xml = sxb.build(new File("/home/playwebapp/webapp/public/xml/supportedTopicSet.xml"));
 			root = xml.getRootElement();
 		} catch (Exception e) {
 			Logger.error("Error while parsing XML document");

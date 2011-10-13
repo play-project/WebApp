@@ -69,12 +69,22 @@
 	method="POST" class="formular">
 	<fieldset>
 		<legend>Email</legend>
+		#{if googleEmail == null}
 		<label><span>Email: </span><input type="text" name="email"
 			id="email" class="validate[required,custom[email]] text-input"
 			value="${email}" /> </label>
 		<label><span>Confirm email: </span><input type="text" name="emailconf" id="emailconf"
 			class="validate[required,custom[email],equals[email]] text-input"
 			value="${emailconf}" /> </label>
+		#{/if}
+		#{else}
+		<label><span>Email: </span><input type="text" name="email"
+			id="email" class="validate[required,custom[email]] text-input"
+			value="${googleEmail}" /> </label>
+		<label><span>Confirm email: </span><input type="text" name="emailconf" id="emailconf"
+			class="validate[required,custom[email],equals[email]] text-input"
+			value="${googleEmail}" /> </label>
+		#{/else}
 	</fieldset>
 	<fieldset>
 		<legend>Password</legend>

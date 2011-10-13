@@ -35,6 +35,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import models.BoyerMoore;
 import models.EventTopic;
 import models.ModelManager;
+import models.PutGetClient;
 import models.SupportedTopicsXML;
 import models.User;
 
@@ -74,12 +75,16 @@ import com.ebmwebsourcing.wsstar.wsnb.services.impl.util.Wsnb4ServUtils;
 import com.ebmwebsourcing.wsstar.wsrfbf.services.faults.AbsWSStarFault;
 import com.google.gson.reflect.TypeToken;
 import com.hp.hpl.jena.graph.Triple;
+import com.hp.hpl.jena.query.QuerySolution;
 
 import fr.inria.eventcloud.api.Collection;
 import fr.inria.eventcloud.api.Event;
 import fr.inria.eventcloud.api.Quadruple;
+import fr.inria.eventcloud.api.responses.SparqlSelectResponse;
+import fr.inria.eventcloud.api.wrappers.ResultSetWrapper;
 import fr.inria.eventcloud.translators.wsnotif.WsNotificationTranslator;
 import fr.inria.eventcloud.translators.wsnotif.WsNotificationTranslatorImpl;
+import fr.inria.eventcloud.webservices.api.PutGetWsApi;
 
 /**
  * The WebService controller is in charge of SOAP connection with the DSB.
@@ -113,15 +118,15 @@ public class WebService extends Controller {
 				inputStreamFrom("public/xml/xsd-01.xml"), eventId);
 
 		Collection<Triple> triples = event.getTriples();
-		String title = "Error";
-		String content = "Error";
+		String title = "No title";
+		String content = "No data";
 		for (Triple t : triples) {
 			String predicate = t.getPredicate().toString();
 			if (BoyerMoore.match("Topic", predicate).size() > 0) {
-				title = "Topic: " + t.getObject().toString();
+				title = "Topic: " + t.getObject().getLiteralLexicalForm();
 			}
 			if (BoyerMoore.match("emissionDate", predicate).size() > 0) {
-				content = "emissionDate: " + t.getObject().toString();
+				content = "emissionDate: " + t.getObject().getLiteralLexicalForm();
 			}
 		}
 		ModelManager.get().getTopicById(topicId).multicast(new models.Event(title, content));
@@ -161,7 +166,7 @@ public class WebService extends Controller {
 	}
 
 	/**
-	 * Subscription action Forwars the subscription to the DSB
+	 * Subscription action, forwards the subscription to the DSB
 	 * 
 	 * @param et
 	 */
@@ -186,6 +191,26 @@ public class WebService extends Controller {
 			e.printStackTrace();
 		}
 		return 0;
+	}
+	
+	/**
+	 * Retreives historical events for a given topic
+	 * 
+	 * @param et
+	 * @return
+	 */
+	public static ArrayList<Event> getHistorical(EventTopic et){
+		PutGetWsApi pgc = PutGetClient.getClient("http://94.23.221.97:8084/petals/services/EventCloudPutGetPortService");
+		SparqlSelectResponse response = pgc.executeSparqlSelect("SELECT ?g ?s ?p ?o WHERE { GRAPH ?g { ?s ?p ?o } } LIMIT 30");
+		ResultSetWrapper result = response.getResult();
+		while(result.hasNext()){
+			QuerySolution qs = result.next();
+			Logger.info(qs.get("g").toString());
+			Logger.info(qs.get("s").toString());
+			Logger.info(qs.get("p").toString());
+			Logger.info(qs.get("o").toString());
+		}
+		return new ArrayList<Event>();
 	}
 
 	/**

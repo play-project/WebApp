@@ -7,6 +7,7 @@ import play.data.validation.Error;
 import play.libs.Codec;
 import play.libs.F.IndexedEvent;
 import play.libs.F.Promise;
+import play.libs.WS.HttpResponse;
 import play.libs.Images;
 import play.libs.WS;
 import play.mvc.*;
@@ -57,7 +58,7 @@ public class Application extends Controller {
 	/**
 	 * Action to call before each action requiring the user to be connected
 	 */
-	@Before(only = { "index", "settings", "updateSettings", "sendEvent", "subscribe", "unsubscribe",
+	@Before(only = { "index", "historicalEvents", "settings", "updateSettings", "sendEvent", "subscribe", "unsubscribe",
 			"getTopics" })
 	private static void checkAuthentification() {
 		String uid = session.get("userid");
@@ -82,25 +83,27 @@ public class Application extends Controller {
 			logout();
 		}
 		JsonObject fbInfo = null;
-		JsonObject googleInfo = null;
+		HttpResponse googleInfo = null;
 		if (u.fbAccessToken != null) {
 			fbInfo = WS.url("https://graph.facebook.com/me?access_token=%s", WS.encode(u.fbAccessToken))
 					.get().getJson().getAsJsonObject();
 			if (fbInfo.get("error") != null) {
-				Authentifier.refreshFbAccessToken(u, fullURL());
+				try {
+					Authentifier.refreshFbAccessToken(u, fullURL());
+				} catch (Exception e) {
+					logout();
+				}
 				fbInfo = WS.url("https://graph.facebook.com/me?access_token=%s", WS.encode(u.fbAccessToken))
 						.get().getJson().getAsJsonObject();
 			}
 		}
 		if (u.googleAccessToken != null) {
-			googleInfo = WS
-					.url("https://www.googleapis.com/userinfo/email?access_token==%s",
-							WS.encode(u.googleAccessToken)).get().getJson().getAsJsonObject();
-			if (googleInfo.get("error") != null) {
+			googleInfo = WS.url("https://www.googleapis.com/userinfo/email?access_token=%s",
+					WS.encode(u.googleAccessToken)).get();
+			if (googleInfo.getString().toLowerCase().contains("error")) {
 				Authentifier.refreshGoogleAccessToken(u, fullURL());
-				googleInfo = WS
-						.url("https://www.googleapis.com/userinfo/email?access_token==%s",
-								WS.encode(u.googleAccessToken)).get().getJson().getAsJsonObject();
+				googleInfo = WS.url("https://www.googleapis.com/userinfo/email?access_token=%s",
+						WS.encode(u.googleAccessToken)).get();
 			}
 		}
 		ArrayList<EventTopic> topics = new ArrayList<EventTopic>();
@@ -109,7 +112,19 @@ public class Application extends Controller {
 		for (int i = 0; i < userTopics.size(); i++) {
 			topics.remove(userTopics.get(i));
 		}
-		render(u, fbInfo, topics, userTopics);
+		render(u, fbInfo, googleInfo, topics, userTopics);
+	}
+
+	/**
+	 * Historical events
+	 */
+	public static void historicalEvents() {
+		User u = ModelManager.get().getUserById(Long.parseLong(session.get("userid")));
+		if (u == null) {
+			logout();
+		}
+		ArrayList<EventTopic> userTopics = u.getTopics();
+		render(userTopics);
 	}
 
 	private static String fullURL() {
@@ -134,7 +149,9 @@ public class Application extends Controller {
 	public static void logout() {
 		if (session.get("userid") != null) {
 			User u = ModelManager.get().getUserById(Long.parseLong(session.get("userid")));
-			ModelManager.get().disconnect(u);
+			if (u != null) {
+				ModelManager.get().disconnect(u);
+			}
 		}
 		session.clear();
 		login();
@@ -170,6 +187,7 @@ public class Application extends Controller {
 	public static void register() {
 		String randomID = Codec.UUID();
 		String fbAccessToken = session.get("fbAccessToken");
+		String googleAccessToken = session.get("googleAccessToken");
 		if (fbAccessToken != null) {
 			JsonObject fbInfo = null;
 			fbInfo = WS
@@ -177,6 +195,18 @@ public class Application extends Controller {
 							WS.encode(fbAccessToken)).get().getJson().getAsJsonObject();
 			Logger.info(fbInfo.toString());
 			render(fbInfo, randomID);
+		}
+		if (googleAccessToken != null) {
+			HttpResponse googleInfo = null;
+			String googleEmail = null;
+			googleInfo = WS.url("https://www.googleapis.com/userinfo/email?access_token=%s",
+					WS.encode(googleAccessToken)).get();
+			Logger.info(googleInfo.getString());
+			if (googleInfo != null) {
+				googleEmail = googleInfo.getString().split("=")[1];
+				googleEmail = googleEmail.split("&")[0];
+			}
+			render(googleEmail, randomID);
 		}
 		render(randomID);
 	}
@@ -192,8 +222,8 @@ public class Application extends Controller {
 			@Required(message = "Mail notification choice is required") String mailnotif, String code,
 			String randomID) {
 		String fbId = session.get("fbId");
-		String googleId = session.get("googleId");
-		if (fbId == null && googleId == null) {
+		String googleEmail = session.get("googleEmail");
+		if (fbId == null && googleEmail == null) {
 			validation.equals(code, Cache.get(randomID)).message("Invalid code. Please type it again");
 		}
 		validation.isTrue(User.find("byEmail", email).first() == null).message("Email already in use");
@@ -209,13 +239,14 @@ public class Application extends Controller {
 		Cache.delete(randomID);
 		User u = new User(email, password, firstname, lastname, gender, mailnotif);
 		u.fbId = fbId;
-		u.googleId = googleId;
+		u.googleEmail = googleEmail;
 		u.create();
 		// Connect
 		User uc = ModelManager.get().connect(u.email, u.password);
 		if (u != null) {
 			Logger.info("User registered : " + uc);
 			u.fbAccessToken = session.get("fbAccessToken");
+			u.googleAccessToken = session.get("googleAccessToken");
 			session.put("userid", uc.id);
 		}
 		index();
@@ -275,13 +306,6 @@ public class Application extends Controller {
 	}
 
 	/**
-	 * Historical events
-	 */
-	public static void historicalEvents() {
-		render();
-	}
-
-	/**
 	 * Events handlers
 	 */
 
@@ -324,13 +348,13 @@ public class Application extends Controller {
 					continue;
 				} else {
 					if (searchTitle) {
-						if (BoyerMoore.match(search, currentTopic.getId()).size() > 0) {
+						if (BoyerMoore.match(search.toLowerCase(), currentTopic.getId().toLowerCase()).size() > 0) {
 							result.add(topics.get(i));
 							continue;
 						}
 					}
 					if (searchContent) {
-						if (BoyerMoore.match(search, currentTopic.content).size() > 0) {
+						if (BoyerMoore.match(search.toLowerCase(), currentTopic.content.toLowerCase()).size() > 0) {
 							result.add(topics.get(i));
 							continue;
 						}
@@ -379,8 +403,8 @@ public class Application extends Controller {
 				et.subscribersCount--;
 				/*
 				 * TODO : ADD WHEN WE HAVE UNSUBSCRIPTIONS TO THE DSB
-				 * if(et.subscribersCount < 1){
-				 * WebService.unsubscribe(topicId); }
+				 * if(et.subscribersCount < 1){ WebService.unsubscribe(topicId);
+				 * }
 				 */
 				result = "{\"id\":\"" + et.getId() + "\",\"title\":\"" + et.title + "\",\"icon\":\""
 						+ et.icon + "\",\"content\":\"" + et.content + "\",\"path\":\"" + et.path + "\"}";
@@ -389,7 +413,7 @@ public class Application extends Controller {
 		renderJSON(result);
 	}
 
-	public static void about() {
+	public static void faq() {
 		render();
 	}
 }

@@ -45,10 +45,6 @@
 			</snapshots>
 		</repository>
 		<repository>
-			<id>event-cloud-releases</id>
-			<url>http://maven.event-cloud.googlecode.com/hg/releases</url>
-		</repository>
-		<repository>
 			<id>event-cloud-snapshots</id>
 			<url>http://maven.event-cloud.googlecode.com/hg/snapshots</url>
 		</repository>
@@ -60,15 +56,26 @@
 			<id>sti2-archiva-snapshot</id>
 			<url>http://maven.sti2.at/archiva/repository/snapshots</url>
 		</repository>
-		<repository>
-			<id>dspace-releases</id>
-			<name>dspace releases repository</name>
-			<url>http://dspace.gforge.inria.fr/maven2/repository/releases</url>
-		</repository>
 
 		<repository>
 			<id>test-rep-at-hska</id>
 			<url>http://www.home.hs-karlsruhe.de/~obst1011/maven2/</url>
+		</repository>
+		<repository>
+			<id>sonatype-snapshots-proactive-030</id>
+			<url>https://oss.sonatype.org/content/repositories/orgobjectwebproactive-030</url>
+		</repository>
+
+		<repository>
+			<id>sonatype-nexus-staging</id>
+			<name>sonatype-nexus-staging</name>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+		</repository>
+
+		<repository>
+			<id>sonatype-nexus-snapshots</id>
+			<name>sonatype-nexus-snapshots</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 		</repository>
 
 		<repository>
@@ -82,6 +89,8 @@
 				<enabled>true</enabled>
 			</snapshots>
 		</repository>
+
+
 	</repositories>
 
 	<dependencies>
@@ -130,7 +139,19 @@
 			<groupId>eu.play-project</groupId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
-		
+
+		<dependency>
+			<groupId>fr.inria.eventcloud</groupId>
+			<artifactId>event-cloud-webservices</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-bundle</artifactId>
+			<version>2.4.0</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.semweb4j</groupId>
 			<artifactId>rdf2go.impl.jena26</artifactId>

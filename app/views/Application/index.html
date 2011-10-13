@@ -3,6 +3,9 @@
 #{set nobanner:true /}
 #{set nofooter:true /}
 
+<link rel="stylesheet" media="screen"
+	href="@{'/public/stylesheets/tabsindex.css'}">
+
 #{if fbInfo != null && fbInfo.get("error") == null}
 <div id="indextitle">
 	<img id="profilepic" src="http://graph.facebook.com/${fbInfo.get("id").getAsString()}/picture" />
@@ -80,26 +83,28 @@
 			}
 		}%
 	</div>
+</div>
 
-	<div id="error1" title="Error">
-		<br /> <span class="ui-icon ui-icon-alert"
-			style="float: left; margin: -2px 30px 0 15px;"></span>Error : topic
-		not found
-	</div>
-	<div id="error2" title="Error">
-		<br /> <span class="ui-icon ui-icon-alert"
-			style="float: left; margin: -2px 30px 0 15px;"></span>Error :
-		subscription failed
-	</div>
-	<div id="error3" title="Error">
-		<br /> <span class="ui-icon ui-icon-alert"
-			style="float: left; margin: -2px 30px 0 15px;"></span>Error :
-		unsubscription failed
-	</div>
-	<div id="error4" title="Error">
-		<br /> <span class="ui-icon ui-icon-alert"
-			style="float: left; margin: -2px 30px 0 15px;"></span>Disconnected
-	</div>
+
+
+<div id="error1" title="Error">
+	<br /> <span class="ui-icon ui-icon-alert"
+		style="float: left; margin: -2px 30px 0 15px;"></span>Error : topic
+	not found
+</div>
+<div id="error2" title="Error">
+	<br /> <span class="ui-icon ui-icon-alert"
+		style="float: left; margin: -2px 30px 0 15px;"></span>Error :
+	subscription failed
+</div>
+<div id="error3" title="Error">
+	<br /> <span class="ui-icon ui-icon-alert"
+		style="float: left; margin: -2px 30px 0 15px;"></span>Error :
+	unsubscription failed
+</div>
+<div id="error4" title="Error">
+	<br /> <span class="ui-icon ui-icon-alert"
+		style="float: left; margin: -2px 30px 0 15px;"></span>Disconnected
 </div>
 
 <!--  

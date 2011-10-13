@@ -165,112 +165,17 @@ img.available-topic-icon {
 	margin-left: 10px;
 }
 
-/* Vertical Tabs
-----------------------------------*/
-div#topics {
-	font-size: 80%;
-	float: left;
-	padding: 0 0 0 20px;
-	height: 550px;
-	width: 480px;
-}
-
-.ui-tabs-vertical {
-	width: 660px;
-}
-
-.ui-tabs-vertical .ui-tabs-nav {
-	padding: 3px 2px 3px 3px;
-	float: left;
-	width: 210px;
-}
-
-.ui-tabs-vertical .ui-tabs-nav li {
-	clear: left;
-	width: 100%;
-	border-bottom-width: 1px !important;
-	border-right-width: 0 !important;
-	margin: 0 -1px 3px 0;
-}
-
-.ui-tabs-vertical .ui-tabs-nav li a {
-	display: block;
-	width: 90%;
-}
-
-.ui-tabs-vertical .ui-tabs-nav li.ui-tabs-selected {
-	padding-bottom: 0;
-	margin-bottom: 2px;
-	padding-right: 2px;
-	border-right-width: 1px;
-	border-right-width: 1px;
-}
-
-.ui-tabs-vertical .ui-tabs-panel {
-	overflow-y: scroll;
-	overflow-x: hidden;
-	padding: 0 16px 16px 16px;
-	float: right;
-	width: 410px;
-	min-height: 550px;
-}
-
-.ui-helper-reset {
-    font-size: 100%;
-    line-height: 16px;
-}
-
-.event {
-	margin-top: 10px;
-}
-
-.event h3 {
-	font-size: 12px;
-	margin-bottom: 5px;
-}
-
-a.subscribe-button {
-	position: absolute;
-	margin-top: -27px;
-	margin-left: 190px;
-}
-
-a.subscribe-button:hover {
-	color: #EE0;
-}
-
-a.unsubscribe-button {
-	display: block;
-	font-size: 70%;
-	font-weight: bold;
-	margin-left: 300px;
-	margin-right: 10px;
-	margin-top: -18px;
-	position: absolute;
-	text-decoration: none;
-}
-
-a.unsubscribe-button:hover {
-	color: #EE0;
-}
-
-.unread-count {
-	float: right;
-	width: 100px;
-	text-align: right;
-}
-
-img.tab-topic-icon {
-	position:absolute;
-	width:16px;
-	height:16px;
-	margin-left: 10px;
-}
-
 /* Dialog panels
 ----------------------------------*/
 div.ui-dialog {
 	font-size: 1em;
+}
+
+/* Main Layout
+----------------------------------*/
+
+#howto-tabs {
+	width: 99%;
 }
 
 /* Main Layout

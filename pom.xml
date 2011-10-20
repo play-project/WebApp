@@ -58,12 +58,16 @@
 			<id>sti2-archiva-snapshot</id>
 			<url>http://maven.sti2.at/archiva/repository/snapshots</url>
 		</repository>
-
 		<repository>
 			<id>test-rep-at-hska</id>
 			<url>http://www.home.hs-karlsruhe.de/~obst1011/maven2/</url>
 		</repository>
-
+		<repository>
+			<id>dspace-releases</id>
+			<name>dspace releases repository</name>
+			<url>http://dspace.gforge.inria.fr/maven2/repository/releases</url>
+		</repository>
+        
 		<repository>
 			<id>sonatype-nexus-staging</id>
 			<name>sonatype-nexus-staging</name>
@@ -90,7 +94,6 @@
 
 
 	</repositories>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.petalslink.dsb</groupId>

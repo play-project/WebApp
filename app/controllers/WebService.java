@@ -77,8 +77,8 @@ import com.google.gson.reflect.TypeToken;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.QuerySolution;
 
-import fr.inria.eventcloud.api.Collection;
 import fr.inria.eventcloud.api.Event;
+<<<<<<< HEAD
 import fr.inria.eventcloud.api.Quadruple;
 import fr.inria.eventcloud.api.QuadruplePattern;
 import fr.inria.eventcloud.api.generators.QuadrupleGenerator;

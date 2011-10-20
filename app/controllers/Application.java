@@ -21,28 +21,13 @@ import java.util.concurrent.ExecutionException;
 import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
 
-import com.ebmwebsourcing.easycommons.xml.XMLHelper;
-import com.ebmwebsourcing.wsstar.basefaults.datatypes.impl.impl.WsrfbfModelFactoryImpl;
-import com.ebmwebsourcing.wsstar.basenotification.datatypes.api.abstraction.Subscribe;
-import com.ebmwebsourcing.wsstar.basenotification.datatypes.api.abstraction.SubscribeResponse;
-import com.ebmwebsourcing.wsstar.basenotification.datatypes.api.refinedabstraction.RefinedWsnbFactory;
-import com.ebmwebsourcing.wsstar.basenotification.datatypes.api.utils.WsnbException;
-import com.ebmwebsourcing.wsstar.basenotification.datatypes.impl.impl.WsnbModelFactoryImpl;
-import com.ebmwebsourcing.wsstar.resource.datatypes.impl.impl.WsrfrModelFactoryImpl;
-import com.ebmwebsourcing.wsstar.resourcelifetime.datatypes.impl.impl.WsrfrlModelFactoryImpl;
-import com.ebmwebsourcing.wsstar.resourceproperties.datatypes.impl.impl.WsrfrpModelFactoryImpl;
-import com.ebmwebsourcing.wsstar.topics.datatypes.impl.impl.WstopModelFactoryImpl;
-import com.ebmwebsourcing.wsstar.wsnb.services.INotificationProducer;
-import com.ebmwebsourcing.wsstar.wsnb.services.impl.util.Wsnb4ServUtils;
-import com.ebmwebsourcing.wsstar.wsrfbf.services.faults.AbsWSStarFault;
-
-import org.petalslink.dsb.notification.client.http.HTTPNotificationProducerClient;
-import org.petalslink.dsb.notification.commons.NotificationException;
-import org.petalslink.dsb.notification.commons.NotificationHelper;
 import org.w3c.dom.Document;
 
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+
+import controllers.Authentifier;
+import controllers.WebService;
 
 import models.*;
 

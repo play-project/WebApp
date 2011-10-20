@@ -2,274 +2,73 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.play</groupId>
-		<artifactId>play-parent</artifactId>
-		<version>1.2</version>
-	</parent>
-
 	<groupId>eu.play-project</groupId>
 	<artifactId>webapp</artifactId>
 	<version>1.0-SNAPSHOT</version>
+
 	<name>PLAY Project WebApp</name>
+	<url>http://play-project.eu</url>
 
 	<repositories>
-		<!-- Repository containing Play! jars. If you have your own repo (ex: Nexus), 
-			upload missing libs in third-parties -->
+		<!-- for the play-platformservices-eventformat dependency -->
 		<repository>
-			<id>infin-it</id>
-			<url>http://nexus.infin-it.fr/content/groups/public</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>petalslink-public-snapshot</id>
-			<name>petalslink-public-snapshot</name>
-			<url>http://maven.petalslink.com/public-snapshot/</url>
-		</repository>
-		<repository>
-			<id>semweb4j-repo</id>
-			<name>FZI Maven Repository</name>
-			<url>
-				http://mavenrepo.fzi.de/semweb4j.org/repo
-			</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<!-- 
-		<repository>
-			<id>event-cloud-snapshots</id>
-			<url>http://maven.event-cloud.googlecode.com/hg/snapshots</url>
-		</repository>
-		 -->
-		<repository>
-			<id>sti2-archiva-external</id>
-			<url>http://maven.sti2.at/archiva/repository/external</url>
-		</repository>
-		<repository>
-			<id>sti2-archiva-snapshot</id>
-			<url>http://maven.sti2.at/archiva/repository/snapshots</url>
-		</repository>
-		<repository>
-			<id>test-rep-at-hska</id>
+			<id>rep-at-hska</id>
 			<url>http://www.home.hs-karlsruhe.de/~obst1011/maven2/</url>
 		</repository>
-		<repository>
-			<id>dspace-releases</id>
-			<name>dspace releases repository</name>
-			<url>http://dspace.gforge.inria.fr/maven2/repository/releases</url>
-		</repository>
-        
-		<repository>
-			<id>sonatype-nexus-staging</id>
-			<name>sonatype-nexus-staging</name>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-		</repository>
 
+		<!-- for Event Cloud dependencies -->
 		<repository>
 			<id>sonatype-nexus-snapshots</id>
 			<name>sonatype-nexus-snapshots</name>
 			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 		</repository>
-
-		<repository>
-			<id>semweb4j-snapshots</id>
-			<name>FZI Maven Snapshot Repository</name>
-			<url>http://mavenrepo.fzi.de/semweb4j.org/snapshots</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-
-
 	</repositories>
-	<dependencies>
-		<dependency>
-			<groupId>org.petalslink.dsb</groupId>
-			<artifactId>dsb-soap</artifactId>
-			<version>1.0-SNAPSHOT</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.petalslink.dsb</groupId>
-			<artifactId>dsb-notification-commons</artifactId>
-			<version>1.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.petalslink.dsb</groupId>
-			<artifactId>dsb-notification-httpclient</artifactId>
-			<version>1.0-SNAPSHOT</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>logback-classic</artifactId>
-					<groupId>ch.qos.logback</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<version>1.7.1</version>
-		</dependency>
-
-		<!-- 
-		<dependency>
-			<artifactId>wsn-b-services-impl</artifactId>
-			<groupId>com.ebmwebsourcing.deprecated.oasis-ws-basenotification</groupId>
-			<version>1.0-SNAPSHOT</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>org.apache.cxf</artifactId>
-					<groupId>cxf-bundle-minimal</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>org.apache.cxf</artifactId>
-					<groupId>cxf-rt-transports-http-jetty</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>org.apache.cxf</artifactId>
-					<groupId>cxf-rt-transports-http</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>org.apache.cxf</artifactId>
-					<groupId>cxf-api</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>org.apache.cxf</artifactId>
-					<groupId>cxf-rt-core</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>org.apache.cxf</artifactId>
-					<groupId>cxf-rt-frontend-jaxws</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>org.apache.cxf</artifactId>
-					<groupId>cxf-common-utilities</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		 -->
-		 
-		<dependency>
-			<groupId>com.ebmwebsourcing.easybox</groupId>
-			<artifactId>easybox-api</artifactId>
-			<version>1.0-SNAPSHOT</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>logback-classic</artifactId>
-					<groupId>ch.qos.logback</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-		<dependency>
-			<artifactId>play-platformservices-eventformat</artifactId>
-			<groupId>eu.play-project</groupId>
-			<version>1.0-SNAPSHOT</version>
-		</dependency>
-
-		<dependency>
-			<groupId>fr.inria.eventcloud</groupId>
-			<artifactId>event-cloud-webservices</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>org.apache.cxf</artifactId>
-					<groupId>cxf-bundle-minimal</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-			<!-- 
-		<dependency>
-			<groupId>org.apache.cxf</groupId>
-			<artifactId>cxf-bundle</artifactId>
-			<version>2.4.0</version>
-			<exclusions>
-				<exclusion>
-					<groupId>com.sun.xml.bind</groupId>
-					<artifactId>jaxb-impl</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.sun.xml.bind</groupId>
-					<artifactId>jaxb-xjc</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-			 -->
-
-		<!-- 
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-xjc</artifactId>
-			<version>2.1.9</version>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-impl</artifactId>
-			<version>2.1.9</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.semweb4j</groupId>
-			<artifactId>rdf2go.impl.jena26</artifactId>
-			<version>4.7.3</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		 -->
-	</dependencies>
 
 	<build>
 		<plugins>
 			<plugin>
-				<artifactId>maven-clean-plugin</artifactId>
-			</plugin>
-			<!-- Keeping this order is very important for packaging phase (copy-dependency 
-				must run before antrun) -->
-			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
+				<configuration>
+					<outputDirectory>lib/</outputDirectory>
+				</configuration>
 			</plugin>
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-			</plugin>
-			<!-- End -->
 		</plugins>
 	</build>
 
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>xerces</groupId>
-				<artifactId>xercesImpl</artifactId>
-				<version>2.10.0</version>
-			</dependency>
-			<dependency>
-				<groupId>xerces</groupId>
-				<artifactId>xmlParserAPIs</artifactId>
-				<version>2.6.2</version>
-			</dependency>
-			<dependency>
-				<groupId>xml-apis</groupId>
-				<artifactId>xml-apis</artifactId>
-				<version>1.4.01</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+	<dependencies>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>1.7.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>eu.play-project</groupId>
+			<artifactId>play-platformservices-eventformat</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.0.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>fr.inria.eventcloud</groupId>
+			<artifactId>event-cloud-webservices-core</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-core</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
 </project>

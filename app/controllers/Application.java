@@ -126,6 +126,10 @@ public class Application extends Controller {
 		ArrayList<EventTopic> userTopics = u.getTopics();
 		render(userTopics);
 	}
+	
+	public static void patternQuery() {
+		render();
+	}
 
 	private static String fullURL() {
 		String url = "Application." + Thread.currentThread().getStackTrace()[2].getMethodName();

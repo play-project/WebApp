@@ -1,0 +1,175 @@
+<class-diagram version="1.0.4" icons="true" always-add-relationships="false" generalizations="true" realizations="true" 
+  associations="true" dependencies="false" nesting-relationships="true">  
+  <class id="1" corner="BOTTOM_RIGHT" language="java" name="controllers.Authentifier" project="webapp" 
+    file="/webapp/app/controllers/Authentifier.java" binary="false">    
+    <position height="195" width="243" x="315" y="37"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="2" corner="BOTTOM_RIGHT" language="java" name="controllers.WebService" project="webapp" 
+    file="/webapp/app/controllers/WebService.java" binary="false">    
+    <position height="-1" width="-1" x="208" y="575"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="3" corner="BOTTOM_RIGHT" language="java" name="controllers.Application" project="webapp" 
+    file="/webapp/app/controllers/Application.java" binary="false">    
+    <position height="387" width="458" x="990" y="37"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="5" corner="BOTTOM_RIGHT" language="java" name="models.ModelManager" project="webapp" 
+    file="/webapp/app/models/ModelManager.java" binary="false">    
+    <position height="227" width="342" x="598" y="37"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="7" corner="BOTTOM_RIGHT" language="java" name="models.User" project="webapp" 
+    file="/webapp/app/models/User.java" binary="false">    
+    <position height="387" width="325" x="341" y="464"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="8" corner="BOTTOM_RIGHT" language="java" name="models.UserEventBuffer" project="webapp" 
+    file="/webapp/app/models/UserEventBuffer.java" binary="false">    
+    <position height="147" width="291" x="678" y="891"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="9" corner="BOTTOM_RIGHT" language="java" name="notifiers.Mails" project="webapp" 
+    file="/webapp/app/notifiers/Mails.java" binary="false">    
+    <position height="-1" width="-1" x="177" y="76"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="18" corner="BOTTOM_RIGHT" language="java" name="models.EventTopic" project="webapp" 
+    file="/webapp/app/models/EventTopic.java" binary="false">    
+    <position height="259" width="297" x="341" y="891"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="19" corner="BOTTOM_RIGHT" language="java" name="models.Event" project="webapp" 
+    file="/webapp/app/models/Event.java" binary="false">    
+    <position height="243" width="140" x="144" y="1003"/>    
+    <display autosize="false" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <dependency>    
+    <bendpoint x="999" y="464"/>    
+    <bendpoint x="998" y="1046"/>    
+    <bendpoint x="815" y="1229"/>    
+    <bendpoint x="596" y="1230"/>    
+    <end type="SOURCE" nodeId="3"/>    
+    <end type="TARGET" nodeId="19"/>  
+  </dependency>  
+  <association>    
+    <bendpoint x="726" y="681"/>    
+    <end type="SOURCE" nodeId="5" navigable="false">      
+      <attribute name="topics"/>      
+      <multiplicity minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" nodeId="18" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency>    
+    <bendpoint x="81" y="460"/>    
+    <bendpoint x="81" y="895"/>    
+    <end type="SOURCE" nodeId="9"/>    
+    <end type="TARGET" nodeId="19"/>  
+  </dependency>  
+  <dependency>    
+    <bendpoint x="331" y="848"/>    
+    <end type="SOURCE" nodeId="2"/>    
+    <end type="TARGET" nodeId="18"/>  
+  </dependency>  
+  <dependency>    
+    <end type="SOURCE" nodeId="3"/>    
+    <end type="TARGET" nodeId="7"/>  
+  </dependency>  
+  <dependency>    
+    <end type="SOURCE" nodeId="5"/>    
+    <end type="TARGET" nodeId="8"/>  
+  </dependency>  
+  <dependency>    
+    <end type="SOURCE" nodeId="18"/>    
+    <end type="TARGET" nodeId="7"/>  
+  </dependency>  
+  <dependency>    
+    <end type="SOURCE" nodeId="7"/>    
+    <end type="TARGET" nodeId="18"/>  
+  </dependency>  
+  <dependency>    
+    <end type="SOURCE" nodeId="18"/>    
+    <end type="TARGET" nodeId="19"/>  
+  </dependency>  
+  <dependency>    
+    <bendpoint x="841" y="705"/>    
+    <end type="SOURCE" nodeId="3"/>    
+    <end type="TARGET" nodeId="18"/>  
+  </dependency>  
+  <association>    
+    <end type="SOURCE" nodeId="5" navigable="false">      
+      <attribute name="instance"/>      
+      <multiplicity minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" nodeId="5" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association>    
+    <end type="SOURCE" nodeId="5" navigable="false">      
+      <attribute name="connectedUsers"/>      
+      <multiplicity minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" nodeId="7" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency>    
+    <bendpoint x="594" y="1207"/>    
+    <end type="SOURCE" nodeId="8"/>    
+    <end type="TARGET" nodeId="19"/>  
+  </dependency>  
+  <dependency>    
+    <bendpoint x="210" y="891"/>    
+    <end type="SOURCE" nodeId="2"/>    
+    <end type="TARGET" nodeId="19"/>  
+  </dependency>  
+  <dependency>    
+    <end type="SOURCE" nodeId="1"/>    
+    <end type="TARGET" nodeId="7"/>  
+  </dependency>  
+  <association>    
+    <end type="SOURCE" nodeId="7" navigable="false">      
+      <attribute name="eventBuffer"/>      
+      <multiplicity minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" nodeId="8" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <dependency>    
+    <end type="SOURCE" nodeId="9"/>    
+    <end type="TARGET" nodeId="7"/>  
+  </dependency>  
+  <classifier-display autosize="true" package="true" initial-value="false" signature="true" visibility="true">    
+    <attributes public="true" package="true" protected="true" private="true"/>    
+    <operations public="true" package="true" protected="true" private="true"/>  
+  </classifier-display>  
+  <association-display labels="true" multiplicity="true"/>
+</class-diagram>

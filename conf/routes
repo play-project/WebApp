@@ -8,6 +8,7 @@ GET		/login							Application.login
 POST	/proclog						Application.processLogin
 GET		/logout							Application.logout
 GET		/faq							Application.faq
+GET 	/query							Application.patternQuery
 
 GET		/settings						Application.settings
 POST	/updatesettings					Application.updateSettings

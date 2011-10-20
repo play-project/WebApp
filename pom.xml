@@ -44,10 +44,12 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
+		<!-- 
 		<repository>
 			<id>event-cloud-snapshots</id>
 			<url>http://maven.event-cloud.googlecode.com/hg/snapshots</url>
 		</repository>
+		 -->
 		<repository>
 			<id>sti2-archiva-external</id>
 			<url>http://maven.sti2.at/archiva/repository/external</url>
@@ -60,10 +62,6 @@
 		<repository>
 			<id>test-rep-at-hska</id>
 			<url>http://www.home.hs-karlsruhe.de/~obst1011/maven2/</url>
-		</repository>
-		<repository>
-			<id>sonatype-snapshots-proactive-030</id>
-			<url>https://oss.sonatype.org/content/repositories/orgobjectwebproactive-030</url>
 		</repository>
 
 		<repository>
@@ -98,12 +96,6 @@
 			<groupId>org.petalslink.dsb</groupId>
 			<artifactId>dsb-soap</artifactId>
 			<version>1.0-SNAPSHOT</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>logback-classic</artifactId>
-					<groupId>ch.qos.logback</groupId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -115,6 +107,12 @@
 			<groupId>org.petalslink.dsb</groupId>
 			<artifactId>dsb-notification-httpclient</artifactId>
 			<version>1.0-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>logback-classic</artifactId>
+					<groupId>ch.qos.logback</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -123,15 +121,54 @@
 			<version>1.7.1</version>
 		</dependency>
 
+		<!-- 
 		<dependency>
 			<artifactId>wsn-b-services-impl</artifactId>
 			<groupId>com.ebmwebsourcing.deprecated.oasis-ws-basenotification</groupId>
 			<version>1.0-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>org.apache.cxf</artifactId>
+					<groupId>cxf-bundle-minimal</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>org.apache.cxf</artifactId>
+					<groupId>cxf-rt-transports-http-jetty</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>org.apache.cxf</artifactId>
+					<groupId>cxf-rt-transports-http</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>org.apache.cxf</artifactId>
+					<groupId>cxf-api</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>org.apache.cxf</artifactId>
+					<groupId>cxf-rt-core</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>org.apache.cxf</artifactId>
+					<groupId>cxf-rt-frontend-jaxws</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>org.apache.cxf</artifactId>
+					<groupId>cxf-common-utilities</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
+		 -->
+		 
 		<dependency>
 			<groupId>com.ebmwebsourcing.easybox</groupId>
 			<artifactId>easybox-api</artifactId>
 			<version>1.0-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>logback-classic</artifactId>
+					<groupId>ch.qos.logback</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -144,12 +181,42 @@
 			<groupId>fr.inria.eventcloud</groupId>
 			<artifactId>event-cloud-webservices</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>org.apache.cxf</artifactId>
+					<groupId>cxf-bundle-minimal</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
+			<!-- 
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-bundle</artifactId>
 			<version>2.4.0</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.sun.xml.bind</groupId>
+					<artifactId>jaxb-impl</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.sun.xml.bind</groupId>
+					<artifactId>jaxb-xjc</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+			 -->
+
+		<!-- 
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-xjc</artifactId>
+			<version>2.1.9</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.xml.bind</groupId>
+			<artifactId>jaxb-impl</artifactId>
+			<version>2.1.9</version>
 		</dependency>
 
 		<dependency>
@@ -163,6 +230,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		 -->
 	</dependencies>
 
 	<build>

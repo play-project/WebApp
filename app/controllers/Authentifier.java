@@ -126,6 +126,7 @@ public class Authentifier extends Controller {
 							User u = ModelManager.get()
 									.connect(uByGoogleEmail.email, uByGoogleEmail.password);
 							u.googleAccessToken = googleAccessToken;
+							u.save();
 							if (u != null) {
 								Logger.info("User connected with google : " + u);
 								session.put("userid", u.id);
@@ -147,34 +148,6 @@ public class Authentifier extends Controller {
 		}
 		GOOGLE.retrieveVerificationCode(fullURL());
 	}
-
-	/*
-	 * public static void googleAuth() { Logger.info("googleAuth"); if
-	 * (GoogleOAuth2.isCodeResponse()) { GoogleOAuth2.Response response =
-	 * GOOGLE.retrieveAccessToken(fullURL()); Logger.info("response : " +
-	 * response.httpResponse.getString()); String googleAccessToken =
-	 * response.accessToken; Logger.info("GAT : " + googleAccessToken);
-	 * JsonObject googleInfo = null; String googleId = null; // If user allows
-	 * application to access his data if (googleAccessToken != null) { // Get
-	 * his info Logger.info("GAT != NULL"); googleInfo = WS
-	 * .url("https://www.googleapis.com/userinfo/email?access_token=%s",
-	 * WS.encode(googleAccessToken)).get().getJson().getAsJsonObject(); if
-	 * (googleInfo != null) { Logger.info("<googleInfo>");
-	 * Logger.info(googleInfo.getAsString()); Logger.info("</googleInfo>");
-	 * googleId = googleInfo.get("id").getAsString(); if (googleId != null) { //
-	 * Find user by Google id User uByGoogleId = User.find("byGoogleId",
-	 * googleId).first(); // If user is already google-registered if
-	 * (uByGoogleId != null) { // Connect and update his access token User u =
-	 * ModelManager.get().connect(uByGoogleId.email, uByGoogleId.password);
-	 * u.googleAccessToken = googleAccessToken; if (u != null) {
-	 * Logger.info("User connected with google : " + u); session.put("userid",
-	 * u.id); Application.index(); } // Else : first time connecting with google
-	 * // -> redirect to registration page with infos in // session } else {
-	 * session.put("googleAccessToken", googleAccessToken);
-	 * session.put("googleId", googleId); Application.register(); } } } }
-	 * flash.error("Google login procedure has encountered an error.");
-	 * Application.login(); } GOOGLE.retrieveVerificationCode(fullURL()); }
-	 */
 
 	public static void refreshGoogleAccessToken(User u, String url) {
 		if (GoogleOAuth2.isCodeResponse()) {

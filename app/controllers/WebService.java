@@ -80,10 +80,14 @@ import com.hp.hpl.jena.query.QuerySolution;
 import fr.inria.eventcloud.api.Collection;
 import fr.inria.eventcloud.api.Event;
 import fr.inria.eventcloud.api.Quadruple;
+import fr.inria.eventcloud.api.QuadruplePattern;
+import fr.inria.eventcloud.api.generators.QuadrupleGenerator;
 import fr.inria.eventcloud.api.responses.SparqlSelectResponse;
 import fr.inria.eventcloud.api.wrappers.ResultSetWrapper;
+/*
 import fr.inria.eventcloud.translators.wsnotif.WsNotificationTranslator;
 import fr.inria.eventcloud.translators.wsnotif.WsNotificationTranslatorImpl;
+*/
 import fr.inria.eventcloud.webservices.api.PutGetWsApi;
 
 /**
@@ -112,6 +116,7 @@ public class WebService extends Controller {
 	 *            : necessary to have a unique endpoint for each topic.
 	 */
 	public static void soapNotifEndPoint(String topicId) {
+		/*
 		WsNotificationTranslator translator = new WsNotificationTranslatorImpl();
 		URI eventId = generateRandomUri();
 		Event event = translator.translateWsNotifNotificationToEvent(request.body,
@@ -130,6 +135,7 @@ public class WebService extends Controller {
 			}
 		}
 		ModelManager.get().getTopicById(topicId).multicast(new models.Event(title, content));
+		*/
 	}
 
 	/**
@@ -192,23 +198,39 @@ public class WebService extends Controller {
 		}
 		return 0;
 	}
-	
+
 	/**
 	 * Retreives historical events for a given topic
 	 * 
 	 * @param et
 	 * @return
 	 */
-	public static ArrayList<Event> getHistorical(EventTopic et){
-		PutGetWsApi pgc = PutGetClient.getClient("http://94.23.221.97:8084/petals/services/EventCloudPutGetPortService");
-		SparqlSelectResponse response = pgc.executeSparqlSelect("SELECT ?g ?s ?p ?o WHERE { GRAPH ?g { ?s ?p ?o } } LIMIT 30");
+	public static ArrayList<Event> getHistorical(EventTopic et) {
+		/*
+		 * PutGetWsApi pgc = PutGetClient.getClientFromFinalURL(
+		 * "http://94.23.221.97:8084/petals/services/EventCloudPutGetPortService"
+		 * , PutGetWsApi.class);
+		 */
+
+		PutGetClient pgc = new PutGetClient(
+				"http://eventcloud.inria.fr:8951/proactive/services/EventCloud_putget-webservices");
+
+		pgc.addQuadruple(QuadrupleGenerator.create());
+		//SparqlSelectResponse response = pgc
+		//		.executeSparqlSelect("SELECT ?g ?s ?p ?o WHERE { GRAPH ?g { ?s ?p ?o } } LIMIT 30");
+		Collection<Quadruple> response = pgc.findQuadruplePattern(QuadruplePattern.ANY);
+		/*
 		ResultSetWrapper result = response.getResult();
-		while(result.hasNext()){
+		while (result.hasNext()) {
 			QuerySolution qs = result.next();
 			Logger.info(qs.get("g").toString());
 			Logger.info(qs.get("s").toString());
 			Logger.info(qs.get("p").toString());
 			Logger.info(qs.get("o").toString());
+		}
+		*/
+		for(Quadruple q : response){
+			Logger.info("q : " + q.toString());
 		}
 		return new ArrayList<Event>();
 	}
@@ -268,7 +290,7 @@ public class WebService extends Controller {
 
 		QName topicUsed = new QName("http://dsb.petalslink.org/notification", "NuclearUC", "tns");
 		String dialect = WstopConstants.CONCRETE_TOPIC_EXPRESSION_DIALECT_URI.toString();
-		// TODO initialize notifPayload otherwise
+		// TODO initialize notifPayload another way
 		Document notifPayload = null;
 		Notify notify;
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

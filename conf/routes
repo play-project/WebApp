@@ -28,6 +28,7 @@ GET		/googleauth						Authentifier.googleAuth
 GET		/waitevents						Application.waitEvents
 POST    /sendevent             		 	Application.sendEvent
 GET		/historical						Application.historicalEvents
+POST	/histobytopic					Application.historicalByTopic
 
 # WS
 POST	/webservice/soapnotifendpoint/{topicId}		WebService.soapNotifEndPoint
@@ -41,5 +42,3 @@ GET     /favicon.ico                    404
 # Map static resources from the /app/public folder to the /public path
 GET     /public-v003/						staticDir:public
 GET		/images/							staticDir:public/images
-
-GET 	/histo							WebService.getHistorical

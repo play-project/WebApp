@@ -295,11 +295,11 @@ var display = function(event, blink) {
 	}
 	
 	$('#topic-events-'+event.data.topicId)
-		.prepend('<div id="event-'+event.id+'" class="event"><h3>'+event.id+' : '+event.data.title+'</h3><p>'+event.data.content+'</p></div>');
+		.prepend('<div id="event-'+event.id+'" class="event"><h3>'+event.data.title+'</h3><p>'+event.data.content+'</p></div>');
 	$('#event-'+event.id).hide().fadeIn();
 	
 	$('#alltopics-events')
-		.prepend('<div id="eventall-'+event.id+'" class="event"><h3>'+event.id+' : '+event.data.title+'</h3><p>'+event.data.content+'</p></div>');
+		.prepend('<div id="eventall-'+event.id+'" class="event"><h3>'+event.data.title+'</h3><p>'+event.data.content+'</p></div>');
 	$('#eventall-'+event.id).hide().fadeIn();
 }
 

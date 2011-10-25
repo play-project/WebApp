@@ -50,12 +50,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.0.1</version>
-		</dependency>
-
-		<dependency>
 			<groupId>fr.inria.eventcloud</groupId>
 			<artifactId>event-cloud-webservices-core</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
@@ -69,6 +63,12 @@
 					<artifactId>logback-core</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+
+		<dependency>
+			<artifactId>play-platformservices-querydispatcher</artifactId>
+			<groupId>eu.play-project</groupId>
+			<version>1.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>

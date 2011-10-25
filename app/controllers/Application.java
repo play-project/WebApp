@@ -112,6 +112,13 @@ public class Application extends Controller {
 		render(userTopics);
 	}
 	
+	public static void historicalByTopic(String topicId) {
+		EventTopic et = ModelManager.get().getTopicById(topicId);
+		ArrayList<Event> events = WebService.getHistorical(et);
+		renderJSON(events, new TypeToken<ArrayList<Event>>() {
+		}.getType());
+	}
+	
 	public static void patternQuery() {
 		render();
 	}

@@ -4,8 +4,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,11 +35,14 @@ import play.mvc.Util;
 import play.templates.TemplateLoader;
 
 import com.hp.hpl.jena.graph.Triple;
+import com.hp.hpl.jena.query.QuerySolution;
 
 import fr.inria.eventcloud.api.Event;
 import fr.inria.eventcloud.api.Quadruple;
 import fr.inria.eventcloud.api.QuadruplePattern;
 import fr.inria.eventcloud.api.generators.QuadrupleGenerator;
+import fr.inria.eventcloud.api.responses.SparqlSelectResponse;
+import fr.inria.eventcloud.api.wrappers.ResultSetWrapper;
 import fr.inria.eventcloud.translators.wsnotif.WsNotificationTranslator;
 
 /**
@@ -49,11 +54,16 @@ public class WebService extends Controller {
 
 	private static QName TOPIC_SET_QNAME = new QName("http://docs.oasis-open.org/wsn/t-1", "TopicSet");
 
-	public static String DSB_SUBSCRIBE_SERVICE = "http://94.23.221.97:8084/petals/services/NotificationProducerPortService";
+	public static String DSB_RESOURCE_SERVICE = "http://94.23.221.97:8084/petals/services/NotificationProducerPortService";
+	public static String DSB_SUBSCRIBE_SERVICE = "http://94.23.221.97:8084/petals/services/EventCloudSubscribePortService";
+	public static String EC_SUBSCRIBE_SERVICE = "http://eventcloud.inria.fr:8950/proactive/services/EventCloud_subscribe-webservices";
+	// public static String PUTGET_SERVICE =
+	// "http://138.96.19.125:8952/proactive/services/EventCloud_putget-webservices";
+	public static String PUTGET_SERVICE = "http://94.23.221.97:8084/petals/services/PutGetServicePortService";
 
 	// public static String dsbNotify =
 	// "http://94.23.221.97:8084/petals/services/NotificationConsumerPortService";
-	public static String DSB_NOTIFY_SERVICE = "http://www.postbin.org/y83a5d";
+	public static String DSB_NOTIFY_SERVICE = "http://www.postbin.org/1abunq6";
 
 	/**
 	 * SOAP endpoint to receive WS-Notifications from the DSB.
@@ -68,12 +78,17 @@ public class WebService extends Controller {
 				inputStreamFrom("public/xml/xsd-01.xml"), eventId);
 
 		Collection<Triple> triples = event.getTriples();
-		String title = "No title";
-		String content = "No data";
+		String title = "-";
+		String content = "";
 		for (Triple t : triples) {
-			title = "Topic: " + t.getObject().getLiteralLexicalForm();
-			content = t.getSubject().toString() + " : " + t.getPredicate().toString()
-					+ " : " + t.getObject().toString();
+			String predicate = t.getPredicate().toString();
+			String object = t.getObject().getLiteralLexicalForm();
+			if (BoyerMoore.match("Topic", predicate).size() > 0) {
+				title = object;
+			} else {
+				content += splitUri(t.getSubject().toString())[1] + " : " + splitUri(predicate)[1] + " : "
+						+ object + "<br/>";
+			}
 		}
 
 		ModelManager.get().getTopicById(topicId).multicast(new models.Event(title, content));
@@ -88,7 +103,7 @@ public class WebService extends Controller {
 
 		String rendered = TemplateLoader.load("WebService/gettopicstemplate.xml").render(map);
 
-		WSRequest request = WS.url(DSB_SUBSCRIBE_SERVICE).setHeader("content-type", "application/soap+xml")
+		WSRequest request = WS.url(DSB_RESOURCE_SERVICE).setHeader("Content-Type", "application/soap+xml")
 				.body(rendered);
 
 		try {
@@ -127,13 +142,13 @@ public class WebService extends Controller {
 		Map<String, Object> map = new HashMap<String, Object>();
 
 		map.put("topicName", et.name);
-		map.put("topicURL", et.uri);
+		map.put("topicURI", et.uri);
 		map.put("topicPrefix", et.namespace);
 		map.put("subscriber", "http://demo.play-project.eu/webservice/soapnotifendpoint/" + et.getId());
 
 		String rendered = TemplateLoader.load("WebService/subscribetemplate.xml").render(map);
 
-		WSRequest request = WS.url(DSB_SUBSCRIBE_SERVICE).setHeader("content-type", "application/soap+xml")
+		WSRequest request = WS.url(EC_SUBSCRIBE_SERVICE).setHeader("Content-Type", "application/soap+xml")
 				.body(rendered);
 		request.post();
 
@@ -151,32 +166,64 @@ public class WebService extends Controller {
 	 * @param et
 	 * @return
 	 */
-	public static ArrayList<Event> getHistorical(EventTopic et) {
-		/*
-		 * PutGetWsApi pgc = PutGetClient.getClientFromFinalURL(
-		 * "http://94.23.221.97:8084/petals/services/EventCloudPutGetPortService"
-		 * , PutGetWsApi.class);
-		 */
+	@Util
+	public static ArrayList<models.Event> getHistorical(EventTopic et) {
+		ArrayList<models.Event> events = new ArrayList<models.Event>();
+		// EventTopic et = ModelManager.get().getTopicById("dsb_TaxiUCIMA");
 
-		PutGetClient pgc = new PutGetClient(
-				"http://eventcloud.inria.fr:8951/proactive/services/EventCloud_putget-webservices");
+		PutGetClient pgc = new PutGetClient(PUTGET_SERVICE);
 
-		pgc.addQuadruple(QuadrupleGenerator.create());
-		// SparqlSelectResponse response = pgc
-		// .executeSparqlSelect("SELECT ?g ?s ?p ?o WHERE { GRAPH ?g { ?s ?p ?o } } LIMIT 30");
-		Collection<Quadruple> response = pgc.findQuadruplePattern(QuadruplePattern.ANY);
-		/*
-		 * ResultSetWrapper result = response.getResult(); while
-		 * (result.hasNext()) { QuerySolution qs = result.next();
-		 * Logger.info(qs.get("g").toString());
-		 * Logger.info(qs.get("s").toString());
-		 * Logger.info(qs.get("p").toString());
-		 * Logger.info(qs.get("o").toString()); }
-		 */
-		for (Quadruple q : response) {
-			Logger.info("q : " + q.toString());
+		SparqlSelectResponse response = pgc
+				.executeSparqlSelect("SELECT ?g ?s ?p ?o WHERE { GRAPH ?g { <http://eventcloud.inria.fr/replace/me/with/a/correct/namespace/"
+						+ et.namespace + ":" + et.name + "> ?p ?o } } LIMIT 30");
+		String title = "-";
+		String content = "";
+		ResultSetWrapper result = response.getResult();
+		while (result.hasNext()) {
+			QuerySolution qs = result.next();
+			String predicate = qs.get("p").toString();
+			String object = qs.get("o").toString();
+			if (BoyerMoore.match("Topic", predicate).size() > 0) {
+				title = object;
+			} else {
+				content = et.namespace + ":" + et.name + " : " + predicate + " : " + object + "<br/>";
+			}
+			events.add(new models.Event(title, content));
 		}
-		return new ArrayList<Event>();
+		ArrayList<models.Event> temp = new ArrayList<models.Event>();
+		for (int i = 0; i < events.size(); i++) {
+			temp.add(events.get(events.size() - i - 1));
+		}
+		return temp;
+	}
+
+	public void connect() {
+		URL wsdl = null;
+		try {
+			wsdl = new URL("http://94.23.221.97:8084/petals/services/QueryDispatchApiPortService?wsdl");
+			// wsdl = new URL("http://141.21.8.245:8891/jaxws/putQuery?wsdl");
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+
+		QName serviceName = new QName("http://play_platformservices.play_project.eu/", "QueryDispatchApi");
+
+		Service service = Service.create(wsdl, serviceName);
+		QueryDispatchApi queryDispatchApi = service.getPort(QueryDispatchApi.class);
+
+		String topic = "\"JEANS\"";
+
+		String prefix = "PREFIX : <http://events.event-processing.org/types/>";
+		String queryString = prefix + "SELECT ?friend1 ?friend2 ?friend3 ?topic" + " WHERE " + "WINDOW{ "
+				+ "EVENT ?id1{" + "?s ?p :FacebookStatusFeedEvent. " + "?friend1 :status ?topic1} "
+				+ "FILTER fn:contains(?topic1, " + topic + ")" + "SEQ " + "EVENT ?id2 {"
+				+ "?s1 ?p1 :FacebookStatusFeedEvent. " + "?friend2 :status ?topic2} "
+				+ "FILTER fn:contains(?topic2, " + topic + ")" + "SEQ " + "EVENT ?id3 {"
+				+ "?s2 ?p2 :FacebookStatusFeedEvent. " + "?friend3 :status ?topic3} "
+				+ "FILTER fn:contains(?topic3, " + topic + ")" + "} (\"P1M\"^^xsd:duration, sliding)";
+
+		System.out.println(queryDispatchApi.putQuery(queryString));
+
 	}
 
 	/**
@@ -303,4 +350,20 @@ public class WebService extends Controller {
 			return null;
 		}
 	}
+
+	@Util
+	private static String[] splitUri(String uri) {
+		if (uri.endsWith("/")) {
+			uri = uri.substring(0, uri.length() - 1);
+		}
+
+		int slashIndex = uri.lastIndexOf('/');
+
+		if (slashIndex == -1) {
+			return new String[] { "", uri };
+		} else {
+			return new String[] { uri.substring(0, slashIndex), uri.substring(slashIndex + 1) };
+		}
+	}
+
 }

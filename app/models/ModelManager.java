@@ -60,8 +60,9 @@ public class ModelManager {
 					.count("Select count(*) from User as u inner join u.eventTopicIds as strings where ? in strings",
 							et.getId());
 			if (et.subscribersCount > 0) {
-				et.alreadySubscribedDSB = true;
-				WebService.subscribe(et);
+				if(WebService.subscribe(et) == 1){
+					et.alreadySubscribedDSB = true;
+				}
 			}
 		}
 	}

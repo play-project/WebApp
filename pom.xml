@@ -12,7 +12,7 @@
 	<repositories>
 		<!-- for the play-platformservices-eventformat dependency -->
 		<repository>
-			<id>rep-at-hska</id>
+			<id>test-rep-at-hska</id>
 			<url>http://www.home.hs-karlsruhe.de/~obst1011/maven2/</url>
 		</repository>
 

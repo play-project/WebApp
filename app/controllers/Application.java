@@ -43,8 +43,8 @@ public class Application extends Controller {
 	/**
 	 * Action to call before each action requiring the user to be connected
 	 */
-	@Before(only = { "index", "historicalEvents", "settings", "updateSettings", "sendEvent", "subscribe", "unsubscribe",
-			"getTopics" })
+	@Before(only = { "index", "historicalEvents", "settings", "updateSettings", "sendEvent", "subscribe",
+			"unsubscribe", "getTopics" })
 	private static void checkAuthentification() {
 		String uid = session.get("userid");
 		if (uid == null) {
@@ -111,14 +111,14 @@ public class Application extends Controller {
 		ArrayList<EventTopic> userTopics = u.getTopics();
 		render(userTopics);
 	}
-	
+
 	public static void historicalByTopic(String topicId) {
 		EventTopic et = ModelManager.get().getTopicById(topicId);
 		ArrayList<Event> events = WebService.getHistorical(et);
 		renderJSON(events, new TypeToken<ArrayList<Event>>() {
 		}.getType());
 	}
-	
+
 	public static void patternQuery() {
 		render();
 	}
@@ -371,14 +371,17 @@ public class Application extends Controller {
 		User u = ModelManager.get().getUserById(id);
 		String result = "{\"id\":\"-1\"}";
 		if (u != null) {
-			EventTopic et = u.subscribe(topicId);
+			EventTopic et = ModelManager.get().getTopicById(topicId);
 			if (et != null) {
 				if (et.subscribersCount < 1) {
-					WebService.subscribe(et);
+					if (WebService.subscribe(et) == 1) {
+						if (u.subscribe(et)) {
+							result = "{\"id\":\"" + et.getId() + "\",\"title\":\"" + et.title
+									+ "\",\"icon\":\"" + et.icon + "\",\"content\":\"" + et.content
+									+ "\",\"path\":\"" + et.path + "\"}";
+						}
+					}
 				}
-				et.subscribersCount++;
-				result = "{\"id\":\"" + et.getId() + "\",\"title\":\"" + et.title + "\",\"icon\":\""
-						+ et.icon + "\",\"content\":\"" + et.content + "\",\"path\":\"" + et.path + "\"}";
 			}
 		}
 		renderJSON(result);
@@ -394,16 +397,17 @@ public class Application extends Controller {
 		User u = ModelManager.get().getUserById(id);
 		String result = "{\"id\":\"-1\"}";
 		if (u != null) {
-			EventTopic et = u.unsubscribe(topicId);
+			EventTopic et = ModelManager.get().getTopicById(topicId);
 			if (et != null) {
-				et.subscribersCount--;
-				/*
-				 * TODO : ADD WHEN WE HAVE UNSUBSCRIPTIONS TO THE DSB
-				 * if(et.subscribersCount < 1){ WebService.unsubscribe(topicId);
-				 * }
-				 */
-				result = "{\"id\":\"" + et.getId() + "\",\"title\":\"" + et.title + "\",\"icon\":\""
-						+ et.icon + "\",\"content\":\"" + et.content + "\",\"path\":\"" + et.path + "\"}";
+				if (u.unsubscribe(et)) {
+					/*
+					 * TODO : ADD WHEN WE HAVE UNSUBSCRIPTIONS TO THE DSB
+					 * if(et.subscribersCount < 1){
+					 * WebService.unsubscribe(topicId); }
+					 */
+					result = "{\"id\":\"" + et.getId() + "\",\"title\":\"" + et.title + "\",\"icon\":\""
+							+ et.icon + "\",\"content\":\"" + et.content + "\",\"path\":\"" + et.path + "\"}";
+				}
 			}
 		}
 		renderJSON(result);

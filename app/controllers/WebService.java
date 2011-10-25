@@ -27,6 +27,7 @@ import org.jdom.input.SAXBuilder;
 
 import play.Logger;
 import play.Play;
+import play.libs.F.Promise;
 import play.libs.WS;
 import play.libs.WS.HttpResponse;
 import play.libs.WS.WSRequest;
@@ -146,18 +147,18 @@ public class WebService extends Controller {
 		map.put("topicPrefix", et.namespace);
 		map.put("subscriber", "http://demo.play-project.eu/webservice/soapnotifendpoint/" + et.getId());
 
-		String rendered = TemplateLoader.load("WebService/subscribetemplate.xml").render(map);
+		try {
+			String rendered = TemplateLoader.load("WebService/subscribetemplate.xml").render(map);
 
-		WSRequest request = WS.url(EC_SUBSCRIBE_SERVICE).setHeader("Content-Type", "application/soap+xml")
-				.body(rendered);
-		request.post();
+			WSRequest request = WS.url(EC_SUBSCRIBE_SERVICE)
+					.setHeader("Content-Type", "application/soap+xml").body(rendered);
 
-		HttpResponse response = request.post();
-		String result = response.getString();
+			request.postAsync();
+		} catch (Exception e) {
+			return 0;
+		}
 
-		Logger.info("subscribe response = " + result);
-
-		return 0;
+		return 1;
 	}
 
 	/**
@@ -197,34 +198,36 @@ public class WebService extends Controller {
 		return temp;
 	}
 
-	public void connect() {
-		URL wsdl = null;
-		try {
-			wsdl = new URL("http://94.23.221.97:8084/petals/services/QueryDispatchApiPortService?wsdl");
-			// wsdl = new URL("http://141.21.8.245:8891/jaxws/putQuery?wsdl");
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
-
-		QName serviceName = new QName("http://play_platformservices.play_project.eu/", "QueryDispatchApi");
-
-		Service service = Service.create(wsdl, serviceName);
-		QueryDispatchApi queryDispatchApi = service.getPort(QueryDispatchApi.class);
-
-		String topic = "\"JEANS\"";
-
-		String prefix = "PREFIX : <http://events.event-processing.org/types/>";
-		String queryString = prefix + "SELECT ?friend1 ?friend2 ?friend3 ?topic" + " WHERE " + "WINDOW{ "
-				+ "EVENT ?id1{" + "?s ?p :FacebookStatusFeedEvent. " + "?friend1 :status ?topic1} "
-				+ "FILTER fn:contains(?topic1, " + topic + ")" + "SEQ " + "EVENT ?id2 {"
-				+ "?s1 ?p1 :FacebookStatusFeedEvent. " + "?friend2 :status ?topic2} "
-				+ "FILTER fn:contains(?topic2, " + topic + ")" + "SEQ " + "EVENT ?id3 {"
-				+ "?s2 ?p2 :FacebookStatusFeedEvent. " + "?friend3 :status ?topic3} "
-				+ "FILTER fn:contains(?topic3, " + topic + ")" + "} (\"P1M\"^^xsd:duration, sliding)";
-
-		System.out.println(queryDispatchApi.putQuery(queryString));
-
-	}
+	/*
+	 * @Util public void connect() { URL wsdl = null; try { wsdl = new URL(
+	 * "http://94.23.221.97:8084/petals/services/QueryDispatchApiPortService?wsdl"
+	 * ); // wsdl = new URL("http://141.21.8.245:8891/jaxws/putQuery?wsdl"); }
+	 * catch (MalformedURLException e) { e.printStackTrace(); }
+	 * 
+	 * QName serviceName = new
+	 * QName("http://play_platformservices.play_project.eu/",
+	 * "QueryDispatchApi");
+	 * 
+	 * Service service = Service.create(wsdl, serviceName); QueryDispatchApi
+	 * queryDispatchApi = service.getPort(QueryDispatchApi.class);
+	 * 
+	 * String topic = "\"JEANS\"";
+	 * 
+	 * String prefix = "PREFIX : <http://events.event-processing.org/types/>";
+	 * String queryString = prefix + "SELECT ?friend1 ?friend2 ?friend3 ?topic"
+	 * + " WHERE " + "WINDOW{ " + "EVENT ?id1{" +
+	 * "?s ?p :FacebookStatusFeedEvent. " + "?friend1 :status ?topic1} " +
+	 * "FILTER fn:contains(?topic1, " + topic + ")" + "SEQ " + "EVENT ?id2 {" +
+	 * "?s1 ?p1 :FacebookStatusFeedEvent. " + "?friend2 :status ?topic2} " +
+	 * "FILTER fn:contains(?topic2, " + topic + ")" + "SEQ " + "EVENT ?id3 {" +
+	 * "?s2 ?p2 :FacebookStatusFeedEvent. " + "?friend3 :status ?topic3} " +
+	 * "FILTER fn:contains(?topic3, " + topic + ")" +
+	 * "} (\"P1M\"^^xsd:duration, sliding)";
+	 * 
+	 * System.out.println(queryDispatchApi.putQuery(queryString));
+	 * 
+	 * }
+	 */
 
 	/**
 	 * Notify action triggered by buttons on the web interface Generates an

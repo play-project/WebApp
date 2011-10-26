@@ -104,7 +104,7 @@ public class WebService extends Controller {
 
 		String rendered = TemplateLoader.load("WebService/gettopicstemplate.xml").render(map);
 
-		WSRequest request = WS.url(DSB_RESOURCE_SERVICE).setHeader("Content-Type", "application/soap+xml")
+		WSRequest request = WS.url(DSB_RESOURCE_SERVICE).setHeader("content-type", "application/soap+xml")
 				.body(rendered);
 
 		try {
@@ -150,10 +150,11 @@ public class WebService extends Controller {
 		try {
 			String rendered = TemplateLoader.load("WebService/subscribetemplate.xml").render(map);
 
-			WSRequest request = WS.url(EC_SUBSCRIBE_SERVICE)
-					.setHeader("Content-Type", "application/soap+xml").body(rendered);
+			WSRequest request = WS.url(DSB_RESOURCE_SERVICE)
+					.setHeader("content-type", "application/soap+xml").body(rendered);
 
-			request.postAsync();
+			HttpResponse phr = request.post();
+			Logger.info(phr.getString());
 		} catch (Exception e) {
 			return 0;
 		}

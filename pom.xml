@@ -10,12 +10,11 @@
 	<url>http://play-project.eu</url>
 
 	<repositories>
-		<!-- for the play-platformservices-eventformat dependency -->
+		<!-- for the play-platformservices-eventformat dependency and query dispatcher -->
 		<repository>
 			<id>test-rep-at-hska</id>
 			<url>http://www.home.hs-karlsruhe.de/~obst1011/maven2/</url>
 		</repository>
-
 		<!-- for Event Cloud dependencies -->
 		<repository>
 			<id>sonatype-nexus-snapshots</id>
@@ -67,6 +66,11 @@
 
 		<dependency>
 			<artifactId>play-platformservices-querydispatcher</artifactId>
+			<groupId>eu.play-project</groupId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<artifactId>play-platformservices</artifactId>
 			<groupId>eu.play-project</groupId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>

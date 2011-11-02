@@ -276,8 +276,12 @@ var getEvents = function() {
 	});
 }
 
+var blinking = false;
+var unblinking = false;
 var display = function(event, blink) {
-	if(blink){
+	if(blink && !blinking){
+		blinking = true;
+		unblinking = false;
 		$('#unread-'+event.data.topicId).parent().animate({
 			"color": "#FF0"
 		}, 200);
@@ -285,22 +289,25 @@ var display = function(event, blink) {
 	
 	var cptall = parseInt($('#unread-all').html());
 	$('#unread-all').html(cptall+1);
-	var cpt = parseInt($('#unread-'+event.data.topicId).html());
-	$('#unread-'+event.data.topicId).html(cpt+1);
+	var $topicunreadspan = $('#unread-'+event.data.topicId);
+	var cpt = parseInt($topicunreadspan.html());
+	$topicunreadspan.html(cpt+1);
 	
-	if(blink){
-		$('#unread-'+event.data.topicId).parent().animate({
+	if(blink && blinking && !unblinking){
+		blinking = false;
+		unblinking = true;
+		$topicunreadspan.parent().animate({
 			"color": "#4F7425"
 		}, 200);
 	}
 	
 	$('#topic-events-'+event.data.topicId)
 		.prepend('<div id="event-'+event.id+'" class="event"><h3>'+event.data.title+'</h3><p>'+event.data.content+'</p></div>');
-	$('#event-'+event.id).hide().fadeIn();
+	//$('#event-'+event.id).hide().fadeIn();
 	
 	$('#alltopics-events')
 		.prepend('<div id="eventall-'+event.id+'" class="event"><h3>'+event.data.title+'</h3><p>'+event.data.content+'</p></div>');
-	$('#eventall-'+event.id).hide().fadeIn();
+	//$('#eventall-'+event.id).hide().fadeIn();
 }
 
 var searchAction = #{jsAction @searchTopics() /}

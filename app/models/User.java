@@ -84,7 +84,7 @@ public class User extends Model {
 			return false;
 		}
 		eventTopicIds.remove(et.getId());
-		et.subscribersCount--;
+		//et.subscribersCount--;
 		update();
 		return true;
 	}

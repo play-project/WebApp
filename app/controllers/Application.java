@@ -44,7 +44,7 @@ public class Application extends Controller {
 	 * Action to call before each action requiring the user to be connected
 	 */
 	@Before(only = { "index", "historicalEvents", "settings", "updateSettings", "sendEvent", "subscribe",
-			"unsubscribe", "getTopics" })
+			"unsubscribe", "getTopics", "patternQuery", "processPatternQuery", "historicalByTopic" })
 	private static void checkAuthentification() {
 		String uid = session.get("userid");
 		if (uid == null) {
@@ -118,18 +118,20 @@ public class Application extends Controller {
 		renderJSON(events, new TypeToken<ArrayList<Event>>() {
 		}.getType());
 	}
+	
+	/**
+	 * Pattern Queries
+	 */
 
 	public static void patternQuery() {
 		render();
 	}
-
-	private static String fullURL() {
-		String url = "Application." + Thread.currentThread().getStackTrace()[2].getMethodName();
-		return play.mvc.Router.getFullUrl(url);
-	}
-
-	private static String fullURL(String url) {
-		return play.mvc.Router.getFullUrl(url);
+	
+	public static void processPatternQuery(String token){
+		if(token != null && token != ""){
+			Boolean result = WebService.sendPatternQuery(token);
+		}		
+		patternQuery();
 	}
 
 	/**
@@ -249,59 +251,6 @@ public class Application extends Controller {
 	}
 
 	/**
-	 * Captcha generator
-	 */
-	public static void captcha(String id) {
-		Images.Captcha captcha = Images.captcha();
-		String code = captcha.getText("#33FF6F");
-		Cache.set(id, code, "10mn");
-		renderBinary(captcha);
-	}
-
-	/**
-	 * Settings page
-	 */
-	public static void settings() {
-		Long id = Long.parseLong(session.get("userid"));
-		User u = ModelManager.get().getUserById(id);
-		render(u);
-	}
-
-	/**
-	 * Update settings
-	 */
-	public static void updateSettings(String password, String newpassword, String newpasswordconf,
-			@Required(message = "First name is required") String firstname,
-			@Required(message = "Last name is required") String lastname,
-			@Required(message = "Gender is required") String gender,
-			@Required(message = "Mail notification choice is required") String mailnotif) {
-		Long id = Long.parseLong(session.get("userid"));
-		User u = ModelManager.get().getUserById(id);
-		if (!newpassword.equals("")) {
-			validation.equals(password, u.password).message("Wrong password");
-			validation.equals(newpassword, newpasswordconf).message(
-					"New password and confirmation don't match.");
-			if (!validation.hasErrors()) {
-				u.password = newpassword;
-			}
-		}
-		if (validation.hasErrors()) {
-			ArrayList<String> errorMsg = new ArrayList<String>();
-			for (Error error : validation.errors()) {
-				errorMsg.add(error.message());
-			}
-			flash.put("error", errorMsg);
-			settings();
-		}
-		u.firstname = firstname;
-		u.lastname = lastname;
-		u.gender = gender;
-		u.mailnotif = mailnotif;
-		u.update();
-		settings();
-	}
-
-	/**
 	 * Events handlers
 	 */
 
@@ -381,6 +330,12 @@ public class Application extends Controller {
 									+ "\",\"path\":\"" + et.path + "\"}";
 						}
 					}
+				} else {
+					if (u.subscribe(et)) {
+						result = "{\"id\":\"" + et.getId() + "\",\"title\":\"" + et.title
+								+ "\",\"icon\":\"" + et.icon + "\",\"content\":\"" + et.content
+								+ "\",\"path\":\"" + et.path + "\"}";
+					}
 				}
 			}
 		}
@@ -413,7 +368,69 @@ public class Application extends Controller {
 		renderJSON(result);
 	}
 
+	/**
+	 * Captcha generator
+	 */
+	public static void captcha(String id) {
+		Images.Captcha captcha = Images.captcha();
+		String code = captcha.getText("#33FF6F");
+		Cache.set(id, code, "10mn");
+		renderBinary(captcha);
+	}
+
+	/**
+	 * Settings page
+	 */
+	public static void settings() {
+		Long id = Long.parseLong(session.get("userid"));
+		User u = ModelManager.get().getUserById(id);
+		render(u);
+	}
+
+	/**
+	 * Update settings
+	 */
+	public static void updateSettings(String password, String newpassword, String newpasswordconf,
+			@Required(message = "First name is required") String firstname,
+			@Required(message = "Last name is required") String lastname,
+			@Required(message = "Gender is required") String gender,
+			@Required(message = "Mail notification choice is required") String mailnotif) {
+		Long id = Long.parseLong(session.get("userid"));
+		User u = ModelManager.get().getUserById(id);
+		if (!newpassword.equals("")) {
+			validation.equals(password, u.password).message("Wrong password");
+			validation.equals(newpassword, newpasswordconf).message(
+					"New password and confirmation don't match.");
+			if (!validation.hasErrors()) {
+				u.password = newpassword;
+			}
+		}
+		if (validation.hasErrors()) {
+			ArrayList<String> errorMsg = new ArrayList<String>();
+			for (Error error : validation.errors()) {
+				errorMsg.add(error.message());
+			}
+			flash.put("error", errorMsg);
+			settings();
+		}
+		u.firstname = firstname;
+		u.lastname = lastname;
+		u.gender = gender;
+		u.mailnotif = mailnotif;
+		u.update();
+		settings();
+	}
+
 	public static void faq() {
 		render();
+	}
+
+	private static String fullURL() {
+		String url = "Application." + Thread.currentThread().getStackTrace()[2].getMethodName();
+		return play.mvc.Router.getFullUrl(url);
+	}
+
+	private static String fullURL(String url) {
+		return play.mvc.Router.getFullUrl(url);
 	}
 }

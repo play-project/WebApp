@@ -18,8 +18,9 @@ import play.mvc.Router;
 
 /**
  * Extracts topics from an XML file
+ * 
  * @author Alexandre Bourdin
- *
+ * 
  */
 public class SupportedTopicsXML {
 

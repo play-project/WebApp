@@ -48,5 +48,5 @@ Installation
         $ play eclipsify .
 
 6. Import the eclipsified project in Eclipse:
-File -> Import -> Projects from Git (add the path where WebApp was cloned)
+`File -> Import -> Projects from Git` (add the path where WebApp was cloned)
 

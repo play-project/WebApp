@@ -130,7 +130,10 @@ public class Application extends Controller {
 	public static void processPatternQuery(String token){
 		if(token != null && token != ""){
 			Boolean result = WebService.sendPatternQuery(token);
-		}		
+			if(!result){
+				flash.error("The operation encoutered an error.");
+			}
+		}
 		patternQuery();
 	}
 

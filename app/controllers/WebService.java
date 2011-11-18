@@ -204,43 +204,53 @@ public class WebService extends Controller {
 	@Util
 	public static boolean sendPatternQuery(String token) {
 		URL wsdl = null;
-		try {
-			wsdl = new URL("http://141.21.8.245:8891/jaxws/putQuery?wsdl");
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
+        try {
+            //wsdl = new URL("http://94.23.221.97:8084/petals/services/QueryDispatchApiPortService?wsdl");
+            wsdl = new URL("http://demo.play-project.eu:8085/play/QueryDispatchApi?wsdl");
+            //wsdl = new URL("http://localhost:8080/jaxws/putQuery?wsdl");
+            //wsdl = new URL("http://127.0.0.1:8085/play/QueryDispatchApi?wsdl");
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
 
 		QName serviceName = new QName("http://play_platformservices.play_project.eu/", "QueryDispatchApi");
 
 		Service service = Service.create(wsdl, serviceName);
 		QueryDispatchApi queryDispatchApi = service.getPort(QueryDispatchApi.class);
-
+		
 		String topic = "\"" + token + "\"";
 
 		String prefix = "PREFIX : <http://streams.play-project.eu/types/>" ;
         String queryString = prefix + "SELECT ?friend1 ?friend2 ?friend3 ?topic1" +
-            " WHERE " +
-                "WINDOW{ " +
-                    "EVENT ?id1{" +
-                                "?dtc1 ?typ1 :FacebookStatusFeedEvent." +
-                                "?dtc1 :status ?topic1." +
-                                "?dtc1 :name ?friend1} " +
-                                "FILTER fn:contains(?topic1, " + topic + ")" +
-                    "SEQ " +
-                    "EVENT ?id2{" +
-                                "?dtc2 ?typ1 :FacebookStatusFeedEvent. " +
-                                "?dtc2 :status ?topic2." +
-                                "?dtc2 :name ?friend2} " +
-                                "FILTER fn:contains(?topic2, " + topic + ")" +
-                    "SEQ " +
-                    "EVENT ?id3{" +
-                                "?dtc3 ?typ1 :FacebookStatusFeedEvent. " +
-                                "?dtc3 :status ?topic3." +
-                                "?dtc3 :name ?friend3} " +
-                                "FILTER fn:contains(?topic3, " + topic + ")" +
-                "} (\"P30M\"^^xsd:duration, sliding)"; 
+                " WHERE " +
+                    "WINDOW{ " +
+                        "EVENT ?id1{" +
+                                    "?dtc1 ?typ1 :FacebookStatusFeedEvent." +
+                                    "?dtc1 :status ?topic1." +
+                                    "?dtc1 :name ?friend1} " +
+                                    "FILTER fn:contains(?topic1, " + topic + ")" +
+                        "SEQ " +
+                        "EVENT ?id2{" +
+                                    "?dtc2 ?typ1 :FacebookStatusFeedEvent. " +
+                                    "?dtc2 :status ?topic2." +
+                                    "?dtc2 :name ?friend2} " +
+                                    "FILTER fn:contains(?topic2, " + topic + ")" +
+                        "SEQ " +
+                        "EVENT ?id3{" +
+                                    "?dtc3 ?typ1 :FacebookStatusFeedEvent. " +
+                                    "?dtc3 :status ?topic3." +
+                                    "?dtc3 :name ?friend3} " +
+                                    "FILTER fn:contains(?topic3, " + topic + ")" +
+                    "} (\"P30M\"^^xsd:duration, sliding)";
 
-		return queryDispatchApi.putQuery(queryString);
+        try{
+		String s = queryDispatchApi.registerQuery(queryString);
+		Logger.info(s);
+        } catch (Exception e){
+        	Logger.error(e.toString());
+        	return false;
+        }
+		return true;
 	}
 
 	/**

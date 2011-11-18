@@ -1,11 +1,14 @@
 tmp
-logs
+logs/*
 eclipse
 .settings/*
 etc
 test
 test-result
 conf/application.conf
-lib
+lib/*
 *.class
 *.jar
+server.pid
+target
+db/*

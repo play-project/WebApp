@@ -118,7 +118,7 @@ public class Application extends Controller {
 		renderJSON(events, new TypeToken<ArrayList<Event>>() {
 		}.getType());
 	}
-	
+
 	/**
 	 * Pattern Queries
 	 */
@@ -126,11 +126,21 @@ public class Application extends Controller {
 	public static void patternQuery() {
 		render();
 	}
+
+	public static void processTokenPatternQuery(String token) {
+		if (token != null && token != "") {
+			Boolean result = WebService.sendTokenPatternQuery(token);
+			if (!result) {
+				flash.error("The operation encoutered an error.");
+			}
+		}
+		patternQuery();
+	}
 	
-	public static void processPatternQuery(String token){
-		if(token != null && token != ""){
-			Boolean result = WebService.sendPatternQuery(token);
-			if(!result){
+	public static void processFullPatternQuery(String text) {
+		if (text != null && text != "") {
+			Boolean result = WebService.sendFullPatternQuery(text);
+			if (!result) {
 				flash.error("The operation encoutered an error.");
 			}
 		}
@@ -335,9 +345,9 @@ public class Application extends Controller {
 					}
 				} else {
 					if (u.subscribe(et)) {
-						result = "{\"id\":\"" + et.getId() + "\",\"title\":\"" + et.title
-								+ "\",\"icon\":\"" + et.icon + "\",\"content\":\"" + et.content
-								+ "\",\"path\":\"" + et.path + "\"}";
+						result = "{\"id\":\"" + et.getId() + "\",\"title\":\"" + et.title + "\",\"icon\":\""
+								+ et.icon + "\",\"content\":\"" + et.content + "\",\"path\":\"" + et.path
+								+ "\"}";
 					}
 				}
 			}

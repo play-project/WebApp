@@ -3,6 +3,9 @@
 #{set nobanner:true /}
 #{set nofooter:true /}
 
+<link rel="stylesheet" media="screen"
+	href="@{'/public/stylesheets/tabsquery.css'}">
+
 <h1>Pattern</h1>
 
 #{if flash.get("error")}
@@ -13,8 +16,69 @@
 </p>
 %{ out.print("<br />"); %} #{/if}
 
-Here, you can register a new word to be notified :<br/><br/>
-<form action="@{Application.processPatternQuery()}">
-Notify me when <input id="token" name="token" type="text" value="" /> occurs 3 times within 30 minutes in my Facebook friends statuses.<br/><br/>
-<input type="submit" value="Send query" />
-</form>
+<div id="query-editor">
+	<div id="query-editor-tabs">
+		<ul id="tabs">
+			<li><a href="#tab-query-word">Easy query editor</a></li>
+			<li><a href="#tab-query-select">Advanced query editor</a></li>
+			<li><a href="#tab-query-text">Expert query editor</a></li>
+		</ul>
+		<div id="tab-query-word">
+			<h2>Easy query editor</h2>
+			<div>
+				Here, you can register a new word to be notified :<br/><br/>
+				<form action="@{Application.processTokenPatternQuery()}">
+				Notify me when <input id="token" name="token" type="text" value="" /> occurs 3 times within 30 minutes in my Facebook friends statuses.<br/><br/>
+				<input type="submit" value="Send query" />
+				</form>
+			</div>
+		</div>
+		<div id="tab-query-select">
+			<h2>Advanced query editor</h2>
+			<div>
+				Not yet implemented.
+			</div>
+		</div>
+		<div id="tab-query-text">
+			<h2>Expert query editor</h2>
+			<div>
+				Here, you can write the full EP-SPARQL query :<br/><br/>
+				<form action="@{Application.processFullPatternQuery()}">
+				<textarea id="text" name="text" type="text" cols="60" rows="30">
+	PREFIX : <http://streams.play-project.eu/types/>
+	SELECT ?friend1 ?friend2 ?friend3 ?topic1
+		WHERE
+			WINDOW{ 
+				EVENT ?id1{
+					?dtc1 ?typ1 :FacebookStatusFeedEvent.
+					?dtc1 :status ?topic1.
+					?dtc1 :name ?friend1}
+					FILTER fn:contains(?topic1, "JEANS")
+				SEQ
+				EVENT ?id2{
+					?dtc2 ?typ1 :FacebookStatusFeedEvent.
+					?dtc2 :status ?topic2.
+					?dtc2 :name ?friend2}
+					FILTER fn:contains(?topic2, "JEANS")
+				SEQ
+				EVENT ?id3{
+					?dtc3 ?typ1 :FacebookStatusFeedEvent.
+					?dtc3 :status ?topic3.
+					?dtc3 :name ?friend3}
+					FILTER fn:contains(?topic3, "JEANS")
+			} ("P30M"^^xsd:duration, sliding)</textarea><br/><br/>
+				<input type="submit" value="Send query" />
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(
+		function() {
+			$("#query-editor-tabs").tabs().addClass('ui-tabs-vertical ui-helper-clearfix');
+			$("#query-editor-tabs li").removeClass('ui-corner-top').addClass('ui-corner-left');
+			$(".ui-tabs-vertical .ui-tabs-panel").height($(".ui-tabs-nav").first().height());
+		});
+</script>

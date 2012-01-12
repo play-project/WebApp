@@ -9,7 +9,8 @@ POST	/proclog						Application.processLogin
 GET		/logout							Application.logout
 GET		/faq							Application.faq
 GET 	/query							Application.patternQuery
-GET 	/processquery					Application.processPatternQuery
+GET 	/processtokenquery				Application.processTokenPatternQuery
+GET 	/processfullquery				Application.processFullPatternQuery
 
 GET		/settings						Application.settings
 POST	/updatesettings					Application.updateSettings
@@ -33,9 +34,8 @@ POST	/histobytopic					Application.historicalByTopic
 
 # WS
 POST	/webservice/soapnotifendpoint/{topicId}		WebService.soapNotifEndPoint
-POST	/webservice/notif							WebService.notif
 GET		/webservice/topics							WebService.getSupportedTopics
-GET		/webservice/test							WebService.notifTest
+POST	/webservice/facebookstatus					WebService.testFacebookStatusFeedEvent
 
 # Ignore favicon requests
 GET     /favicon.ico                    404

@@ -109,14 +109,14 @@
 		style="float: left; margin: -2px 30px 0 15px;"></span>Disconnected
 </div>
 
-<!--  
 <div style="clear: left; padding-top: 30px;">
-	<input id="send0" type="button" value="Send event on internalns_rootTopic1" /><br />
+	<input id="send0" type="button" value="Send a dummy FacebookStatusEvent" /><br />
+	<!-- 
 	<input id="send1" type="button" value="Send event on internalns_childTopic1" /><br />
 	<input id="send2" type="button" value="Send event on internalns_grandChildTopic21" /><br />
 	<input id="send3" type="button" value="Send event on internalns_childTopic3" /><br />
+	 -->
 </div>
--->
 
 <script type="text/javascript">
 $(function() {
@@ -230,19 +230,22 @@ $(function() {
 
 var $lastReceived = 0
 var waitEvents = #{jsAction @waitEvents(':lastReceived') /}
+/*
 %{
 	String txt = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ullamcorper laoreet fermentum. Cras placerat dui pharetra arcu ultricies sit amet commodo tortor molestie.";
 }%
-var send0 = #{jsAction @sendEvent('Event !', txt, 'internalns_rootTopic1') /}
-var send1 = #{jsAction @sendEvent('Event !', txt, 'internalns_childTopic1') /}
-var send2 = #{jsAction @sendEvent('Event !', txt, 'internalns_grandChildTopic21') /}
-var send3 = #{jsAction @sendEvent('Event !', txt, 'internalns_childTopic3') /}
+*/
+//var send0 = #{jsAction @sendEvent('Event !', txt, 'internalns_rootTopic1') /}
+//var send1 = #{jsAction @sendEvent('Event !', txt, 'internalns_childTopic1') /}
+//var send2 = #{jsAction @sendEvent('Event !', txt, 'internalns_grandChildTopic21') /}
+//var send3 = #{jsAction @sendEvent('Event !', txt, 'internalns_childTopic3') /}
 
-var sendfb = #{jsAction @WebService.notif('Name1', 'Status1', 'Location1', 'internalns_rootTopic1') /}
+var sendFbStatusEvent = #{jsAction @WebService.testFacebookStatusFeedEvent() /}
 
 $("#send0").click(function(e) {
-	$.post(sendfb())
+	$.post(sendFbStatusEvent())
 });
+/*
 $("#send1").click(function(e) {
 	$.post(send1())
 });
@@ -252,6 +255,7 @@ $("#send2").click(function(e) {
 $("#send3").click(function(e) {
 	$.post(send3())
 });
+*/
 
 var getEvents = function() {
 	$.ajax({
@@ -314,8 +318,12 @@ var searchAction = #{jsAction @searchTopics() /}
 $('#search-button').bind("click", function(){
 	search();
 });
-$('#search').bind('keypress', function(e) {
-	if ((e.keyCode || e.which) == 13){
+$('#search').bind('keyup', function(e) {
+	var charCode = (e.which) ? e.which : e.keyCode;
+	if (charCode == 27){
+		$('#search').prop("value", "");
+	}
+	if (charCode == 13){
 		search();
 	}
 });

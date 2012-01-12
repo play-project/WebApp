@@ -11,11 +11,11 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 
-import fr.inria.eventcloud.api.Event;
+import fr.inria.eventcloud.api.CompoundEvent;
 
 public class TranslationUtils {
 
-    public static Event translateWsNotifNotificationToEvent(InputStream xmlPayload,
+    public static CompoundEvent translateWsNotifNotificationToEvent(InputStream xmlPayload,
                                                      InputStream xsdPayload,
                                                      URI eventId) {
         Map<String, XSDDatatype> elementDatatypes = null;

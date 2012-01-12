@@ -2,6 +2,7 @@ package controllers;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.MalformedURLException;
@@ -10,6 +11,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,9 +24,19 @@ import models.EventTopic;
 import models.ModelManager;
 import models.PutGetClient;
 import models.SupportedTopicsXML;
-import models.translator.TranslationUtils;
+import models.translator.*;
+import models.eventformat.*;
 
 import org.jdom.input.SAXBuilder;
+import org.event_processing.events.types.FacebookCepResult;
+import org.event_processing.events.types.FacebookStatusFeedEvent;
+import org.event_processing.events.types.TwitterEvent;
+import org.junit.Test;
+import org.ontoware.rdf2go.exception.ModelRuntimeException;
+import org.ontoware.rdf2go.model.Syntax;
+import org.ontoware.rdf2go.model.node.impl.URIImpl;
+import org.ontoware.rdfreactor.runtime.CardinalityException;
+import org.ontoware.rdfreactor.schema.rdfs.List;
 
 import play.Logger;
 import play.Play;
@@ -40,7 +52,7 @@ import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.QuerySolution;
 
 import eu.play_project.play_platformservices_querydispatcher.Api.QueryDispatchApi;
-import fr.inria.eventcloud.api.Event;
+import fr.inria.eventcloud.api.CompoundEvent;
 import fr.inria.eventcloud.api.Quadruple;
 import fr.inria.eventcloud.api.QuadruplePattern;
 import fr.inria.eventcloud.api.generators.QuadrupleGenerator;
@@ -57,12 +69,12 @@ public class WebService extends Controller {
 
 	private static QName TOPIC_SET_QNAME = new QName("http://docs.oasis-open.org/wsn/t-1", "TopicSet");
 
-	public static String DSB_RESOURCE_SERVICE = "http://94.23.221.97:8084/petals/services/NotificationProducerPortService";
-	public static String DSB_SUBSCRIBE_SERVICE = "http://94.23.221.97:8084/petals/services/EventCloudSubscribePortService";
+	public static String DSB_RESOURCE_SERVICE = "http://46.105.181.221:8084/petals/services/NotificationProducerPortService";
+	public static String DSB_SUBSCRIBE_SERVICE = "http://46.105.181.221:8084/petals/services/EventCloudSubscribePortService";
 	public static String EC_SUBSCRIBE_SERVICE = "http://eventcloud.inria.fr:8950/proactive/services/EventCloud_subscribe-webservices";
 	// public static String PUTGET_SERVICE =
 	// "http://138.96.19.125:8952/proactive/services/EventCloud_putget-webservices";
-	public static String PUTGET_SERVICE = "http://94.23.221.97:8084/petals/services/PutGetServicePortService";
+	public static String PUTGET_SERVICE = "http://46.105.181.221:8084/petals/services/PutGetServicePortService";
 
 	// public static String dsbNotify =
 	// "http://94.23.221.97:8084/petals/services/NotificationConsumerPortService";
@@ -77,7 +89,7 @@ public class WebService extends Controller {
 	public static void soapNotifEndPoint(String topicId) {
 
 		URI eventId = generateRandomUri();
-		Event event = TranslationUtils.translateWsNotifNotificationToEvent(request.body,
+		CompoundEvent event = TranslationUtils.translateWsNotifNotificationToEvent(request.body,
 				inputStreamFrom("public/xml/xsd-01.xml"), eventId);
 
 		Collection<Triple> triples = event.getTriples();
@@ -202,140 +214,85 @@ public class WebService extends Controller {
 	}
 
 	@Util
-	public static boolean sendPatternQuery(String token) {
+	public static boolean sendTokenPatternQuery(String token) {
 		URL wsdl = null;
-        try {
-            //wsdl = new URL("http://94.23.221.97:8084/petals/services/QueryDispatchApiPortService?wsdl");
-            wsdl = new URL("http://demo.play-project.eu:8085/play/QueryDispatchApi?wsdl");
-            //wsdl = new URL("http://localhost:8080/jaxws/putQuery?wsdl");
-            //wsdl = new URL("http://127.0.0.1:8085/play/QueryDispatchApi?wsdl");
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
+		try {
+			wsdl = new URL("http://demo.play-project.eu:8085/play/QueryDispatchApi?wsdl");
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
 
 		QName serviceName = new QName("http://play_platformservices.play_project.eu/", "QueryDispatchApi");
 
 		Service service = Service.create(wsdl, serviceName);
 		QueryDispatchApi queryDispatchApi = service.getPort(QueryDispatchApi.class);
-		
+
 		String topic = "\"" + token + "\"";
 
-		String prefix = "PREFIX : <http://streams.play-project.eu/types/>" ;
-        String queryString = prefix + "SELECT ?friend1 ?friend2 ?friend3 ?topic1" +
-                " WHERE " +
-                    "WINDOW{ " +
-                        "EVENT ?id1{" +
-                                    "?dtc1 ?typ1 :FacebookStatusFeedEvent." +
-                                    "?dtc1 :status ?topic1." +
-                                    "?dtc1 :name ?friend1} " +
-                                    "FILTER fn:contains(?topic1, " + topic + ")" +
-                        "SEQ " +
-                        "EVENT ?id2{" +
-                                    "?dtc2 ?typ1 :FacebookStatusFeedEvent. " +
-                                    "?dtc2 :status ?topic2." +
-                                    "?dtc2 :name ?friend2} " +
-                                    "FILTER fn:contains(?topic2, " + topic + ")" +
-                        "SEQ " +
-                        "EVENT ?id3{" +
-                                    "?dtc3 ?typ1 :FacebookStatusFeedEvent. " +
-                                    "?dtc3 :status ?topic3." +
-                                    "?dtc3 :name ?friend3} " +
-                                    "FILTER fn:contains(?topic3, " + topic + ")" +
-                    "} (\"P30M\"^^xsd:duration, sliding)";
+		String prefix = "PREFIX : <http://streams.play-project.eu/types/>";
+		String queryString = prefix + "SELECT ?friend1 ?friend2 ?friend3 ?topic1" + " WHERE " + "WINDOW{ "
+				+ "EVENT ?id1{" + "?dtc1 ?typ1 :FacebookStatusFeedEvent." + "?dtc1 :status ?topic1."
+				+ "?dtc1 :name ?friend1} " + "FILTER fn:contains(?topic1, " + topic + ")" + "SEQ "
+				+ "EVENT ?id2{" + "?dtc2 ?typ1 :FacebookStatusFeedEvent. " + "?dtc2 :status ?topic2."
+				+ "?dtc2 :name ?friend2} " + "FILTER fn:contains(?topic2, " + topic + ")" + "SEQ "
+				+ "EVENT ?id3{" + "?dtc3 ?typ1 :FacebookStatusFeedEvent. " + "?dtc3 :status ?topic3."
+				+ "?dtc3 :name ?friend3} " + "FILTER fn:contains(?topic3, " + topic + ")"
+				+ "} (\"P30M\"^^xsd:duration, sliding)";
 
-        try{
-		String s = queryDispatchApi.registerQuery(queryString);
-		Logger.info(s);
-        } catch (Exception e){
-        	Logger.error(e.toString());
-        	return false;
-        }
+		try {
+			String s = queryDispatchApi.registerQuery(queryString);
+			Logger.info(s);
+		} catch (Exception e) {
+			Logger.error(e.toString());
+			return false;
+		}
+		return true;
+	}
+
+	public static Boolean sendFullPatternQuery(String queryString) {
+		URL wsdl = null;
+		try {
+			wsdl = new URL("http://demo.play-project.eu:8085/play/QueryDispatchApi?wsdl");
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+
+		QName serviceName = new QName("http://play_platformservices.play_project.eu/", "QueryDispatchApi");
+
+		Service service = Service.create(wsdl, serviceName);
+		QueryDispatchApi queryDispatchApi = service.getPort(QueryDispatchApi.class);
+
+		try {
+			String s = queryDispatchApi.registerQuery(queryString);
+			Logger.info(s);
+		} catch (Exception e) {
+			Logger.error(e.toString());
+			return false;
+		}
 		return true;
 	}
 
 	/**
-	 * Notify action triggered by buttons on the web interface Generates an
-	 * event and sends it to the DSB on the specified topic
-	 * 
-	 * @param name
-	 * @param status
-	 * @param location
-	 * @param topic
+	 * Notify action triggered by buttons on the web interface Generates a
+	 * Facebook status event event and sends it to the DSB
 	 */
-	public static void notif(String name, String status, String location, String topic) {
-		// Model model = RDF2Go.getModelFactory().createModel(new
-		// URIImpl("http://www.inria.fr"));
-		// model.open();
-		// model.setNamespace("", "http://events.event-processing.org/types/");
-		// model.setNamespace("e", "http://events.event-processing.org/ids/");
-		// model.setNamespace("xsd", "http://www.w3.org/2001/XMLSchema#");
-		// model.setNamespace("rdf",
-		// "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
-		// model.setNamespace("rdfs", "http://www.w3.org/2000/01/rdf-schema#");
-		// model.setNamespace("owl", "http://www.w3.org/2002/07/owl#");
-		// FacebookStatusFeedEvent e2 = new FacebookStatusFeedEvent(model,
-		// "http://events.event-processing.org/ids/e2#event", true);
-		// e2.setName(name);
-		// e2.setStatus(status);
-		// e2.setLocation(location);
-		// e2.setEndTime(javax.xml.bind.DatatypeConverter.parseDateTime("2011-08-24T14:42:01.011"));
-		// String modelString = model.serialize(Syntax.RdfXml);
-		//
-		// String producerAddress = "http://localhost:9998/foo/Producer";
-		// String endpointAddress = "http://localhost:9998/foo/Endpoint";
-		// String uuid = UUID.randomUUID().toString();
-		//
-		// QName topicUsed = new QName("http://dsb.petalslink.org/notification",
-		// "Sample", "dsbn");
-		// String dialect =
-		// WstopConstants.CONCRETE_TOPIC_EXPRESSION_DIALECT_URI.toString();
-		// try {
-		// Document notifPayload =
-		// XMLHelper.createDocumentFromString(modelString);
-		// Notify notify;
-		// DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		// dbf.setNamespaceAware(true);
-		// notify = NotificationHelper.createNotification(producerAddress,
-		// endpointAddress, uuid, topicUsed,
-		// dialect, notifPayload);
-		// Document dom =
-		// Wsnb4ServUtils.getWsnbWriter().writeNotifyAsDOM(notify);
-		// XMLHelper.writeDocument(dom, System.out);
-		// INotificationConsumer consumerClient = new
-		// HTTPNotificationConsumerClient(dsbNotify);
-		// consumerClient.notify(notify);
-		// } catch (Exception e) {
-		// e.printStackTrace();
-		// }
-	}
+	public static void testFacebookStatusFeedEvent() throws ModelRuntimeException, IOException {
+		ArrayList<String> eventIds = new ArrayList<String>();
+		String eventId = Stream.FacebookStatusFeed.getUri() + "/" + Math.random();
 
-	public static void notifTest() {
-		// String producerAddress = "http://localhost:9998/foo/Producer";
-		// String endpointAddress = "http://localhost:9998/foo/Endpoint";
-		// String uuid = UUID.randomUUID().toString();
-		//
-		// QName topicUsed = new QName("http://dsb.petalslink.org/notification",
-		// "NuclearUC", "tns");
-		// String dialect =
-		// WstopConstants.CONCRETE_TOPIC_EXPRESSION_DIALECT_URI.toString();
-		// // TODO initialize notifPayload another way
-		// Document notifPayload = null;
-		// Notify notify;
-		// DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		// dbf.setNamespaceAware(true);
-		// try {
-		// notify = NotificationHelper.createNotification(producerAddress,
-		// endpointAddress, uuid, topicUsed,
-		// dialect, notifPayload);
-		// Document dom =
-		// Wsnb4ServUtils.getWsnbWriter().writeNotifyAsDOM(notify);
-		// XMLHelper.writeDocument(dom, System.out);
-		// INotificationConsumer consumerClient = new
-		// HTTPNotificationConsumerClient(dsbNotify);
-		// consumerClient.notify(notify);
-		// } catch (Exception e) {
-		// e.printStackTrace();
-		// }
+		FacebookStatusFeedEvent event = new FacebookStatusFeedEvent(EventHelpers.createEmptyModel(eventId),
+				eventId + "#event", true);
+		eventIds.add(eventId + "#event");
+
+		event.setName("Roland Stühmer");
+		event.setId("100000058455726");
+		event.setLink(new URIImpl("http://graph.facebook.com/roland.stuehmer#"));
+		event.setStatus("I bought some JEANS this morning");
+		event.setLocation("Karlsruhe, Germany");
+		event.setEndTime(Calendar.getInstance());
+		event.setStream(new URIImpl(Stream.FacebookStatusFeed.getUri()));
+		event.getModel().writeTo(System.out, Syntax.Turtle);
+		System.out.println();
 	}
 
 	/**

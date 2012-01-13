@@ -101,3 +101,9 @@ img.tab-topic-icon {
 	height:16px;
 	margin-left: 10px;
 }
+
+.subscribed-topic-title {
+	width: 146px;
+	display: inline-block;
+	overflow: hidden;
+}

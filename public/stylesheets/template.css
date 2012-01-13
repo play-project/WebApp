@@ -165,6 +165,12 @@ img.available-topic-icon {
 	margin-left: 10px;
 }
 
+.available-topic-title {
+	width:160px;
+	overflow:hidden;
+	display:inline-block;
+}
+
 /* Dialog panels
 ----------------------------------*/
 div.ui-dialog {

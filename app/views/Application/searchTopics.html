@@ -3,7 +3,8 @@
 		for(int i=0; i < result.size(); i++){
 }%
 			<h3 id="topic-${result.get(i).getId()}">
-				<a href="#">${result.get(i).title}</a>
+				<a href="#"><span class="available-topic-title">${result.get(i).title}</span>
+				<img src="${result.get(i).icon}" class="available-topic-icon"></a>
 				<a href="#" class="subscribe-button">Sub</a>
 			</h3>
 			<div id="desc-topic-${result.get(i).getId()}">

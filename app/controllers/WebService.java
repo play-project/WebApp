@@ -51,6 +51,7 @@ import play.templates.TemplateLoader;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.QuerySolution;
 
+import eu.play_project.play_commons.constants.Constants;
 import eu.play_project.play_platformservices_querydispatcher.Api.QueryDispatchApi;
 import fr.inria.eventcloud.api.CompoundEvent;
 import fr.inria.eventcloud.api.Quadruple;
@@ -58,7 +59,6 @@ import fr.inria.eventcloud.api.QuadruplePattern;
 import fr.inria.eventcloud.api.generators.QuadrupleGenerator;
 import fr.inria.eventcloud.api.responses.SparqlSelectResponse;
 import fr.inria.eventcloud.api.wrappers.ResultSetWrapper;
-import fr.inria.eventcloud.translators.wsnotif.WsNotificationTranslator;
 
 /**
  * The WebService controller is in charge of SOAP connection with the DSB.
@@ -68,8 +68,7 @@ import fr.inria.eventcloud.translators.wsnotif.WsNotificationTranslator;
 public class WebService extends Controller {
 
 	private static QName TOPIC_SET_QNAME = new QName("http://docs.oasis-open.org/wsn/t-1", "TopicSet");
-
-	public static String DSB_RESOURCE_SERVICE = "http://46.105.181.221:8084/petals/services/NotificationProducerPortService";
+	public static String DSB_RESOURCE_SERVICE = Constants.getProperties().getProperty("dsb.notify.endpoint");
 	public static String DSB_SUBSCRIBE_SERVICE = "http://46.105.181.221:8084/petals/services/EventCloudSubscribePortService";
 	public static String EC_SUBSCRIBE_SERVICE = "http://eventcloud.inria.fr:8950/proactive/services/EventCloud_subscribe-webservices";
 	// public static String PUTGET_SERVICE =
@@ -288,7 +287,7 @@ public class WebService extends Controller {
 		event.setId("100000058455726");
 		event.setLink(new URIImpl("http://graph.facebook.com/roland.stuehmer#"));
 		event.setStatus("I bought some JEANS this morning");
-		event.setLocation("Karlsruhe, Germany");
+		event.setUserLocation("Karlsruhe, Germany");
 		event.setEndTime(Calendar.getInstance());
 		event.setStream(new URIImpl(Stream.FacebookStatusFeed.getUri()));
 		event.getModel().writeTo(System.out, Syntax.Turtle);

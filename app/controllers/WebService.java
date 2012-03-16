@@ -75,8 +75,8 @@ public class WebService extends Controller {
 	// "http://138.96.19.125:8952/proactive/services/EventCloud_putget-webservices";
 	public static String PUTGET_SERVICE = "http://46.105.181.221:8084/petals/services/PutGetServicePortService";
 
-	// public static String dsbNotify =
-	// "http://94.23.221.97:8084/petals/services/NotificationConsumerPortService";
+	// public static String DSB_NOTIFY_SERVICE =
+	// Constants.getProperties().getProperty("dsb.notify.endpoint");
 	public static String DSB_NOTIFY_SERVICE = "http://www.postbin.org/1abunq6";
 
 	/**

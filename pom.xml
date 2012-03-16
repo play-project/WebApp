@@ -10,11 +10,53 @@
 	<url>http://www.play-project.eu/</url>
 
 	<repositories>
-		<!-- for the play-platformservices-eventformat dependency and query dispatcher -->
 		<repository>
-			<id>test-rep-at-hska</id>
-			<url>http://www.home.hs-karlsruhe.de/~obst1011/maven2/</url>
+			<id>play-private.release</id>
+			<url>http://maven.petalslink.com/private-play-release</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
+		<repository>
+			<id>play-private.snapshot</id>
+			<url>http://maven.petalslink.com/private-play-snapshot</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>petalslink-public.release</id>
+			<name>PetalsLink Public Repository</name>
+			<url>http://maven.petalslink.com/public</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>petalslink-public.snapshot</id>
+			<name>PetalsLink Snapshot Public Repository</name>
+			<url>http://maven.petalslink.com/public-snapshot</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
+		<repository>
+			<id>petalslink-public.others</id>
+			<url>http://maven.petalslink.com/others</url>
+		</repository>
+
 		<!-- for Event Cloud dependencies -->
 		<repository>
 			<id>sonatype-nexus-snapshots</id>
@@ -63,18 +105,17 @@
 			<artifactId>gson</artifactId>
 			<version>1.7.2</version>
 		</dependency>
-
 		<dependency>
 			<groupId>eu.play-project</groupId>
 			<artifactId>play-platformservices-eventformat</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
-
 		<dependency>
 			<groupId>fr.inria.eventcloud</groupId>
 			<artifactId>event-cloud-webservices-core</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 			<exclusions>
+				<!-- exclude various files mostly because of conflicts with playframework :stuehmer -->
 				<exclusion>
 					<groupId>ch.qos.logback</groupId>
 					<artifactId>logback-classic</artifactId>
@@ -83,9 +124,24 @@
 					<groupId>ch.qos.logback</groupId>
 					<artifactId>logback-core</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>net.sf.ehcache</groupId>
+					<artifactId>ehcache</artifactId>
+				</exclusion>
+				<exclusion>
+					<artifactId>hibernate-core</artifactId>
+					<groupId>org.hibernate</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>hibernate-annotations</artifactId>
+					<groupId>org.hibernate</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>hibernate-commons-annotations</artifactId>
+					<groupId>org.hibernate</groupId>
+				</exclusion>
 			</exclusions>
 		</dependency>
-
 		<dependency>
 			<artifactId>play-platformservices-querydispatcher</artifactId>
 			<groupId>eu.play-project</groupId>
@@ -102,4 +158,14 @@
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<!-- fix for a temporary(?) dependency resolution problem in event-cloud :steuhmer -->
+			<dependency>
+				<groupId>org.apache.jena</groupId>
+				<artifactId>jena-tdb</artifactId>
+				<version>0.9.0-incubating</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>

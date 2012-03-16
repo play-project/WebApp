@@ -12,12 +12,13 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.hp.hpl.jena.datatypes.RDFDatatype;
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.graph.Node;
-import fr.inria.eventcloud.api.Collection;
+import java.util.Collection;
 import fr.inria.eventcloud.api.CompoundEvent;
 import fr.inria.eventcloud.api.Quadruple;
-import fr.inria.eventcloud.translators.wsnotif.WsNotificationTranslator;
+import fr.inria.eventcloud.translators.wsn.notify.NotificationTranslator;
 
 /**
  * Translates a WS-Notification notification payload to an {@link Event}. The
@@ -122,19 +123,19 @@ public class WsNotifNotificationToEventHandler extends DefaultHandler {
             XSDDatatype datatype =
                     this.elementDatatypes.get(this.elements.getLast().localName);
             if (datatype != null) {
-                object = Node.createLiteral(textNode, datatype);
+                object = Node.createLiteral(textNode, null, datatype);
                 // System.out.println("@@@@@@ Data TYPE = "+datatype.toString());
             } else {
                 datatype = getDatatype(textNode);
                 // System.out.println("@@@@@@ Data TYPE = "+datatype.toString());
-                object = Node.createLiteral(textNode, datatype);
+                object = Node.createLiteral(textNode, null, datatype);
             }
         }
 
         if (object == null) {
             XSDDatatype datatype = getDatatype(textNode);
             if (datatype != null) {
-                object = Node.createLiteral(textNode, datatype);
+                object = Node.createLiteral(textNode, null, datatype);
             } else {
                 Node.createLiteral(textNode);
             }
@@ -198,7 +199,7 @@ public class WsNotifNotificationToEventHandler extends DefaultHandler {
     }
 
     public CompoundEvent getEvent() {
-        return new CompoundEvent(new Collection<Quadruple>(this.quadruples));
+        return new CompoundEvent(new ArrayList<Quadruple>(this.quadruples));
     }
 
     private static class Element {

@@ -48,36 +48,38 @@ public class Authentifier extends Controller {
 					if (fbId != null) {
 						// Find user by Facebook id
 						User uByFbId = User.find("byFbId", fbId).first();
-						User uByFbEmail = User.find("byEmail", fbEmail).first();
 						// If user is already fb-registered
 						if (uByFbId != null) {
 							// Connect and update his access token
 							User u = ModelManager.get().connect(uByFbId.email, uByFbId.password);
-							u.fbAccessToken = fbAccessToken;
 							if (u != null) {
+								u.fbAccessToken = fbAccessToken;
 								Logger.info("User connected with facebook : " + u);
 								session.put("userid", u.id);
 								Application.index();
 							}
 							// Already registered with fb email, but first time
 							// connecting with fb
-						} else if (uByFbEmail != null) {
-							User u = ModelManager.get().connect(uByFbEmail.email, uByFbEmail.password);
-							u.fbId = fbId;
-							u.save();
-							u.fbAccessToken = fbAccessToken;
-							if (u != null) {
-								Logger.info("User connected with facebook : " + u);
-								session.put("userid", u.id);
-								Application.index();
-							}
-							// Else : first time connecting with fb
-							// -> redirect to registration page with infos in
-							// session
 						} else {
-							session.put("fbAccessToken", fbAccessToken);
-							session.put("fbId", fbId);
-							Application.register();
+							User uByFbEmail = User.find("byEmail", fbEmail).first();
+							if (uByFbEmail != null) {
+								User u = ModelManager.get().connect(uByFbEmail.email, uByFbEmail.password);
+								if (u != null) {
+									u.fbId = fbId;
+									u.fbAccessToken = fbAccessToken;
+									u.save();
+									Logger.info("User connected with facebook : " + u);
+									session.put("userid", u.id);
+									Application.index();
+								}
+								// Else : first time connecting with fb
+								// -> redirect to registration page with infos
+								// in session
+							} else {
+								session.put("fbAccessToken", fbAccessToken);
+								session.put("fbId", fbId);
+								Application.register();
+							}
 						}
 					}
 				}

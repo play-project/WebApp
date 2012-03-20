@@ -77,7 +77,7 @@
 
 		<div id="tab-topic-${userTopics.get(i).getId()}">
 			<h2>
-				<span class="available-topic-title">${userTopics.get(i).title}</span>
+				${userTopics.get(i).title}
 				<a href="#" id="unsubscribe-button-${userTopics.get(i).getId()}"
 					class="unsubscribe-button">Unsubscribe</a>
 			</h2>
@@ -121,6 +121,11 @@
 </div>
 
 <script type="text/javascript">
+function windowActive() { focus = true; }
+function windowInactive() { focus = false; }
+window.onfocus = windowActive;
+window.onblur = windowInactive;
+
 $(function() {
 	$("#available-topics").accordion({
 			autoHeight: false,
@@ -285,7 +290,7 @@ var getEvents = function() {
 var blinking = false;
 var unblinking = false;
 var display = function(event, blink) {
-	if(blink && !blinking){
+	if(focus && blink && !blinking){
 		blinking = true;
 		unblinking = false;
 		$('#unread-'+event.data.topicId).parent().animate({
@@ -299,7 +304,7 @@ var display = function(event, blink) {
 	var cpt = parseInt($topicunreadspan.html());
 	$topicunreadspan.html(cpt+1);
 	
-	if(blink && blinking && !unblinking){
+	if(focus && blink && blinking && !unblinking){
 		blinking = false;
 		unblinking = true;
 		$topicunreadspan.parent().animate({

@@ -43,13 +43,22 @@ public class Application extends Controller {
 	/**
 	 * Action to call before each action requiring the user to be connected
 	 */
-	@Before(only = { "index", "historicalEvents", "settings", "updateSettings", "sendEvent", "subscribe",
+	@Before(only = { "index", "historicalEvents", "waitEvents", "settings", "updateSettings", "sendEvent", "subscribe",
 			"unsubscribe", "getTopics", "patternQuery", "processPatternQuery", "historicalByTopic" })
 	private static void checkAuthentification() {
 		String uid = session.get("userid");
 		if (uid == null) {
 			login();
+			return;
 		}
+		User user = ModelManager.get().getUserById(Long.parseLong(uid));
+		if(user == null){
+			logout();
+			return;
+		}
+		Logger.info(user + " called " + request.action);
+		user.lastRequest = new Date();
+		request.args.put("user", user);
 	}
 
 	@Before(only = { "register", "processRegistration", "login", "processLogin" })
@@ -63,7 +72,7 @@ public class Application extends Controller {
 	 * Index action, renders the main page of the web application
 	 */
 	public static void index() {
-		User u = ModelManager.get().getUserById(Long.parseLong(session.get("userid")));
+		User u = (User) request.args.get("user");
 		if (u == null) {
 			logout();
 		}
@@ -104,7 +113,7 @@ public class Application extends Controller {
 	 * Historical events
 	 */
 	public static void historicalEvents() {
-		User u = ModelManager.get().getUserById(Long.parseLong(session.get("userid")));
+		User u = (User) request.args.get("user");
 		if (u == null) {
 			logout();
 		}
@@ -127,13 +136,17 @@ public class Application extends Controller {
 		render();
 	}
 
-	public static void processTokenPatternQuery(String token) {
-		if (token != null && token != "") {
-			Boolean result = WebService.sendTokenPatternQuery(token);
+	public static void processTokenPatternQuery(String text) {
+		if (text != null && text != "") {
+			Boolean result = WebService.sendTokenPatternQuery(text);
 			if (!result) {
 				flash.error("The operation encoutered an error.");
 			}
 		}
+		patternQuery();
+	}
+
+	public static void processComposedPatternQuery(String text) {
 		patternQuery();
 	}
 	
@@ -248,16 +261,16 @@ public class Application extends Controller {
 					mailnotif, randomID);
 		}
 		Cache.delete(randomID);
-		User u = new User(email, password, firstname, lastname, gender, mailnotif);
+		User u = new User(email, PasswordEncrypt.encrypt(password), firstname, lastname, gender, mailnotif);
 		u.fbId = fbId;
-		u.googleEmail = googleEmail;
+		//u.googleEmail = googleEmail;
 		u.create();
 		// Connect
-		User uc = ModelManager.get().connect(u.email, u.password);
-		if (u != null) {
+		User uc = ModelManager.get().connect(email, password);
+		if (uc != null) {
 			Logger.info("User registered : " + uc);
-			u.fbAccessToken = session.get("fbAccessToken");
-			u.googleAccessToken = session.get("googleAccessToken");
+			uc.fbAccessToken = session.get("fbAccessToken");
+			uc.googleAccessToken = session.get("googleAccessToken");
 			session.put("userid", uc.id);
 		}
 		index();
@@ -281,7 +294,7 @@ public class Application extends Controller {
 	 */
 	public static void waitEvents(@Required Long lastReceived) throws InterruptedException,
 			ExecutionException {
-		User u = ModelManager.get().getUserById(Long.parseLong(session.get("userid")));
+		User u = (User) request.args.get("user");
 		if (u == null) {
 			renderJSON("{\"error\":\"disconnected\"}");
 		}
@@ -291,11 +304,10 @@ public class Application extends Controller {
 	}
 
 	public static void searchTopics(String search, String title, String desc) {
+		User u = (User) request.args.get("user");
 		ArrayList<EventTopic> topics = ModelManager.get().getTopics();
 		boolean searchTitle = Boolean.parseBoolean(title);
 		boolean searchContent = Boolean.parseBoolean(desc);
-		Long id = Long.parseLong(session.get("userid"));
-		User u = ModelManager.get().getUserById(id);
 		ArrayList<EventTopic> result = new ArrayList<EventTopic>();
 		ArrayList<EventTopic> userTopics = u.getTopics();
 		for (int i = 0; i < topics.size(); i++) {
@@ -329,8 +341,7 @@ public class Application extends Controller {
 	 * @param topicId
 	 */
 	public static void subscribe(@Required String topicId) {
-		Long id = Long.parseLong(session.get("userid"));
-		User u = ModelManager.get().getUserById(id);
+		User u = (User) request.args.get("user");
 		String result = "{\"id\":\"-1\"}";
 		if (u != null) {
 			EventTopic et = ModelManager.get().getTopicById(topicId);
@@ -361,8 +372,7 @@ public class Application extends Controller {
 	 * @param topicId
 	 */
 	public static void unsubscribe(@Required String topicId) {
-		Long id = Long.parseLong(session.get("userid"));
-		User u = ModelManager.get().getUserById(id);
+		User u = (User) request.args.get("user");
 		String result = "{\"id\":\"-1\"}";
 		if (u != null) {
 			EventTopic et = ModelManager.get().getTopicById(topicId);
@@ -434,6 +444,9 @@ public class Application extends Controller {
 		settings();
 	}
 
+	/**
+	 * FAQ page
+	 */
 	public static void faq() {
 		render();
 	}

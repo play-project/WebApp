@@ -2,13 +2,19 @@ package models;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.google.gson.JsonObject;
 
 import play.Logger;
+import play.db.jpa.Model;
+
 import play.db.jpa.*;
 
 /**
@@ -30,11 +36,15 @@ public class User extends Model {
 	public String googleEmail;
 	public String mailnotif;
 	@ElementCollection
+	@controllers.CRUD.Exclude
 	public List<String> eventTopicIds;
 	@Transient
-	UserEventBuffer eventBuffer;
+	public UserEventBuffer eventBuffer;
+	@Transient
+	public Date lastRequest;
 	@Transient
 	public String fbAccessToken;
+	@Transient
 	public String googleAccessToken;
 
 	public User(String email, String password, String firstname, String lastname, String gender,
@@ -48,6 +58,7 @@ public class User extends Model {
 		this.googleEmail = null;
 		this.eventTopicIds = eventTopicIds;
 		this.mailnotif = mailnotif;
+		this.lastRequest = new Date();
 		UserEventBuffer eventBuffer = new UserEventBuffer();
 	}
 

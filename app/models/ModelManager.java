@@ -28,7 +28,7 @@ import play.mvc.Scope.Session;
 public class ModelManager {
 
 	public static ModelManager instance = null;
-	private ArrayList<User> connectedUsers = new ArrayList<User>();
+	private List<User> connectedUsers = Collections.synchronizedList(new ArrayList<User>());
 	private ArrayList<EventTopic> topics = new ArrayList<EventTopic>();
 
 	/**
@@ -38,9 +38,11 @@ public class ModelManager {
 		Logger.info("MODELMANAGER INITIALIZED");
 
 		topics = WebService.getSupportedTopics();
-		User u = new User("claw21@live.fr", "666666", "Alexandre", "Bourdin", "M", "N");
-		User u2 = new User("corshclaw@gmail.com", "666666", "Alex", "Claw", "M", "N");
-		User u3 = new User("fb@roland-stuehmer.de", "666666", "Roland", "Stuehmer", "M", "N");
+		User u = new User("claw21@live.fr", PasswordEncrypt.encrypt("666666"), "Alexandre", "Bourdin", "M",
+				"N");
+		User u2 = new User("corshclaw@gmail.com", PasswordEncrypt.encrypt("666666"), "Alex", "Claw", "M", "N");
+		User u3 = new User("fb@roland-stuehmer.de", PasswordEncrypt.encrypt("666666"), "Roland", "Stuehmer",
+				"M", "N");
 		u.create();
 		u2.create();
 		u3.create();
@@ -49,7 +51,7 @@ public class ModelManager {
 	public static ModelManager get() {
 		if (instance == null) {
 			instance = new ModelManager();
-	        instance.initializeSubscriptions();
+			instance.initializeSubscriptions();
 		}
 		return instance;
 	}
@@ -60,7 +62,7 @@ public class ModelManager {
 					.count("Select count(*) from User as u inner join u.eventTopicIds as strings where ? in strings",
 							et.getId());
 			if (et.subscribersCount > 0) {
-				if(WebService.subscribe(et) == 1){
+				if (WebService.subscribe(et) == 1) {
 					et.alreadySubscribedDSB = true;
 				}
 			}
@@ -75,10 +77,12 @@ public class ModelManager {
 	 * @return User
 	 */
 	public User connect(String email, String password) {
-		User u = User.find("byEmailAndPassword", email, password).first();
+		User u = User.find("byEmailAndPassword", email, PasswordEncrypt.encrypt(password)).first();
 		if (u != null) {
-			disconnect(u);
-			connectedUsers.add(u);
+			synchronized(connectedUsers){
+				disconnect(u);
+				connectedUsers.add(u);
+			}
 			Collections.sort(u.eventTopicIds);
 			u.setEventBuffer(new UserEventBuffer());
 		}
@@ -92,11 +96,13 @@ public class ModelManager {
 	 * @return boolean
 	 */
 	public boolean disconnect(User user) {
-		if (user != null && connectedUsers.contains(user)) {
-			connectedUsers.remove(user);
-			return true;
+		synchronized (connectedUsers) {
+			if (user != null && connectedUsers.contains(user)) {
+				connectedUsers.remove(user);
+				return true;
+			}
+			return false;
 		}
-		return false;
 	}
 
 	public boolean isConnected(User u) {
@@ -110,7 +116,7 @@ public class ModelManager {
 	 * GETTERS AND SETTERS
 	 */
 
-	public ArrayList<User> getConnectedUsers() {
+	public List<User> getConnectedUsers() {
 		return connectedUsers;
 	}
 

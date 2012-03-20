@@ -15,36 +15,33 @@ import fr.inria.eventcloud.api.CompoundEvent;
 
 public class TranslationUtils {
 
-    public static CompoundEvent translateWsNotifNotificationToEvent(InputStream xmlPayload,
-                                                     InputStream xsdPayload,
-                                                     URI eventId) {
-        Map<String, XSDDatatype> elementDatatypes = null;
-        if (xsdPayload != null) {
-            XsdHandler xsdHandler = new XsdHandler();
-            executeSaxParser(xsdPayload, null, xsdHandler);
-            elementDatatypes = xsdHandler.getElementDatatypes();
-        } else {
+	public static CompoundEvent translateWsNotifNotificationToEvent(InputStream xmlPayload,
+			InputStream xsdPayload, URI eventId) {
+		Map<String, XSDDatatype> elementDatatypes = null;
+		if (xsdPayload != null) {
+			XsdHandler xsdHandler = new XsdHandler();
+			executeSaxParser(xsdPayload, null, xsdHandler);
+			elementDatatypes = xsdHandler.getElementDatatypes();
+		} else {
 
-        }
+		}
 
-        WsNotifNotificationToEventHandler handler =
-                new WsNotifNotificationToEventHandler(
-                        eventId.toString(), elementDatatypes);
-        executeSaxParser(xmlPayload, xsdPayload, handler);
+		WsNotifNotificationToEventHandler handler = new WsNotifNotificationToEventHandler(eventId.toString(),
+				elementDatatypes);
+		executeSaxParser(xmlPayload, xsdPayload, handler);
 
-        return handler.getEvent();
-    }
+		return handler.getEvent();
+	}
 
-    private static void executeSaxParser(InputStream in, InputStream xsd,
-                                  DefaultHandler handler) {
-        try {
-            SAXParserFactory factory = SAXParserFactory.newInstance();
-            factory.setNamespaceAware(true);
-            SAXParser saxParser = factory.newSAXParser();
-            saxParser.parse(in, handler);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+	private static void executeSaxParser(InputStream in, InputStream xsd, DefaultHandler handler) {
+		try {
+			SAXParserFactory factory = SAXParserFactory.newInstance();
+			factory.setNamespaceAware(true);
+			SAXParser saxParser = factory.newSAXParser();
+			saxParser.parse(in, handler);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 }

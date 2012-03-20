@@ -9,7 +9,7 @@ import play.db.jpa.*;
 import play.libs.F.*;
 
 public class UserEventBuffer {
-	final ArchivedEventStream<Event> stream = new ArchivedEventStream<Event>(30);
+	final ArchivedEventStream<Event> stream = new ArchivedEventStream<Event>(15);
 
 	public Promise<List<IndexedEvent<Event>>> nextEvents(long lastReceived) {
 		return stream.nextEvents(lastReceived);

@@ -9,8 +9,8 @@ POST	/proclog						Application.processLogin
 GET		/logout							Application.logout
 GET		/faq							Application.faq
 GET 	/query							Application.patternQuery
-GET 	/processtokenquery				Application.processTokenPatternQuery
-GET 	/processfullquery				Application.processFullPatternQuery
+POST 	/processtokenquery				Application.processTokenPatternQuery
+POST 	/processfullquery				Application.processFullPatternQuery
 
 GET		/settings						Application.settings
 POST	/updatesettings					Application.updateSettings
@@ -43,3 +43,11 @@ GET     /favicon.ico                    404
 # Map static resources from the /app/public folder to the /public path
 GET     /public-v003/						staticDir:public
 GET		/images/							staticDir:public/images
+
+# Monitoring
+GET		/monitoring/display				Monitoring.displayInfo
+
+# CRUD Admin
+*      /admin              				module:crud
+# Import Secure routes
+*      /secure                        	module:secure

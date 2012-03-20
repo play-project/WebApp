@@ -11,7 +11,7 @@ div#query-editor {
 }
 
 .ui-tabs-vertical {
-	width: 660px;
+	width: 99%;
 }
 
 .ui-tabs-vertical .ui-tabs-nav {
@@ -42,7 +42,7 @@ div#query-editor {
 }
 
 .ui-tabs-vertical .ui-tabs-panel {
-	overflow-y: scroll;
+	overflow-y: visible;
 	overflow-x: hidden;
 	padding: 0 16px 16px 16px;
 	float: right;
@@ -53,4 +53,13 @@ div#query-editor {
 .ui-helper-reset {
     font-size: 100%;
     line-height: 16px;
+}
+
+fieldset {
+	padding: 15px;
+	margin-bottom: 10px;
+}
+
+legend {
+	font-size: 1.1em;
 }

@@ -1,5 +1,6 @@
-package models;
+package models.jobs;
 
+import models.ModelManager;
 import play.Logger;
 import play.jobs.*;
 

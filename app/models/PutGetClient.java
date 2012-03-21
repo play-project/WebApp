@@ -14,6 +14,7 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 
 import play.Logger;
 
+import eu.play_project.play_commons.constants.Constants;
 import fr.inria.eventcloud.api.PutGetApi;
 import fr.inria.eventcloud.api.Quadruple;
 import fr.inria.eventcloud.api.QuadruplePattern;
@@ -27,11 +28,12 @@ import fr.inria.eventcloud.webservices.api.PutGetWsApi;
 public class PutGetClient implements PutGetWsApi {
 	private Client client;
 	private Map<String, String> operationNames;
+	private static String EC_PUTGET_SERVICE = Constants.getProperties().getProperty("eventcloud.putget.endpoint");
 
 	public PutGetClient(String wsUrl) {
 		JaxWsClientFactoryBean factory = new JaxWsClientFactoryBean();
 		factory.setServiceClass(PutGetWsApi.class);
-		factory.setAddress("http://eventcloud.inria.fr:8902/proactive/services/EventCloud_putget-webservices");
+		factory.setAddress(EC_PUTGET_SERVICE);
 		client = factory.create();
 
 		operationNames = new HashMap<String, String>();

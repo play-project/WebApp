@@ -8,6 +8,7 @@ test-result/
 lib/
 target/
 db/
+modules/
 conf/application.conf
 *.class
 *.jar

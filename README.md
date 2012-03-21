@@ -32,17 +32,19 @@ Installation
 -------------																 
 1. Install the Play! framework from www.playframework.org. We tested v. 1.2.x
 
-2. Clone the WebApp e.g. into your Eclipse workspace:
+1. Clone the WebApp e.g. into your Eclipse workspace:
 
-3. Fetch all Maven dependencies for WebApp:
+1. Fetch all Maven dependencies for WebApp:
 
         $ cd WebApp
         $ mvn dependency:copy-dependencies
 
-4. Create Eclipse project files (they are not in Git)
+1. Create Eclipse project files (they are not in Git)
 
         $ play eclipsify .
 
-5. Import the eclipsified project in Eclipse:
-`File -> Import -> Projects from Git` (add the path where WebApp was cloned)
+1. Create your file `conf/application.conf` from the available `conf/application.conf.dist`
+		
+1. Import the eclipsified project in Eclipse:
+`File -> Import -> Import existing projects` (add the path where WebApp was cloned)
 

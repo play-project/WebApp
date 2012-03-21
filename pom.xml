@@ -55,43 +55,25 @@
 		<repository>
 			<id>petalslink-public.others</id>
 			<url>http://maven.petalslink.com/others</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
 		</repository>
 
-		<!-- for Event Cloud dependencies -->
+		<!-- For Event Cloud dependencies -->
 		<repository>
 			<id>sonatype-nexus-snapshots</id>
 			<name>sonatype-nexus-snapshots</name>
 			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 		</repository>
-		<repository>
-			<id>semweb4j-repo</id>
-			<name>FZI Maven Repository</name>
-			<url>http://mavenrepo.fzi.de/semweb4j.org/repo</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>semweb4j-snapshots</id>
-			<name>FZI Maven Snapshot Repository</name>
-			<url>http://mavenrepo.fzi.de/semweb4j.org/snapshots</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
 	</repositories>
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<configuration>
+					<outputDirectory>lib/</outputDirectory>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -110,7 +92,7 @@
 		</dependency>
 		<dependency>
 			<groupId>eu.play-project</groupId>
-			<artifactId>play-platformservices-eventformat</artifactId>
+			<artifactId>play-commons-eventtypes</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
@@ -118,8 +100,7 @@
 			<artifactId>event-cloud-webservices-core</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 			<exclusions>
-				<!-- exclude various files mostly because of conflicts with playframework 
-					:stuehmer -->
+				<!-- exclude various files mostly because of conflicts with playframework :stuehmer -->
 				<exclusion>
 					<groupId>ch.qos.logback</groupId>
 					<artifactId>logback-classic</artifactId>
@@ -147,8 +128,8 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>eu.play-project</groupId>
 			<artifactId>play-platformservices-api</artifactId>
+			<groupId>eu.play-project</groupId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
@@ -157,15 +138,4 @@
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
-	<dependencyManagement>
-		<dependencies>
-			<!-- fix for a temporary(?) dependency resolution problem in event-cloud 
-				:steuhmer -->
-			<dependency>
-				<groupId>org.apache.jena</groupId>
-				<artifactId>jena-tdb</artifactId>
-				<version>0.9.0-incubating</version>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 </project>

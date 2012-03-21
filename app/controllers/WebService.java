@@ -82,7 +82,7 @@ import fr.inria.eventcloud.api.wrappers.ResultSetWrapper;
 public class WebService extends Controller {
 
 	public static String DSB_RESOURCE_SERVICE = Constants.getProperties().getProperty("dsb.notify.endpoint");
-	public static String PUTGET_SERVICE = "http://eventcloud.inria.fr:8902/proactive/services/EventCloud_putget-webservices";
+	public static String EC_PUTGET_SERVICE = Constants.getProperties().getProperty("eventcloud.putget.endpoint");
 
 	static {
 		Wsnb4ServUtils.initModelFactories(new WsrfbfModelFactoryImpl(), new WsrfrModelFactoryImpl(),
@@ -186,9 +186,8 @@ public class WebService extends Controller {
 	@Util
 	public static ArrayList<models.Event> getHistorical(EventTopic et) {
 		ArrayList<models.Event> events = new ArrayList<models.Event>();
-		// EventTopic et = ModelManager.get().getTopicById("dsb_TaxiUCIMA");
 
-		PutGetClient pgc = new PutGetClient(PUTGET_SERVICE);
+		PutGetClient pgc = new PutGetClient(EC_PUTGET_SERVICE);
 
 		SparqlSelectResponse response = pgc
 				.executeSparqlSelect("SELECT ?g ?s ?p ?o WHERE { GRAPH ?g { <http://eventcloud.inria.fr/replace/me/with/a/correct/namespace/"

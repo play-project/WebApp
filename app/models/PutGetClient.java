@@ -14,6 +14,7 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 
 import play.Logger;
 
+import eu.play_project.play_commons.constants.Constants;
 import fr.inria.eventcloud.api.PutGetApi;
 import fr.inria.eventcloud.api.Quadruple;
 import fr.inria.eventcloud.api.QuadruplePattern;

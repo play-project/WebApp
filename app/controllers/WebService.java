@@ -164,6 +164,8 @@ public class WebService extends Controller {
 		try {
 			String rendered = TemplateLoader.load("WebService/subscribetemplate.xml").render(map);
 
+			Logger.info("Subscribing to topic '%s%s' at broker '%s'", et.uri, et.name, DSB_RESOURCE_SERVICE);
+			
 			WSRequest request = WS.url(DSB_RESOURCE_SERVICE)
 					.setHeader("content-type", "application/soap+xml").body(rendered);
 
@@ -278,12 +280,10 @@ public class WebService extends Controller {
 	 * Facebook status event event and sends it to the DSB
 	 */
 	public static void testFacebookStatusFeedEvent() throws ModelRuntimeException, IOException {
-		ArrayList<String> eventIds = new ArrayList<String>();
 		String eventId = Stream.FacebookStatusFeed.getUri() + "/" + Math.random();
 
 		FacebookStatusFeedEvent event = new FacebookStatusFeedEvent(EventHelpers.createEmptyModel(eventId),
 				eventId + "#event", true);
-		eventIds.add(eventId + "#event");
 
 		event.setName("Roland Stühmer");
 		event.setId("100000058455726");

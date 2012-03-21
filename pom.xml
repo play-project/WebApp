@@ -55,6 +55,9 @@
 		<repository>
 			<id>petalslink-public.others</id>
 			<url>http://maven.petalslink.com/others</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
 		</repository>
 
 		<!-- for Event Cloud dependencies -->
@@ -115,7 +118,8 @@
 			<artifactId>event-cloud-webservices-core</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 			<exclusions>
-				<!-- exclude various files mostly because of conflicts with playframework :stuehmer -->
+				<!-- exclude various files mostly because of conflicts with playframework 
+					:stuehmer -->
 				<exclusion>
 					<groupId>ch.qos.logback</groupId>
 					<artifactId>logback-classic</artifactId>
@@ -143,13 +147,8 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<artifactId>play-platformservices-querydispatcher</artifactId>
 			<groupId>eu.play-project</groupId>
-			<version>1.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<artifactId>play-platformservices</artifactId>
-			<groupId>eu.play-project</groupId>
+			<artifactId>play-platformservices-api</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
@@ -160,7 +159,8 @@
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
-			<!-- fix for a temporary(?) dependency resolution problem in event-cloud :steuhmer -->
+			<!-- fix for a temporary(?) dependency resolution problem in event-cloud 
+				:steuhmer -->
 			<dependency>
 				<groupId>org.apache.jena</groupId>
 				<artifactId>jena-tdb</artifactId>

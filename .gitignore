@@ -13,6 +13,7 @@ conf/application.conf
 *.jar
 *.log
 server.pid
+.DS_Store
 .checkstyle
 .checkstyle-rules.xml
 .classpath

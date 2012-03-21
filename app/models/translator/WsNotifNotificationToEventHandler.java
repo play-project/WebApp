@@ -14,10 +14,8 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import com.hp.hpl.jena.graph.Node;
-import fr.inria.eventcloud.api.Collection;
 import fr.inria.eventcloud.api.CompoundEvent;
 import fr.inria.eventcloud.api.Quadruple;
-import fr.inria.eventcloud.translators.wsnotif.WsNotificationTranslator;
 
 /**
  * Translates a WS-Notification notification payload to an {@link Event}. The
@@ -198,7 +196,7 @@ public class WsNotifNotificationToEventHandler extends DefaultHandler {
     }
 
     public CompoundEvent getEvent() {
-        return new CompoundEvent(new Collection<Quadruple>(this.quadruples));
+        return new CompoundEvent(this.quadruples);
     }
 
     private static class Element {

@@ -1,7 +1,9 @@
 package models;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.jws.WebMethod;
@@ -12,7 +14,6 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 
 import play.Logger;
 
-import fr.inria.eventcloud.api.Collection;
 import fr.inria.eventcloud.api.PutGetApi;
 import fr.inria.eventcloud.api.Quadruple;
 import fr.inria.eventcloud.api.QuadruplePattern;
@@ -110,7 +111,7 @@ public class PutGetClient implements PutGetWsApi {
 	}
 
 	@Override
-	public Collection<Quadruple> deleteQuadruplePattern(QuadruplePattern arg0) {
+	public List<Quadruple> deleteQuadruplePattern(QuadruplePattern arg0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -145,7 +146,7 @@ public class PutGetClient implements PutGetWsApi {
 	}
 
 	@Override
-	public Collection<Quadruple> findQuadruplePattern(QuadruplePattern arg0) {
-		return (Collection<Quadruple>) callWS("findQuadruplePattern", new Object[] { arg0 });
+	public List<Quadruple> findQuadruplePattern(QuadruplePattern arg0) {
+		return (List<Quadruple>) callWS("findQuadruplePattern", new Object[] { arg0 });
 	}
 }

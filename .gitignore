@@ -11,10 +11,10 @@ db/
 conf/application.conf
 *.class
 *.jar
+*.log
 server.pid
 .checkstyle
 .checkstyle-rules.xml
 .classpath
 .project
 .settings
-hs_err_pid*.log

@@ -51,14 +51,14 @@ import play.templates.TemplateLoader;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.QuerySolution;
 
-import eu.play_project.play_platformservices_querydispatcher.Api.QueryDispatchApi;
+import eu.play_project.play_commons.constants.Constants;
+import eu.play_project.play_platformservices.api.QueryDispatchApi;
 import fr.inria.eventcloud.api.CompoundEvent;
 import fr.inria.eventcloud.api.Quadruple;
 import fr.inria.eventcloud.api.QuadruplePattern;
 import fr.inria.eventcloud.api.generators.QuadrupleGenerator;
 import fr.inria.eventcloud.api.responses.SparqlSelectResponse;
 import fr.inria.eventcloud.api.wrappers.ResultSetWrapper;
-import fr.inria.eventcloud.translators.wsnotif.WsNotificationTranslator;
 
 /**
  * The WebService controller is in charge of SOAP connection with the DSB.
@@ -69,15 +69,15 @@ public class WebService extends Controller {
 
 	private static QName TOPIC_SET_QNAME = new QName("http://docs.oasis-open.org/wsn/t-1", "TopicSet");
 
-	public static String DSB_RESOURCE_SERVICE = "http://46.105.181.221:8084/petals/services/NotificationProducerPortService";
+	public static String DSB_RESOURCE_SERVICE = Constants.getProperties().getProperty("dsb.notify.endpoint");
 	public static String DSB_SUBSCRIBE_SERVICE = "http://46.105.181.221:8084/petals/services/EventCloudSubscribePortService";
 	public static String EC_SUBSCRIBE_SERVICE = "http://eventcloud.inria.fr:8950/proactive/services/EventCloud_subscribe-webservices";
 	// public static String PUTGET_SERVICE =
 	// "http://138.96.19.125:8952/proactive/services/EventCloud_putget-webservices";
 	public static String PUTGET_SERVICE = "http://46.105.181.221:8084/petals/services/PutGetServicePortService";
 
-	// public static String dsbNotify =
-	// "http://94.23.221.97:8084/petals/services/NotificationConsumerPortService";
+	// public static String DSB_NOTIFY_SERVICE =
+	// Constants.getProperties().getProperty("dsb.notify.endpoint");
 	public static String DSB_NOTIFY_SERVICE = "http://www.postbin.org/1abunq6";
 
 	/**
@@ -164,6 +164,8 @@ public class WebService extends Controller {
 		try {
 			String rendered = TemplateLoader.load("WebService/subscribetemplate.xml").render(map);
 
+			Logger.info("Subscribing to topic '%s%s' at broker '%s'", et.uri, et.name, DSB_RESOURCE_SERVICE);
+			
 			WSRequest request = WS.url(DSB_RESOURCE_SERVICE)
 					.setHeader("content-type", "application/soap+xml").body(rendered);
 
@@ -261,7 +263,7 @@ public class WebService extends Controller {
 		QName serviceName = new QName("http://play_platformservices.play_project.eu/", "QueryDispatchApi");
 
 		Service service = Service.create(wsdl, serviceName);
-		QueryDispatchApi queryDispatchApi = service.getPort(QueryDispatchApi.class);
+		QueryDispatchApi queryDispatchApi = service.getPort(eu.play_project.play_platformservices.api.QueryDispatchApi.class);
 
 		try {
 			String s = queryDispatchApi.registerQuery(queryString);
@@ -278,18 +280,16 @@ public class WebService extends Controller {
 	 * Facebook status event event and sends it to the DSB
 	 */
 	public static void testFacebookStatusFeedEvent() throws ModelRuntimeException, IOException {
-		ArrayList<String> eventIds = new ArrayList<String>();
 		String eventId = Stream.FacebookStatusFeed.getUri() + "/" + Math.random();
 
 		FacebookStatusFeedEvent event = new FacebookStatusFeedEvent(EventHelpers.createEmptyModel(eventId),
 				eventId + "#event", true);
-		eventIds.add(eventId + "#event");
 
 		event.setName("Roland Stühmer");
 		event.setId("100000058455726");
 		event.setLink(new URIImpl("http://graph.facebook.com/roland.stuehmer#"));
 		event.setStatus("I bought some JEANS this morning");
-		event.setLocation("Karlsruhe, Germany");
+		event.setUserLocation("Karlsruhe, Germany");
 		event.setEndTime(Calendar.getInstance());
 		event.setStream(new URIImpl(Stream.FacebookStatusFeed.getUri()));
 		event.getModel().writeTo(System.out, Syntax.Turtle);

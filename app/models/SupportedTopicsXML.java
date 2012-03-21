@@ -36,21 +36,6 @@ public class SupportedTopicsXML {
 		return is;
 	}
 
-	public static ArrayList<EventTopic> getSupportedTopics() {
-		ArrayList<EventTopic> topics = new ArrayList<EventTopic>();
-		SAXBuilder sxb = new SAXBuilder();
-		Document xml = new Document();
-		Element root = null;
-		try {
-			xml = sxb.build(new File("/home/playwebapp/webapp/public/xml/supportedTopicSet.xml"));
-			root = xml.getRootElement();
-		} catch (Exception e) {
-			Logger.error("Error while parsing XML document");
-		}
-		parseXMLTree(topics, root, "");
-		return topics;
-	}
-
 	public static void parseXMLTree(ArrayList<EventTopic> result, Element node, String path) {
 		if (node != null) {
 			String id = node.getNamespacePrefix() + ":" + node.getName();

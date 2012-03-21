@@ -38,14 +38,6 @@ public class ModelManager {
 		Logger.info("MODELMANAGER INITIALIZED");
 
 		topics = WebService.getSupportedTopics();
-		User u = new User("claw21@live.fr", PasswordEncrypt.encrypt("666666"), "Alexandre", "Bourdin", "M",
-				"N");
-		User u2 = new User("corshclaw@gmail.com", PasswordEncrypt.encrypt("666666"), "Alex", "Claw", "M", "N");
-		User u3 = new User("fb@roland-stuehmer.de", PasswordEncrypt.encrypt("666666"), "Roland", "Stuehmer",
-				"M", "N");
-		u.create();
-		u2.create();
-		u3.create();
 	}
 
 	public static ModelManager get() {

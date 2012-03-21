@@ -37,6 +37,10 @@ import org.ontoware.rdf2go.model.Syntax;
 import org.ontoware.rdf2go.model.node.impl.URIImpl;
 import org.ontoware.rdfreactor.runtime.CardinalityException;
 import org.ontoware.rdfreactor.schema.rdfs.List;
+import org.petalslink.dsb.notification.client.http.HTTPNotificationProducerRPClient;
+import org.petalslink.dsb.notification.client.http.simple.HTTPProducerClient;
+import org.petalslink.dsb.notification.commons.NotificationException;
+import org.w3c.dom.Document;
 
 import play.Logger;
 import play.Play;
@@ -48,6 +52,16 @@ import play.mvc.Controller;
 import play.mvc.Util;
 import play.templates.TemplateLoader;
 
+import com.ebmwebsourcing.easycommons.xml.XMLHelper;
+import com.ebmwebsourcing.wsstar.basefaults.datatypes.impl.impl.WsrfbfModelFactoryImpl;
+import com.ebmwebsourcing.wsstar.basenotification.datatypes.impl.impl.WsnbModelFactoryImpl;
+import com.ebmwebsourcing.wsstar.resource.datatypes.impl.impl.WsrfrModelFactoryImpl;
+import com.ebmwebsourcing.wsstar.resourcelifetime.datatypes.impl.impl.WsrfrlModelFactoryImpl;
+import com.ebmwebsourcing.wsstar.resourceproperties.datatypes.impl.impl.WsrfrpModelFactoryImpl;
+import com.ebmwebsourcing.wsstar.topics.datatypes.api.WstopConstants;
+import com.ebmwebsourcing.wsstar.topics.datatypes.impl.impl.WstopModelFactoryImpl;
+import com.ebmwebsourcing.wsstar.wsnb.services.INotificationProducerRP;
+import com.ebmwebsourcing.wsstar.wsnb.services.impl.util.Wsnb4ServUtils;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.QuerySolution;
 
@@ -67,17 +81,14 @@ import fr.inria.eventcloud.api.wrappers.ResultSetWrapper;
  */
 public class WebService extends Controller {
 
-	private static QName TOPIC_SET_QNAME = new QName("http://docs.oasis-open.org/wsn/t-1", "TopicSet");
-
 	public static String DSB_RESOURCE_SERVICE = Constants.getProperties().getProperty("dsb.notify.endpoint");
-	public static String DSB_SUBSCRIBE_SERVICE = "http://46.105.181.221:8084/petals/services/EventCloudSubscribePortService";
-	public static String EC_SUBSCRIBE_SERVICE = "http://eventcloud.inria.fr:8950/proactive/services/EventCloud_subscribe-webservices";
-	// public static String PUTGET_SERVICE =
-	// "http://138.96.19.125:8952/proactive/services/EventCloud_putget-webservices";
-	public static String PUTGET_SERVICE = "http://46.105.181.221:8084/petals/services/PutGetServicePortService";
-	// public static String DSB_NOTIFY_SERVICE =
-	// Constants.getProperties().getProperty("dsb.notify.endpoint");
-	public static String DSB_NOTIFY_SERVICE = "http://www.postbin.org/1abunq6";
+	public static String PUTGET_SERVICE = "http://eventcloud.inria.fr:8902/proactive/services/EventCloud_putget-webservices";
+
+	static {
+		Wsnb4ServUtils.initModelFactories(new WsrfbfModelFactoryImpl(), new WsrfrModelFactoryImpl(),
+				new WsrfrlModelFactoryImpl(), new WsrfrpModelFactoryImpl(), new WstopModelFactoryImpl(),
+				new WsnbModelFactoryImpl());
+	}
 
 	/**
 	 * SOAP endpoint to receive WS-Notifications from the DSB.
@@ -113,37 +124,33 @@ public class WebService extends Controller {
 	 */
 	@Util
 	public static ArrayList<EventTopic> getSupportedTopics() {
-		Map<String, Object> map = new HashMap<String, Object>();
-
-		String rendered = TemplateLoader.load("WebService/gettopicstemplate.xml").render(map);
-
-		WSRequest request = WS.url(DSB_RESOURCE_SERVICE).setHeader("content-type", "application/soap+xml")
-				.body(rendered);
-
+		INotificationProducerRP resourceClient = new HTTPNotificationProducerRPClient(DSB_RESOURCE_SERVICE);
+		
 		try {
-			HttpResponse response = request.post();
-			String topicsString = response.getString();
-
-			Logger.info("topics=" + topicsString);
-
-			ArrayList<EventTopic> topics = new ArrayList<EventTopic>();
+			QName qname = WstopConstants.TOPIC_SET_QNAME;
+			com.ebmwebsourcing.wsstar.resourceproperties.datatypes.api.abstraction.GetResourcePropertyResponse response = resourceClient
+					.getResourceProperty(qname);
+			System.out.println("Get Resource response :");
+			Document dom = Wsnb4ServUtils.getWsrfrpWriter().writeGetResourcePropertyResponseAsDOM(response);
+			String topicsString = XMLHelper.createStringFromDOMDocument(dom);
+			
+			Logger.info("TOPICS STRING: " + topicsString);
 
 			SAXBuilder sxb = new SAXBuilder();
 			org.jdom.Document xml = new org.jdom.Document();
 			org.jdom.Element root = null;
-			try {
-				xml = sxb.build(new StringReader(topicsString));
-				root = xml.getRootElement();
-			} catch (Exception e) {
-				Logger.error("jDom : Error while parsing XML document");
-				e.printStackTrace();
-			}
+			ArrayList<EventTopic> topics = new ArrayList<EventTopic>();
+			xml = sxb.build(new StringReader(topicsString));
+			root = xml.getRootElement();
+			
 			SupportedTopicsXML.parseXMLTree(topics, root, "");
+
 			return topics;
-		} catch (RuntimeException e) {
-			renderText("Error : " + e.getMessage());
-			return null;
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+		
+		return null;
 	}
 
 	/**
@@ -153,26 +160,18 @@ public class WebService extends Controller {
 	 */
 	@Util
 	public static int subscribe(EventTopic et) {
-		Map<String, Object> map = new HashMap<String, Object>();
+		Logger.info("Subscribing to topic '%s%s' at broker '%s'", et.uri, et.name, DSB_RESOURCE_SERVICE);
 
-		map.put("topicName", et.name);
-		map.put("topicURI", et.uri);
-		map.put("topicPrefix", et.namespace);
-		map.put("subscriber", "http://demo.play-project.eu/webservice/soapnotifendpoint/" + et.getId());
+		HTTPProducerClient client = new HTTPProducerClient(DSB_RESOURCE_SERVICE);
+		QName topic = new QName(et.uri, et.name, et.namespace);
 
+		String notificationsEndPoint = "http://demo.play-project.eu/webservice/soapnotifendpoint/"
+				+ et.getId();
 		try {
-			String rendered = TemplateLoader.load("WebService/subscribetemplate.xml").render(map);
-
-			Logger.info("Subscribing to topic '%s%s' at broker '%s'", et.uri, et.name, DSB_RESOURCE_SERVICE);
-			
-			WSRequest request = WS.url(DSB_RESOURCE_SERVICE)
-					.setHeader("content-type", "application/soap+xml").body(rendered);
-
-			HttpResponse phr = request.post();
-			Logger.info(phr.getString());
-		} catch (Exception e) {
-			Logger.info("Error while sending subscription to DSB : " + e.getMessage());
-			return 0;
+			String subscriptionID = client.subscribe(topic, notificationsEndPoint);
+			System.out.printf("My subscription ID is %s", subscriptionID);
+		} catch (NotificationException e) {
+			e.printStackTrace();
 		}
 
 		return 1;
@@ -262,7 +261,8 @@ public class WebService extends Controller {
 		QName serviceName = new QName("http://play_platformservices.play_project.eu/", "QueryDispatchApi");
 
 		Service service = Service.create(wsdl, serviceName);
-		QueryDispatchApi queryDispatchApi = service.getPort(eu.play_project.play_platformservices.api.QueryDispatchApi.class);
+		QueryDispatchApi queryDispatchApi = service
+				.getPort(eu.play_project.play_platformservices.api.QueryDispatchApi.class);
 
 		try {
 			String s = queryDispatchApi.registerQuery(queryString);

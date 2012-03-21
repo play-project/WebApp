@@ -137,5 +137,11 @@
 			<artifactId>play-commons-constants</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>org.petalslink.dsb</groupId>
+			<artifactId>dsb-notification-httpclient</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+
 	</dependencies>
 </project>

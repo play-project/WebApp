@@ -31,7 +31,7 @@ public class PutGetClient implements PutGetWsApi {
 	public PutGetClient(String wsUrl) {
 		JaxWsClientFactoryBean factory = new JaxWsClientFactoryBean();
 		factory.setServiceClass(PutGetWsApi.class);
-		factory.setAddress("http://eventcloud.inria.fr:8902/proactive/services/EventCloud_putget-webservices");
+		factory.setAddress(wsUrl);
 		client = factory.create();
 
 		operationNames = new HashMap<String, String>();

@@ -43,8 +43,9 @@ public class Application extends Controller {
 	/**
 	 * Action to call before each action requiring the user to be connected
 	 */
-	@Before(only = { "index", "historicalEvents", "waitEvents", "settings", "updateSettings", "sendEvent", "subscribe",
-			"unsubscribe", "getTopics", "patternQuery", "processPatternQuery", "historicalByTopic" })
+	@Before(only = { "index", "historicalEvents", "waitEvents", "settings", "updateSettings", "sendEvent",
+			"subscribe", "unsubscribe", "getTopics", "patternQuery", "processPatternQuery",
+			"historicalByTopic" })
 	private static void checkAuthentification() {
 		String uid = session.get("userid");
 		if (uid == null) {
@@ -52,7 +53,7 @@ public class Application extends Controller {
 			return;
 		}
 		User user = ModelManager.get().getUserById(Long.parseLong(uid));
-		if(user == null){
+		if (user == null) {
 			logout();
 			return;
 		}
@@ -149,7 +150,7 @@ public class Application extends Controller {
 	public static void processComposedPatternQuery(String text) {
 		patternQuery();
 	}
-	
+
 	public static void processFullPatternQuery(String text) {
 		if (text != null && text != "") {
 			Boolean result = WebService.sendFullPatternQuery(text);
@@ -263,7 +264,7 @@ public class Application extends Controller {
 		Cache.delete(randomID);
 		User u = new User(email, PasswordEncrypt.encrypt(password), firstname, lastname, gender, mailnotif);
 		u.fbId = fbId;
-		//u.googleEmail = googleEmail;
+		// u.googleEmail = googleEmail;
 		u.create();
 		// Connect
 		User uc = ModelManager.get().connect(email, password);
@@ -378,11 +379,9 @@ public class Application extends Controller {
 			EventTopic et = ModelManager.get().getTopicById(topicId);
 			if (et != null) {
 				if (u.unsubscribe(et)) {
-					/*
-					 * TODO : ADD WHEN WE HAVE UNSUBSCRIPTIONS TO THE DSB
-					 * if(et.subscribersCount < 1){
-					 * WebService.unsubscribe(topicId); }
-					 */
+					if (et.subscribersCount < 1) {
+						WebService.unsubscribe(et);
+					}
 					result = "{\"id\":\"" + et.getId() + "\",\"title\":\"" + et.title + "\",\"icon\":\""
 							+ et.icon + "\",\"content\":\"" + et.content + "\",\"path\":\"" + et.path + "\"}";
 				}

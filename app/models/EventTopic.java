@@ -24,6 +24,7 @@ public class EventTopic {
 	public String path;
 	public long subscribersCount;
 	// TODO : WAITING FOR BEING ABLE TO SEND UNSUBSCRIBE NOTIFICATIONS TO THE DSB
+	public String subscriptionID;
 	public boolean alreadySubscribedDSB;
 
 	public EventTopic(String namespace, String name, String uri, String title, String icon, String content,
@@ -37,6 +38,7 @@ public class EventTopic {
 		this.path = path;
 		this.subscribersCount = 0;
 		this.alreadySubscribedDSB = false;
+		this.subscriptionID = "";
 	}
 
 	/**

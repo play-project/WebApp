@@ -39,6 +39,7 @@ import org.ontoware.rdfreactor.runtime.CardinalityException;
 import org.ontoware.rdfreactor.schema.rdfs.List;
 import org.petalslink.dsb.notification.client.http.HTTPNotificationProducerRPClient;
 import org.petalslink.dsb.notification.client.http.simple.HTTPProducerClient;
+import org.petalslink.dsb.notification.client.http.simple.HTTPSubscriptionManagerClient;
 import org.petalslink.dsb.notification.commons.NotificationException;
 import org.w3c.dom.Document;
 
@@ -82,7 +83,8 @@ import fr.inria.eventcloud.api.wrappers.ResultSetWrapper;
 public class WebService extends Controller {
 
 	public static String DSB_RESOURCE_SERVICE = Constants.getProperties().getProperty("dsb.notify.endpoint");
-	public static String EC_PUTGET_SERVICE = Constants.getProperties().getProperty("eventcloud.putget.endpoint");
+	public static String EC_PUTGET_SERVICE = Constants.getProperties().getProperty(
+			"eventcloud.putget.endpoint");
 
 	static {
 		Wsnb4ServUtils.initModelFactories(new WsrfbfModelFactoryImpl(), new WsrfrModelFactoryImpl(),
@@ -125,15 +127,15 @@ public class WebService extends Controller {
 	@Util
 	public static ArrayList<EventTopic> getSupportedTopics() {
 		INotificationProducerRP resourceClient = new HTTPNotificationProducerRPClient(DSB_RESOURCE_SERVICE);
-		
+
 		try {
 			QName qname = WstopConstants.TOPIC_SET_QNAME;
 			com.ebmwebsourcing.wsstar.resourceproperties.datatypes.api.abstraction.GetResourcePropertyResponse response = resourceClient
 					.getResourceProperty(qname);
-			System.out.println("Get Resource response :");
+			
 			Document dom = Wsnb4ServUtils.getWsrfrpWriter().writeGetResourcePropertyResponseAsDOM(response);
 			String topicsString = XMLHelper.createStringFromDOMDocument(dom);
-			
+
 			Logger.info("TOPICS STRING: " + topicsString);
 
 			SAXBuilder sxb = new SAXBuilder();
@@ -142,14 +144,14 @@ public class WebService extends Controller {
 			ArrayList<EventTopic> topics = new ArrayList<EventTopic>();
 			xml = sxb.build(new StringReader(topicsString));
 			root = xml.getRootElement();
-			
+
 			SupportedTopicsXML.parseXMLTree(topics, root, "");
 
 			return topics;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		return null;
 	}
 
@@ -168,10 +170,30 @@ public class WebService extends Controller {
 		String notificationsEndPoint = "http://demo.play-project.eu/webservice/soapnotifendpoint/"
 				+ et.getId();
 		try {
-			String subscriptionID = client.subscribe(topic, notificationsEndPoint);
-			System.out.printf("My subscription ID is %s", subscriptionID);
+			et.subscriptionID = client.subscribe(topic, notificationsEndPoint);
+			et.alreadySubscribedDSB = true;
 		} catch (NotificationException e) {
 			e.printStackTrace();
+		}
+
+		return 1;
+	}
+
+	/**
+	 * Unsubscription action, forwards the unsubscription to the DSB
+	 * 
+	 * @param et
+	 */
+	@Util
+	public static int unsubscribe(EventTopic et) {
+		HTTPSubscriptionManagerClient subscriptionManagerClient = new HTTPSubscriptionManagerClient(
+				DSB_RESOURCE_SERVICE);
+		try {
+			subscriptionManagerClient.unsubscribe(et.subscriptionID);
+			et.alreadySubscribedDSB = false;
+		} catch (NotificationException e) {
+			e.printStackTrace();
+			return 0;
 		}
 
 		return 1;

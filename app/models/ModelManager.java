@@ -35,9 +35,8 @@ public class ModelManager {
 	 * ModelManager initialization
 	 */
 	public ModelManager() {
-		Logger.info("MODELMANAGER INITIALIZED");
-
 		topics = WebService.getSupportedTopics();
+		Logger.info("- ModelManager initialized -");
 	}
 
 	public static ModelManager get() {
@@ -54,11 +53,19 @@ public class ModelManager {
 					.count("Select count(*) from User as u inner join u.eventTopicIds as strings where ? in strings",
 							et.getId());
 			if (et.subscribersCount > 0) {
-				if (WebService.subscribe(et) == 1) {
-					et.alreadySubscribedDSB = true;
-				}
+				WebService.subscribe(et);
 			}
 		}
+		Logger.info("- Subscriptions sent to DSB -");
+	}
+
+	public void unregisterSubscriptions() {
+		for (EventTopic et : topics) {
+			if (et.alreadySubscribedDSB) {
+				WebService.unsubscribe(et);
+			}
+		}
+		Logger.info("- Unsubscriptions sent to DSB -");
 	}
 
 	/**
@@ -71,7 +78,7 @@ public class ModelManager {
 	public User connect(String email, String password) {
 		User u = User.find("byEmailAndPassword", email, PasswordEncrypt.encrypt(password)).first();
 		if (u != null) {
-			synchronized(connectedUsers){
+			synchronized (connectedUsers) {
 				disconnect(u);
 				connectedUsers.add(u);
 			}
@@ -144,6 +151,10 @@ public class ModelManager {
 			}
 		}
 		return null;
+	}
+
+	public void removeTopic(EventTopic et) {
+		topics.remove(et);
 	}
 
 	public ArrayList<EventTopic> getMatchingTopics(String search, boolean matchTitle, boolean matchDesc) {

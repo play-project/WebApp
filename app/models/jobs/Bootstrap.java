@@ -14,7 +14,8 @@ import play.jobs.*;
 public class Bootstrap extends Job {
     
     public void doJob() {
+    	Logger.info("- Application Start -");
         ModelManager.get();
-        Logger.info("Bootstrap executed !");
+        Logger.info("- Bootstrap executed -");
     }
 }

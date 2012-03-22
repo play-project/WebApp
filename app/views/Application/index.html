@@ -237,32 +237,12 @@ $(function() {
 
 var $lastReceived = 0
 var waitEvents = #{jsAction @waitEvents(':lastReceived') /}
-/*
-%{
-	String txt = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus ullamcorper laoreet fermentum. Cras placerat dui pharetra arcu ultricies sit amet commodo tortor molestie.";
-}%
-*/
-//var send0 = #{jsAction @sendEvent('Event !', txt, 'internalns_rootTopic1') /}
-//var send1 = #{jsAction @sendEvent('Event !', txt, 'internalns_childTopic1') /}
-//var send2 = #{jsAction @sendEvent('Event !', txt, 'internalns_grandChildTopic21') /}
-//var send3 = #{jsAction @sendEvent('Event !', txt, 'internalns_childTopic3') /}
 
 var sendFbStatusEvent = #{jsAction @WebService.testFacebookStatusFeedEvent() /}
 
 $("#send0").click(function(e) {
 	$.post(sendFbStatusEvent())
 });
-/*
-$("#send1").click(function(e) {
-	$.post(send1())
-});
-$("#send2").click(function(e) {
-	$.post(send2())
-});
-$("#send3").click(function(e) {
-	$.post(send3())
-});
-*/
 
 var getEvents = function() {
 	$.ajax({
@@ -289,6 +269,7 @@ var getEvents = function() {
 
 var blinking = false;
 var unblinking = false;
+var displayedEvents = 0;
 var display = function(event, blink) {
 	if(focus && blink && !blinking){
 		blinking = true;
@@ -319,6 +300,14 @@ var display = function(event, blink) {
 	$('#alltopics-events')
 		.prepend('<div id="eventall-'+event.id+'" class="event"><h3>'+event.data.title+'</h3><p>'+event.data.content+'</p></div>');
 	//$('#eventall-'+event.id).hide().fadeIn();
+	
+	if($('#alltopics-events').children().length > 100){
+		$('#alltopics-events').children().last().remove();
+	}
+
+	if($('#topic-events-'+event.data.topicId).children().length > 100){
+		$('#topic-events-'+event.data.topicId).children().last().remove();
+	}
 }
 
 var searchAction = #{jsAction @searchTopics() /}

@@ -4,8 +4,8 @@ import play.*;
 import play.mvc.*;
 import java.util.*;
 
-import models.Event;
 import models.User;
+import models.eventstream.Event;
 
 public class Mails extends Mailer {
 

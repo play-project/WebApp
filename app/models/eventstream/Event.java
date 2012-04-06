@@ -1,4 +1,4 @@
-package models;
+package models.eventstream;
 
 /**
  * Simple event class used to display events on the web page

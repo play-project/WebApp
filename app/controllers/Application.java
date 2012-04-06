@@ -11,6 +11,8 @@ import play.libs.WS.HttpResponse;
 import play.libs.Images;
 import play.libs.WS;
 import play.mvc.*;
+import securesocial.provider.ProviderType;
+import securesocial.provider.SocialUser;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,8 +30,11 @@ import com.google.gson.reflect.TypeToken;
 
 import controllers.Authentifier;
 import controllers.WebService;
+import controllers.securesocial.SecureSocial;
 
 import models.*;
+import models.eventstream.Event;
+import models.eventstream.EventTopic;
 
 /**
  * The Application controller is the main controller in charge of all basic
@@ -45,8 +50,13 @@ public class Application extends Controller {
 	 */
 	@Before(only = { "index", "historicalEvents", "waitEvents", "settings", "updateSettings", "sendEvent",
 			"subscribe", "unsubscribe", "getTopics", "patternQuery", "processPatternQuery",
-			"historicalByTopic" })
+			"historicalByTopic", "searchTopics" })
 	private static void checkAuthentification() {
+		if(session.get("socialauth") != null){
+			session.remove("socialauth");
+			register();
+			return;
+		}
 		String uid = session.get("userid");
 		if (uid == null) {
 			login();
@@ -57,7 +67,6 @@ public class Application extends Controller {
 			logout();
 			return;
 		}
-		Logger.info(user + " called " + request.action);
 		user.lastRequest = new Date();
 		request.args.put("user", user);
 	}
@@ -77,37 +86,14 @@ public class Application extends Controller {
 		if (u == null) {
 			logout();
 		}
-		JsonObject fbInfo = null;
-		HttpResponse googleInfo = null;
-		if (u.fbAccessToken != null) {
-			fbInfo = WS.url("https://graph.facebook.com/me?access_token=%s", WS.encode(u.fbAccessToken))
-					.get().getJson().getAsJsonObject();
-			if (fbInfo.get("error") != null) {
-				try {
-					Authentifier.refreshFbAccessToken(u, fullURL());
-				} catch (Exception e) {
-					logout();
-				}
-				fbInfo = WS.url("https://graph.facebook.com/me?access_token=%s", WS.encode(u.fbAccessToken))
-						.get().getJson().getAsJsonObject();
-			}
-		}
-		if (u.googleAccessToken != null) {
-			googleInfo = WS.url("https://www.googleapis.com/userinfo/email?access_token=%s",
-					WS.encode(u.googleAccessToken)).get();
-			if (googleInfo.getString().toLowerCase().contains("error")) {
-				Authentifier.refreshGoogleAccessToken(u, fullURL());
-				googleInfo = WS.url("https://www.googleapis.com/userinfo/email?access_token=%s",
-						WS.encode(u.googleAccessToken)).get();
-			}
-		}
 		ArrayList<EventTopic> topics = new ArrayList<EventTopic>();
 		topics.addAll(ModelManager.get().getTopics());
 		ArrayList<EventTopic> userTopics = u.getTopics();
 		for (int i = 0; i < userTopics.size(); i++) {
 			topics.remove(userTopics.get(i));
 		}
-		render(u, fbInfo, googleInfo, topics, userTopics);
+		SocialUser su = SecureSocial.getCurrentUser();
+		render(u, topics, userTopics, su);
 	}
 
 	/**
@@ -193,7 +179,7 @@ public class Application extends Controller {
 			flash.error("Please enter your email and password.");
 			login();
 		}
-		User u = ModelManager.get().connect(email, password);
+		User u = ModelManager.get().connect(email, PasswordEncrypt.encrypt(password));
 		if (u != null) {
 			Logger.info("User connected with standard login : " + u);
 			session.put("userid", u.id);
@@ -211,29 +197,11 @@ public class Application extends Controller {
 	 */
 	public static void register() {
 		String randomID = Codec.UUID();
-		String fbAccessToken = session.get("fbAccessToken");
-		String googleAccessToken = session.get("googleAccessToken");
-		if (fbAccessToken != null) {
-			JsonObject fbInfo = null;
-			fbInfo = WS
-					.url("https://graph.facebook.com/me?access_token=%s&perms=email",
-							WS.encode(fbAccessToken)).get().getJson().getAsJsonObject();
-			Logger.info(fbInfo.toString());
-			render(fbInfo, randomID);
+		SocialUser su = Cache.get("su"+session.getId(), SocialUser.class);
+		if (su == null) {
+			su = SecureSocial.getCurrentUser();
 		}
-		if (googleAccessToken != null) {
-			HttpResponse googleInfo = null;
-			String googleEmail = null;
-			googleInfo = WS.url("https://www.googleapis.com/userinfo/email?access_token=%s",
-					WS.encode(googleAccessToken)).get();
-			Logger.info(googleInfo.getString());
-			if (googleInfo != null) {
-				googleEmail = googleInfo.getString().split("=")[1];
-				googleEmail = googleEmail.split("&")[0];
-			}
-			render(googleEmail, randomID);
-		}
-		render(randomID);
+		render(randomID, su);
 	}
 
 	public static void processRegistration(
@@ -241,37 +209,53 @@ public class Application extends Controller {
 			@Required(message = "Email confirmation is required") @Email String emailconf,
 			@Required(message = "Password is required") @Equals("passwordconf") String password,
 			@Required(message = "Passsword confirmation is required") String passwordconf,
-			@Required(message = "First name is required") String firstname,
-			@Required(message = "Last name is required") String lastname,
+			@Required(message = "Full name is required") String name,
 			@Required(message = "Gender is required") String gender,
 			@Required(message = "Mail notification choice is required") String mailnotif, String code,
 			String randomID) {
-		String fbId = session.get("fbId");
-		String googleEmail = session.get("googleEmail");
-		if (fbId == null && googleEmail == null) {
+		SocialUser su = SecureSocial.getCurrentUser();
+		if (su == null) {
 			validation.equals(code, Cache.get(randomID)).message("Invalid code. Please type it again");
+			validation.isTrue(User.find("byEmail", email).fetch().size() == 0).message("Email already in use");
 		}
-		validation.isTrue(User.find("byEmail", email).first() == null).message("Email already in use");
 		if (validation.hasErrors()) {
 			ArrayList<String> errorMsg = new ArrayList<String>();
 			for (Error error : validation.errors()) {
 				errorMsg.add(error.message());
 			}
 			flash.put("error", errorMsg);
-			renderTemplate("Application/register.html", email, emailconf, firstname, lastname, gender,
-					mailnotif, randomID);
+			renderTemplate("Application/register.html", email, emailconf, name, gender, mailnotif, randomID,
+					su);
 		}
 		Cache.delete(randomID);
-		User u = new User(email, PasswordEncrypt.encrypt(password), firstname, lastname, gender, mailnotif);
-		u.fbId = fbId;
-		// u.googleEmail = googleEmail;
-		u.create();
+		String pwdEncrypt = PasswordEncrypt.encrypt(password);
+		User u = null;
+		if(su != null) {
+			u = User.find("byEmail", su.email).first();
+		}
+		if(u == null) {
+			u = new User(email, pwdEncrypt, name, gender, mailnotif);			
+		} else {
+			u.password = pwdEncrypt;
+			u.name = name;
+			u.gender = gender;
+			u.mailnotif = mailnotif;
+		}
+		if (su != null) {
+			if (su.id.provider == ProviderType.facebook) {
+				u.facebookId = su.id.id;
+			} else if (su.id.provider == ProviderType.google) {
+				u.googleId = su.id.id;
+			} else if (su.id.provider == ProviderType.twitter) {
+				u.twitterId = su.id.id;
+			}
+			u.avatarUrl = su.avatarUrl;
+		}
+		u.save();
 		// Connect
-		User uc = ModelManager.get().connect(email, password);
+		User uc = ModelManager.get().connect(u.email, pwdEncrypt);
 		if (uc != null) {
 			Logger.info("User registered : " + uc);
-			uc.fbAccessToken = session.get("fbAccessToken");
-			uc.googleAccessToken = session.get("googleAccessToken");
 			session.put("userid", uc.id);
 		}
 		index();
@@ -282,7 +266,7 @@ public class Application extends Controller {
 	 */
 
 	public static void sendEvent(@Required String title, @Required String content, @Required String topic) {
-		ModelManager.get().getTopicById(topic).multicast(new models.Event(title, content));
+		ModelManager.get().getTopicById(topic).multicast(new models.eventstream.Event(title, content));
 	}
 
 	/**
@@ -413,8 +397,7 @@ public class Application extends Controller {
 	 * Update settings
 	 */
 	public static void updateSettings(String password, String newpassword, String newpasswordconf,
-			@Required(message = "First name is required") String firstname,
-			@Required(message = "Last name is required") String lastname,
+			@Required(message = "Name is required") String name,
 			@Required(message = "Gender is required") String gender,
 			@Required(message = "Mail notification choice is required") String mailnotif) {
 		Long id = Long.parseLong(session.get("userid"));
@@ -435,8 +418,7 @@ public class Application extends Controller {
 			flash.put("error", errorMsg);
 			settings();
 		}
-		u.firstname = firstname;
-		u.lastname = lastname;
+		u.name = name;
 		u.gender = gender;
 		u.mailnotif = mailnotif;
 		u.update();

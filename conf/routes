@@ -23,9 +23,6 @@ POST	/searchtopics					Application.searchTopics
 POST	/subscribe						Application.subscribe
 POST	/unsubscribe					Application.unsubscribe
 
-GET		/fbauth							Authentifier.facebookAuth
-GET		/googleauth						Authentifier.googleAuth
-
 # Events
 GET		/waitevents						Application.waitEvents
 POST    /sendevent             		 	Application.sendEvent
@@ -48,6 +45,13 @@ GET		/images/							staticDir:public/images
 GET		/monitoring/display				Monitoring.displayInfo
 
 # CRUD Admin
-*      /admin              				module:crud
+*		/admin              			module:crud
 # Import Secure routes
-*      /secure                        	module:secure
+*		/secure                        	module:secure
+# Securesocial routes
+*		/auth							module:securesocial
+GET		/fbauth							Authentifier.facebookAuth
+GET		/googleauth						Authentifier.googleAuth
+GET		/twitterauth					Authentifier.twitterAuth
+
+GET		/quicktest						QuickTest.test

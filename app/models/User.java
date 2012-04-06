@@ -10,9 +10,13 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import models.eventstream.EventTopic;
+import models.eventstream.UserEventBuffer;
+
 import com.google.gson.JsonObject;
 
 import play.Logger;
+import play.data.validation.Unique;
 import play.db.jpa.Model;
 
 import play.db.jpa.*;
@@ -27,14 +31,17 @@ import play.db.jpa.*;
 @Entity
 @Table(name = "users")
 public class User extends Model {
+	@Unique
 	public String email;
 	public String password;
-	public String firstname;
-	public String lastname;
+	public String name;
 	public String gender;
-	public String fbId;
-	public String googleEmail;
+	public String facebookId;
+	public String googleId;
+	public String twitterId;
+	public String avatarUrl;
 	public String mailnotif;
+	public Integer connected;
 	@ElementCollection
 	@controllers.CRUD.Exclude
 	public List<String> eventTopicIds;
@@ -42,29 +49,27 @@ public class User extends Model {
 	public UserEventBuffer eventBuffer;
 	@Transient
 	public Date lastRequest;
-	@Transient
-	public String fbAccessToken;
-	@Transient
-	public String googleAccessToken;
 
-	public User(String email, String password, String firstname, String lastname, String gender,
+	public User(String email, String password, String name, String gender,
 			String mailnotif, ArrayList<String> eventTopicIds) {
 		this.email = email;
 		this.password = password;
-		this.firstname = firstname;
-		this.lastname = lastname;
+		this.name = name;
 		this.gender = gender;
-		this.fbId = null;
-		this.googleEmail = null;
+		this.facebookId = null;
+		this.googleId = null;
+		this.twitterId = null;
+		this.avatarUrl = null;
 		this.eventTopicIds = eventTopicIds;
 		this.mailnotif = mailnotif;
+		this.connected = 0;
 		this.lastRequest = new Date();
 		UserEventBuffer eventBuffer = new UserEventBuffer();
 	}
 
-	public User(String email, String password, String firstname, String lastname, String gender,
+	public User(String email, String password, String name, String gender,
 			String mailnotif) {
-		this(email, password, firstname, lastname, gender, mailnotif, new ArrayList<String>());
+		this(email, password, name, gender, mailnotif, new ArrayList<String>());
 	}
 
 	/**
@@ -95,7 +100,7 @@ public class User extends Model {
 			return false;
 		}
 		eventTopicIds.remove(et.getId());
-		//et.subscribersCount--;
+		// et.subscribersCount--;
 		update();
 		return true;
 	}
@@ -128,14 +133,21 @@ public class User extends Model {
 
 	public void update() {
 		User u = User.find("byId", this.id).first();
-		u.email = email;
-		u.password = password;
-		u.firstname = firstname;
-		u.lastname = lastname;
-		u.gender = gender;
-		u.mailnotif = mailnotif;
-		u.eventTopicIds = eventTopicIds;
-		u.save();
+		if(u != null) {
+			u.email = email;
+			u.password = password;
+			u.name = name;
+			u.gender = gender;
+			u.mailnotif = mailnotif;
+			u.facebookId = facebookId;
+			u.googleId = googleId;
+			u.twitterId = twitterId;
+			u.avatarUrl = avatarUrl;
+			u.connected = connected;
+			
+			u.eventTopicIds = eventTopicIds;
+			u.save();	
+		}
 	}
 
 	/**
@@ -157,7 +169,7 @@ public class User extends Model {
 		if (!(o instanceof User))
 			return false;
 		User u = (User) o;
-		if (u.id.equals(id) && u.firstname.equals(firstname) && u.password.equals(password)
+		if (u.id.equals(id) && u.name.equals(name) && u.password.equals(password)
 				&& u.email.equals(email)) {
 			return true;
 		}
@@ -166,8 +178,7 @@ public class User extends Model {
 
 	@Override
 	public String toString() {
-		return "User id=" + id + " [email=" + email + ", firstname=" + firstname + ", lastname=" + lastname
-				+ ", gender=" + gender + ", eventTopicIds=" + eventTopicIds + "]";
+		return "User id=" + id + " [email=" + email + ", name=" + name + ", gender=" + gender + ", eventTopicIds=" + eventTopicIds + "]";
 	}
 
 }

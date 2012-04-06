@@ -6,13 +6,13 @@
 <link rel="stylesheet" media="screen"
 	href="@{'/public/stylesheets/tabsindex.css'}">
 
-#{if fbInfo != null && fbInfo.get("error") == null}
+#{if su != null}
 <div id="indextitle">
-	<img id="profilepic" src="http://graph.facebook.com/${fbInfo.get("id").getAsString()}/picture" />
-	<span class="valign-middle">Hello <a href='${fbInfo.get("link").getAsString()}'>${fbInfo.get("name").getAsString()}</a></span>
+	<img id="profilepic" src="${su.avatarUrl}" />
+	<span class="valign-middle">Hello ${su.displayName} !</span>
 </div>
 #{/if} #{else}
-<h1 class="pagetitle">Hello ${u.firstname+" "+u.lastname} !</h1>
+<h1 class="pagetitle">Hello ${u.name} !</h1>
 #{/else}
 <br />
 
@@ -108,7 +108,11 @@
 </div>
 <div id="error4" title="Error">
 	<br /> <span class="ui-icon ui-icon-alert"
-		style="float: left; margin: -2px 30px 0 15px;"></span>Disconnected
+		style="float: left; margin: -2px 30px 0 15px;"></span>Error : disconnected.
+</div>
+<div id="error5" title="Error">
+	<br /> <span class="ui-icon ui-icon-alert"
+		style="float: left; margin: -2px 30px 0 15px;"></span>An error occured.<br/>Please refresh the page.
 </div>
 
 <div style="clear: left; padding-top: 30px;">
@@ -156,7 +160,7 @@ $(function() {
 			}
 		}
 	});
-	$("#error4").dialog({
+	$("#error4, #error5").dialog({
 		resizable: false,
 		draggable: false,
 		autoOpen: false,
@@ -251,7 +255,8 @@ var getEvents = function() {
 		dataType: 'json',
 		success: function(events) {
 			if(events.error == "disconnected"){
-				$("#error4").dialog("open")
+				$("#error4").dialog("open");
+				return;
 			}
 			var k = events.length;
 			$(events).each(function() {
@@ -262,7 +267,8 @@ var getEvents = function() {
 			getEvents()
 		},
 		error: function() {
-			getEvents();
+			$("#error5").dialog("open");
+			return;
 		}
 	});
 }

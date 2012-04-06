@@ -1,7 +1,9 @@
-package models;
+package models.eventstream;
 
 import java.util.*;
 
+import models.ModelManager;
+import models.User;
 import notifiers.Mails;
 
 import play.Logger;
@@ -23,7 +25,6 @@ public class EventTopic {
 	public String content;
 	public String path;
 	public long subscribersCount;
-	// TODO : WAITING FOR BEING ABLE TO SEND UNSUBSCRIBE NOTIFICATIONS TO THE DSB
 	public String subscriptionID;
 	public boolean alreadySubscribedDSB;
 

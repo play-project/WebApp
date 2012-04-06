@@ -12,17 +12,17 @@
 %{ out.print("<br />"); %} #{/if}
 
 <div style="margin-left:50px; margin-top:20px;">
-#{if fbInfo != null}
+#{if su != null}
 <form id="registerform" action="@{Application.processRegistration()}"
 	method="POST" class="formular">
 	<fieldset>
 		<legend>Email</legend>
 		<label><span>Email: </span><input type="text" name="email"
 			id="email" class="validate[required,custom[email]] text-input"
-			value="${fbInfo.get("email").getAsString()}" /> </label>
+			value="${su.email}" /> </label>
 		<label><span>Confirm email: </span><input type="text" name="emailconf" id="emailconf"
 			class="validate[required,custom[email],equals[email]] text-input"
-			value="${fbInfo.get("email").getAsString()}" /> </label>
+			value="${su.email}" /> </label>
 	</fieldset>
 	<fieldset>
 		<legend>Password (required in case you want to log in while you are logged out of your Facebook account)</legend>
@@ -35,15 +35,12 @@
 	</fieldset>
 	<fieldset>
 		<legend>Personal information</legend>
-	<label><span>First name: </span><input type="text" name="firstname" id="firstname"
+	<label><span>Full name: </span><input type="text" name="name" id="name"
 		class="validate[required],custom[onlyLetterSp] text-input"
-		value="${fbInfo.get("first_name").getAsString()}" /></label>
-	<label><span>Last name: </span><input type="text" name="lastname"  id="lastname"
-		class="validate[required],custom[onlyLetterSp] text-input"
-		value="${fbInfo.get("last_name").getAsString()}" /></label>
+		value="${su.displayName}" /></label>
 	<span>Gender:<br/></span>
-	<label>M <input type="radio" name="gender" value="M" #{if fbInfo.get("gender").getAsString().equals("male")}checked#{/if}/></label>
-	<label>F <input type="radio" name="gender" value="F" #{if fbInfo.get("gender").getAsString().equals("female")}checked#{/if}/></label>
+	<label>M <input type="radio" name="gender" value="M" checked/></label>
+	<label>F <input type="radio" name="gender" value="F" /></label>
 	</fieldset>
 	<fieldset>
 		<legend>Account settings</legend>
@@ -69,22 +66,12 @@
 	method="POST" class="formular">
 	<fieldset>
 		<legend>Email</legend>
-		#{if googleEmail == null}
 		<label><span>Email: </span><input type="text" name="email"
 			id="email" class="validate[required,custom[email]] text-input"
 			value="${email}" /> </label>
 		<label><span>Confirm email: </span><input type="text" name="emailconf" id="emailconf"
 			class="validate[required,custom[email],equals[email]] text-input"
 			value="${emailconf}" /> </label>
-		#{/if}
-		#{else}
-		<label><span>Email: </span><input type="text" name="email"
-			id="email" class="validate[required,custom[email]] text-input"
-			value="${googleEmail}" /> </label>
-		<label><span>Confirm email: </span><input type="text" name="emailconf" id="emailconf"
-			class="validate[required,custom[email],equals[email]] text-input"
-			value="${googleEmail}" /> </label>
-		#{/else}
 	</fieldset>
 	<fieldset>
 		<legend>Password</legend>
@@ -97,16 +84,13 @@
 	</fieldset>
 	<fieldset>
 		<legend>Personal information</legend>
-	<label><span>First name: </span><input type="text" name="firstname" id="firstname"
+	<label><span>Full name: </span><input type="text" name="name" id="name"
 		class="validate[required],custom[onlyLetterSp] text-input"
-		value="${firstname}" /></label>
-	<label><span>Last name: </span><input type="text" name="lastname"  id="lastname"
-		class="validate[required],custom[onlyLetterSp] text-input"
-		value="${lastname}" /></label>
+		value="${name}" /></label>
 	<span>Gender:<br/></span>
 		<label>M <input type="radio" id="gender1" name="gender" 
 			class="validate[required] radio"
-			value="M" #{if gender.equals("M")}checked#{/if}/></label>
+			value="M" #{if !gender.equals("F")}checked#{/if}/></label>
 		<label>F <input type="radio" id="gender2" name="gender" 
 			class="validate[required] radio"
 			value="F" #{if gender.equals("F")}checked#{/if}/></label>

@@ -20,12 +20,12 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
 import models.BoyerMoore;
-import models.EventTopic;
 import models.ModelManager;
 import models.PutGetClient;
 import models.SupportedTopicsXML;
 import models.translator.*;
 import models.eventformat.*;
+import models.eventstream.EventTopic;
 
 import org.jdom.input.SAXBuilder;
 import org.event_processing.events.types.FacebookCepResult;
@@ -50,6 +50,8 @@ import play.libs.WS;
 import play.libs.WS.HttpResponse;
 import play.libs.WS.WSRequest;
 import play.mvc.Controller;
+import play.mvc.Router;
+import play.mvc.Router.Route;
 import play.mvc.Util;
 import play.templates.TemplateLoader;
 
@@ -118,7 +120,7 @@ public class WebService extends Controller {
 			}
 		}
 
-		ModelManager.get().getTopicById(topicId).multicast(new models.Event(title, content));
+		ModelManager.get().getTopicById(topicId).multicast(new models.eventstream.Event(title, content));
 	}
 
 	/**
@@ -132,7 +134,7 @@ public class WebService extends Controller {
 			QName qname = WstopConstants.TOPIC_SET_QNAME;
 			com.ebmwebsourcing.wsstar.resourceproperties.datatypes.api.abstraction.GetResourcePropertyResponse response = resourceClient
 					.getResourceProperty(qname);
-			
+
 			Document dom = Wsnb4ServUtils.getWsrfrpWriter().writeGetResourcePropertyResponseAsDOM(response);
 			String topicsString = XMLHelper.createStringFromDOMDocument(dom);
 
@@ -167,8 +169,9 @@ public class WebService extends Controller {
 		HTTPProducerClient client = new HTTPProducerClient(DSB_RESOURCE_SERVICE);
 		QName topic = new QName(et.uri, et.name, et.namespace);
 
-		String notificationsEndPoint = "http://demo.play-project.eu/webservice/soapnotifendpoint/"
-				+ et.getId();
+		Map params = new HashMap<String, Object>();
+		params.put("topicId", et.getId());
+		String notificationsEndPoint = Router.getFullUrl("WebService.soapNotifEndPoint", params);
 		try {
 			et.subscriptionID = client.subscribe(topic, notificationsEndPoint);
 			et.alreadySubscribedDSB = true;
@@ -206,8 +209,8 @@ public class WebService extends Controller {
 	 * @return
 	 */
 	@Util
-	public static ArrayList<models.Event> getHistorical(EventTopic et) {
-		ArrayList<models.Event> events = new ArrayList<models.Event>();
+	public static ArrayList<models.eventstream.Event> getHistorical(EventTopic et) {
+		ArrayList<models.eventstream.Event> events = new ArrayList<models.eventstream.Event>();
 
 		PutGetClient pgc = new PutGetClient(EC_PUTGET_SERVICE);
 
@@ -226,9 +229,9 @@ public class WebService extends Controller {
 			} else {
 				content = et.namespace + ":" + et.name + " : " + predicate + " : " + object + "<br/>";
 			}
-			events.add(new models.Event(title, content));
+			events.add(new models.eventstream.Event(title, content));
 		}
-		ArrayList<models.Event> temp = new ArrayList<models.Event>();
+		ArrayList<models.eventstream.Event> temp = new ArrayList<models.eventstream.Event>();
 		for (int i = 0; i < events.size(); i++) {
 			temp.add(events.get(events.size() - i - 1));
 		}

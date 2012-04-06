@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import models.eventstream.EventTopic;
+import models.eventstream.UserEventBuffer;
+
 import com.google.gson.JsonObject;
 
 import controllers.WebService;
@@ -16,6 +19,8 @@ import play.db.jpa.JPA;
 import play.db.jpa.Model;
 import play.mvc.Controller;
 import play.mvc.Scope.Session;
+import securesocial.provider.SocialUser;
+import securesocial.provider.UserId;
 
 /**
  * This persistant singleton class manages the model part of the web
@@ -76,7 +81,7 @@ public class ModelManager {
 	 * @return User
 	 */
 	public User connect(String email, String password) {
-		User u = User.find("byEmailAndPassword", email, PasswordEncrypt.encrypt(password)).first();
+		User u = User.find("byEmailAndPassword", email, password).first();
 		if (u != null) {
 			synchronized (connectedUsers) {
 				disconnect(u);
@@ -84,6 +89,8 @@ public class ModelManager {
 			}
 			Collections.sort(u.eventTopicIds);
 			u.setEventBuffer(new UserEventBuffer());
+			u.connected = 1;
+			u.save();
 		}
 		return u;
 	}
@@ -98,10 +105,13 @@ public class ModelManager {
 		synchronized (connectedUsers) {
 			if (user != null && connectedUsers.contains(user)) {
 				connectedUsers.remove(user);
-				return true;
+			} else {
+				return false;
 			}
-			return false;
 		}
+		user.connected = 0;
+		user.update();
+		return true;
 	}
 
 	public boolean isConnected(User u) {

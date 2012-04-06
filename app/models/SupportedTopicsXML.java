@@ -7,6 +7,8 @@ import java.io.*;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import models.eventstream.EventTopic;
+
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;

@@ -303,7 +303,7 @@ public class WebService extends Controller {
 	 * Facebook status event event and sends it to the DSB
 	 */
 	public static void testFacebookStatusFeedEvent() throws ModelRuntimeException, IOException {
-		String eventId = Stream.FacebookStatusFeed.getUri() + "/" + Math.random();
+		String eventId = Stream.FacebookStatusFeed.getUri() + new SecureRandom().nextLong();
 
 		FacebookStatusFeedEvent event = new FacebookStatusFeedEvent(EventHelpers.createEmptyModel(eventId),
 				eventId + "#event", true);

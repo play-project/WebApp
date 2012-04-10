@@ -6,14 +6,15 @@ application.name=webapp
 # ~~~~~
 # Set to dev to enable instant reloading and other development help.
 # Otherwise set to prod.
-application.mode=dev
-%prod.application.mode=prod
+#application.mode=dev
+%stable.application.mode=dev
+%unstable.application.mode=dev
 
 # Secret key
 # ~~~~~
 # The secret key is used to secure cryptographics functions
 # If you deploy your application to several instances be sure to use the same key !
-application.secret=XXX
+application.secret=FIXME
 
 # i18n
 # ~~~~~
@@ -29,7 +30,9 @@ date.format=yyyy-MM-dd
 # Server configuration
 # ~~~~~
 # If you need to change the HTTP port, uncomment this (default is set to 9000)
-http.port=80
+%stable.http.port=10000
+%unstable.http.port=10090
+
 #
 # By default the server listen for HTTP on the wilcard address.
 # You can restrict this.
@@ -80,16 +83,18 @@ application.log=INFO
 # To quickly set up a development database, use either:
 #   - mem : for a transient in memory database (H2 in memory)
 #   - fs  : for a simple file written database (H2 file stored)
-db=mem
+#db=mem
 #
 # To connect to a local MySQL5 database, use:
 # db=mysql:user:pwd@database_name
 #
 # If you need a full JDBC configuration use the following :
-# db.url=jdbc:postgresql:database_name
-# db.driver=org.postgresql.Driver
-# db.user=root
-# db.pass=secret
+%stable.db.url=jdbc:postgresql:FIXME
+%unstable.db.url=jdbc:postgresql:FIXME-unstable
+db.driver=org.postgresql.Driver
+%stable.db.user=FIXME
+%unstable.db.user=FIXME
+db.pass=
 #
 # Connections pool configuration :
 # db.pool.timeout=1000
@@ -108,11 +113,13 @@ db=mem
 # ~~~~~
 #
 # Specify the custom JPA dialect to use here (default to guess):
-# jpa.dialect=org.hibernate.dialect.PostgreSQLDialect
+jpa.dialect=org.hibernate.dialect.PostgreSQLDialect
 #
 # Specify the ddl generation pattern to use. Set to none to disable it 
 # (default to update in DEV mode, and none in PROD mode):
-# jpa.ddl=update
+%stable.jpa.ddl=update
+%unstable.jpa.dll=update
+
 #
 # Debug SQL statements (logged using DEBUG level):
 # jpa.debugSQL=true
@@ -167,7 +174,7 @@ attachments.path=data/attachments
 #mail.smtp=mock
 
 # Or, specify mail host configuration
-mail.smtp.host=exchange.fzi.de
+mail.smtp.host=FIXME
 mail.smtp.port=25
 # mail.smtp.user=admin
 # mail.smtp.pass=
@@ -177,8 +184,8 @@ mail.smtp.channel=clear
 # ~~~~~~
 # When rendering templates with reverse-url-resoling (@@{..}) in Jobs (which do not have an inbound Http.Request),
 # ie if sending a HtmlMail, Play need to know which url your users use when accessing your app.
-# %test.application.baseUrl=http://localhost:9000/
-# %prod.application.baseUrl=http://www.yourdomain.com/
+application.baseUrl=http://demo.play-project.eu/
+unstable.application.baseUrl=http://demo-unstable.play-project.eu/
 
 # Jobs executor
 # ~~~~~~
@@ -207,8 +214,51 @@ mail.smtp.channel=clear
 %test.jpa.ddl=create
 %test.mail.smtp=mock
 
-# Custom properties
-facebook.clientid=XXX
-facebook.secret=XXX
-google.clientid=XXX
-google.secret=XXX
+crypt.seed=FIXME
+
+# Import the secure module
+module.secure=${play.path}/modules/secure
+admin.login=FIXME
+admin.password=FIXME
+
+# Securesocial properties
+securesocial.providers=twitter,facebook,google
+
+#
+# Facebook
+#
+securesocial.facebook.authorizationURL=https://graph.facebook.com/oauth/authorize
+securesocial.facebook.accessTokenURL=https://graph.facebook.com/oauth/access_token
+%stable.securesocial.facebook.clientid=FIXME
+%stable.securesocial.facebook.secret=FIXME
+%unstable.securesocial.facebook.clientid=FIXME
+%unstable.securesocial.facebook.secret=FIXME
+securesocial.facebook.scope=email
+
+#
+# Google
+#
+securesocial.google.requestTokenURL=https://www.google.com/accounts/OAuthGetRequestToken
+securesocial.google.accessTokenURL=https://www.google.com/accounts/OAuthGetAccessToken
+securesocial.google.authorizationURL=https://www.google.com/accounts/OAuthAuthorizeToken
+securesocial.google.scope=http://www-opensocial.googleusercontent.com/api/people
+%stable.securesocial.google.consumerKey=demo.play-project.eu
+%stable.securesocial.google.consumerSecret=FIXME
+%unstable.securesocial.google.consumerKey=demo-unstable.play-project.eu
+%unstable.securesocial.google.consumerSecret=FIXME
+
+#
+# Twitter
+#
+securesocial.twitter.requestTokenURL=https://twitter.com/oauth/request_token
+securesocial.twitter.accessTokenURL=https://twitter.com/oauth/access_token
+securesocial.twitter.authorizationURL=https://twitter.com/oauth/authenticate
+%stable.securesocial.twitter.consumerKey=FIXME
+%stable.securesocial.twitter.consumerSecret=FIXME
+%unstable.securesocial.twitter.consumerKey=FIXME
+%unstable.securesocial.twitter.consumerSecret=FIXME
+
+#
+# Logout redirection
+#
+securesocial.logout.redirect=Application.logout

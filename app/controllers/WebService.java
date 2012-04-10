@@ -86,7 +86,7 @@ public class WebService extends Controller {
 
 	public static String DSB_RESOURCE_SERVICE = Constants.getProperties().getProperty("dsb.notify.endpoint");
 	public static String EC_PUTGET_SERVICE = Constants.getProperties().getProperty(
-			"eventcloud.putget.endpoint");
+			"eventcloud.default.putget.endpoint");
 
 	static {
 		Wsnb4ServUtils.initModelFactories(new WsrfbfModelFactoryImpl(), new WsrfrModelFactoryImpl(),

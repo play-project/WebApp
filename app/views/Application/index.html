@@ -248,12 +248,15 @@ $("#send0").click(function(e) {
 	$.post(sendFbStatusEvent())
 });
 
+var $consecutiveErrorsCount = 0;
+
 var getEvents = function() {
 	$.ajax({
 		url: waitEvents({lastReceived: $lastReceived}),
 		type: 'GET',
 		dataType: 'json',
 		success: function(events) {
+			$consecutiveErrorsCount = 0;
 			if(events.error == "disconnected"){
 				$("#error4").dialog("open");
 				return;
@@ -267,8 +270,13 @@ var getEvents = function() {
 			getEvents()
 		},
 		error: function() {
-			$("#error5").dialog("open");
-			return;
+			$consecutiveErrorsCount++;
+			if($consecutiveErrorsCount > 3){
+				$("#error5").dialog("open");
+				return;
+			} else {
+				getEvents();
+			}
 		}
 	});
 }

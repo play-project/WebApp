@@ -9,10 +9,13 @@ test-result/
 lib/
 modules/
 public/crud
+public/securesocial*
+securesocial*
 target/
 tmp/
 conf/application.conf
 conf/crud
+conf/securesocial*
 *.class
 *.jar
 *.log

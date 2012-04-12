@@ -24,7 +24,7 @@ information between heterogeneous services, providing the possibilities to adapt
 and personalize their execution, resulting in the so-called situational-driven
 process adaptivity.																 
 
-The WebApp uses the [Play! framework](www.playframework.org) (no affiliated with
+The WebApp uses the [Play! framework](www.playframework.org) (not affiliated with
 the research project of same name). See the installation section on how to get
 everything running including Eclipse integration.
 

@@ -22,3 +22,4 @@ conf/crud
 .classpath
 .project
 server.pid
+system.out

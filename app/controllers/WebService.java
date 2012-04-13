@@ -86,7 +86,8 @@ import fr.inria.eventcloud.api.wrappers.ResultSetWrapper;
  * @author Alexandre Bourdin
  */
 public class WebService extends Controller {
-
+	
+	private static boolean m12QueryLoaded = false;
 	public static String DSB_RESOURCE_SERVICE = Constants.getProperties().getProperty("dsb.notify.endpoint");
 	public static String EC_PUTGET_SERVICE = Constants.getProperties().getProperty(
 			"eventcloud.default.putget.endpoint");
@@ -243,6 +244,13 @@ public class WebService extends Controller {
 
 	@Util
 	public static boolean sendTokenPatternQuery(String token) {
+		
+		if(!m12QueryLoaded){
+			//String queryString = getSparqlQuerys("play-epsparql-m12-jeans-example-query.eprq");
+		}
+		String defaultQueryString = "PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>PREFIX user:   <http://graph.facebook.com/schema/user#>PREFIX :       <http://events.event-processing.org/types/>CONSTRUCT {    :e rdf:type :FacebookCepResult.    :e user:name ?friend1.    :e user:name ?friend2.    :e user:name ?friend3.    :e :discussionTopic ?about1.    :e :discussionTopic ?about2.    :e :discussionTopic ?about3}WHERE    WINDOW{        EVENT ?id1 {            ?e1 rdf:type :FacebookStatusFeedEvent.            ?e1 :status ?about1.            ?e1 :name ?friend1            }            FILTER fn:contains(?about1, \"JEANS\")        SEQ        EVENT ?id2 {            ?e2 rdf:type :FacebookStatusFeedEvent.            ?e2 :status ?about2.            ?e2 :name ?friend2            }            FILTER fn:contains(?about2, \"JEANS\")        SEQ        EVENT ?id3 {            ?e3 rdf:type :FacebookStatusFeedEvent.            ?e3 :status ?about3.            ?e3 :name ?friend3            }            FILTER fn:contains(?about3, \"JEANS\")    } (\"P30M\"^^xsd:duration, sliding)";
+		String queryString = defaultQueryString.replaceAll("\"JEANS\"", "\"" + token + "\"");
+		
 		URL wsdl = null;
 		try {
 		wsdl = new URL("http://demo.play-project.eu:8085/play/QueryDispatchApi?wsdl");
@@ -254,18 +262,6 @@ public class WebService extends Controller {
 
 		Service service = Service.create(wsdl, serviceName);
 		QueryDispatchApi queryDispatchApi = service.getPort(QueryDispatchApi.class);
-
-		String topic = "\"" + token + "\"";
-
-		String prefix = "PREFIX : <http://streams.play-project.eu/types/>";
-		String queryString = prefix + "SELECT ?friend1 ?friend2 ?friend3 ?topic1" + " WHERE " + "WINDOW{ "
-		+ "EVENT ?id1{" + "?dtc1 ?typ1 :FacebookStatusFeedEvent." + "?dtc1 :status ?topic1."
-		+ "?dtc1 :name ?friend1} " + "FILTER fn:contains(?topic1, " + topic + ")" + "SEQ "
-		+ "EVENT ?id2{" + "?dtc2 ?typ1 :FacebookStatusFeedEvent. " + "?dtc2 :status ?topic2."
-		+ "?dtc2 :name ?friend2} " + "FILTER fn:contains(?topic2, " + topic + ")" + "SEQ "
-		+ "EVENT ?id3{" + "?dtc3 ?typ1 :FacebookStatusFeedEvent. " + "?dtc3 :status ?topic3."
-		+ "?dtc3 :name ?friend3} " + "FILTER fn:contains(?topic3, " + topic + ")"
-		+ "} (\"P30M\"^^xsd:duration, sliding)";
 
 		try {
 		String s = queryDispatchApi.registerQuery("patternId_" + Math.random(),queryString, "http://streams.event-processing.org/ids/FacebookCEPResults");

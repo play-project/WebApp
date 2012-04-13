@@ -48,11 +48,10 @@ public class Application extends Controller {
 	/**
 	 * Action to call before each action requiring the user to be connected
 	 */
-	@Before(only = { "index", "historicalEvents", "waitEvents", "settings", "updateSettings", "sendEvent",
-			"subscribe", "unsubscribe", "getTopics", "patternQuery", "processPatternQuery",
-			"historicalByTopic", "searchTopics" })
+	@Before(only = { "index", "historicalEvents", "waitEvents", "settings", "updateSettings", "sendEvent", "subscribe", "unsubscribe", "getTopics",
+			"patternQuery", "processPatternQuery", "historicalByTopic", "searchTopics" })
 	private static void checkAuthentification() {
-		if(session.get("socialauth") != null){
+		if (session.get("socialauth") != null) {
 			session.remove("socialauth");
 			register();
 			return;
@@ -123,9 +122,9 @@ public class Application extends Controller {
 		render();
 	}
 
-	public static void processTokenPatternQuery(String text) {
-		if (text != null && text != "") {
-			Boolean result = WebService.sendTokenPatternQuery(text);
+	public static void processTokenPatternQuery(String token) {
+		if (token != null && token != "") {
+			Boolean result = WebService.sendTokenPatternQuery(token);
 			if (!result) {
 				flash.error("The operation encoutered an error.");
 			}
@@ -197,21 +196,18 @@ public class Application extends Controller {
 	 */
 	public static void register() {
 		String randomID = Codec.UUID();
-		SocialUser su = Cache.get("su"+session.getId(), SocialUser.class);
+		SocialUser su = Cache.get("su" + session.getId(), SocialUser.class);
 		if (su == null) {
 			su = SecureSocial.getCurrentUser();
 		}
 		render(randomID, su);
 	}
 
-	public static void processRegistration(
-			@Required(message = "Email is required") @Email(message = "Invalid email") @Equals("emailconf") String email,
+	public static void processRegistration(@Required(message = "Email is required") @Email(message = "Invalid email") @Equals("emailconf") String email,
 			@Required(message = "Email confirmation is required") @Email String emailconf,
 			@Required(message = "Password is required") @Equals("passwordconf") String password,
-			@Required(message = "Passsword confirmation is required") String passwordconf,
-			@Required(message = "Full name is required") String name,
-			@Required(message = "Gender is required") String gender,
-			@Required(message = "Mail notification choice is required") String mailnotif, String code,
+			@Required(message = "Passsword confirmation is required") String passwordconf, @Required(message = "Full name is required") String name,
+			@Required(message = "Gender is required") String gender, @Required(message = "Mail notification choice is required") String mailnotif, String code,
 			String randomID) {
 		SocialUser su = SecureSocial.getCurrentUser();
 		if (su == null) {
@@ -224,17 +220,16 @@ public class Application extends Controller {
 				errorMsg.add(error.message());
 			}
 			flash.put("error", errorMsg);
-			renderTemplate("Application/register.html", email, emailconf, name, gender, mailnotif, randomID,
-					su);
+			renderTemplate("Application/register.html", email, emailconf, name, gender, mailnotif, randomID, su);
 		}
 		Cache.delete(randomID);
 		String pwdEncrypt = PasswordEncrypt.encrypt(password);
 		User u = null;
-		if(su != null) {
+		if (su != null) {
 			u = User.find("byEmail", su.email).first();
 		}
-		if(u == null) {
-			u = new User(email, pwdEncrypt, name, gender, mailnotif);			
+		if (u == null) {
+			u = new User(email, pwdEncrypt, name, gender, mailnotif);
 		} else {
 			u.password = pwdEncrypt;
 			u.name = name;
@@ -277,8 +272,7 @@ public class Application extends Controller {
 	 * @throws InterruptedException
 	 * @throws ExecutionException
 	 */
-	public static void waitEvents(@Required Long lastReceived) throws InterruptedException,
-			ExecutionException {
+	public static void waitEvents(@Required Long lastReceived) throws InterruptedException, ExecutionException {
 		User u = (User) request.args.get("user");
 		if (u == null) {
 			renderJSON("{\"error\":\"disconnected\"}");
@@ -334,16 +328,14 @@ public class Application extends Controller {
 				if (et.subscribersCount < 1) {
 					if (WebService.subscribe(et) == 1) {
 						if (u.subscribe(et)) {
-							result = "{\"id\":\"" + et.getId() + "\",\"title\":\"" + et.title
-									+ "\",\"icon\":\"" + et.icon + "\",\"content\":\"" + et.content
+							result = "{\"id\":\"" + et.getId() + "\",\"title\":\"" + et.title + "\",\"icon\":\"" + et.icon + "\",\"content\":\"" + et.content
 									+ "\",\"path\":\"" + et.path + "\"}";
 						}
 					}
 				} else {
 					if (u.subscribe(et)) {
-						result = "{\"id\":\"" + et.getId() + "\",\"title\":\"" + et.title + "\",\"icon\":\""
-								+ et.icon + "\",\"content\":\"" + et.content + "\",\"path\":\"" + et.path
-								+ "\"}";
+						result = "{\"id\":\"" + et.getId() + "\",\"title\":\"" + et.title + "\",\"icon\":\"" + et.icon + "\",\"content\":\"" + et.content
+								+ "\",\"path\":\"" + et.path + "\"}";
 					}
 				}
 			}
@@ -366,8 +358,8 @@ public class Application extends Controller {
 					if (et.subscribersCount < 1) {
 						WebService.unsubscribe(et);
 					}
-					result = "{\"id\":\"" + et.getId() + "\",\"title\":\"" + et.title + "\",\"icon\":\""
-							+ et.icon + "\",\"content\":\"" + et.content + "\",\"path\":\"" + et.path + "\"}";
+					result = "{\"id\":\"" + et.getId() + "\",\"title\":\"" + et.title + "\",\"icon\":\"" + et.icon + "\",\"content\":\"" + et.content
+							+ "\",\"path\":\"" + et.path + "\"}";
 				}
 			}
 		}
@@ -396,16 +388,13 @@ public class Application extends Controller {
 	/**
 	 * Update settings
 	 */
-	public static void updateSettings(String password, String newpassword, String newpasswordconf,
-			@Required(message = "Name is required") String name,
-			@Required(message = "Gender is required") String gender,
-			@Required(message = "Mail notification choice is required") String mailnotif) {
+	public static void updateSettings(String password, String newpassword, String newpasswordconf, @Required(message = "Name is required") String name,
+			@Required(message = "Gender is required") String gender, @Required(message = "Mail notification choice is required") String mailnotif) {
 		Long id = Long.parseLong(session.get("userid"));
 		User u = ModelManager.get().getUserById(id);
 		if (!newpassword.equals("")) {
 			validation.equals(password, u.password).message("Wrong password");
-			validation.equals(newpassword, newpasswordconf).message(
-					"New password and confirmation don't match.");
+			validation.equals(newpassword, newpasswordconf).message("New password and confirmation don't match.");
 			if (!validation.hasErrors()) {
 				u.password = newpassword;
 			}

@@ -1,9 +1,11 @@
 package controllers;
 
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -68,8 +70,9 @@ import com.ebmwebsourcing.wsstar.wsnb.services.impl.util.Wsnb4ServUtils;
 import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.QuerySolution;
 
-import eu.play_project.play_commons.constants.Constants;
+
 import eu.play_project.play_platformservices.api.QueryDispatchApi;
+import eu.play_project.play_commons.constants.Constants;
 import fr.inria.eventcloud.api.CompoundEvent;
 import fr.inria.eventcloud.api.Quadruple;
 import fr.inria.eventcloud.api.QuadruplePattern;
@@ -242,9 +245,9 @@ public class WebService extends Controller {
 	public static boolean sendTokenPatternQuery(String token) {
 		URL wsdl = null;
 		try {
-			wsdl = new URL("http://demo.play-project.eu:8085/play/QueryDispatchApi?wsdl");
+		wsdl = new URL("http://demo.play-project.eu:8085/play/QueryDispatchApi?wsdl");
 		} catch (MalformedURLException e) {
-			e.printStackTrace();
+		e.printStackTrace();
 		}
 
 		QName serviceName = new QName("http://play_platformservices.play_project.eu/", "QueryDispatchApi");
@@ -256,46 +259,48 @@ public class WebService extends Controller {
 
 		String prefix = "PREFIX : <http://streams.play-project.eu/types/>";
 		String queryString = prefix + "SELECT ?friend1 ?friend2 ?friend3 ?topic1" + " WHERE " + "WINDOW{ "
-				+ "EVENT ?id1{" + "?dtc1 ?typ1 :FacebookStatusFeedEvent." + "?dtc1 :status ?topic1."
-				+ "?dtc1 :name ?friend1} " + "FILTER fn:contains(?topic1, " + topic + ")" + "SEQ "
-				+ "EVENT ?id2{" + "?dtc2 ?typ1 :FacebookStatusFeedEvent. " + "?dtc2 :status ?topic2."
-				+ "?dtc2 :name ?friend2} " + "FILTER fn:contains(?topic2, " + topic + ")" + "SEQ "
-				+ "EVENT ?id3{" + "?dtc3 ?typ1 :FacebookStatusFeedEvent. " + "?dtc3 :status ?topic3."
-				+ "?dtc3 :name ?friend3} " + "FILTER fn:contains(?topic3, " + topic + ")"
-				+ "} (\"P30M\"^^xsd:duration, sliding)";
+		+ "EVENT ?id1{" + "?dtc1 ?typ1 :FacebookStatusFeedEvent." + "?dtc1 :status ?topic1."
+		+ "?dtc1 :name ?friend1} " + "FILTER fn:contains(?topic1, " + topic + ")" + "SEQ "
+		+ "EVENT ?id2{" + "?dtc2 ?typ1 :FacebookStatusFeedEvent. " + "?dtc2 :status ?topic2."
+		+ "?dtc2 :name ?friend2} " + "FILTER fn:contains(?topic2, " + topic + ")" + "SEQ "
+		+ "EVENT ?id3{" + "?dtc3 ?typ1 :FacebookStatusFeedEvent. " + "?dtc3 :status ?topic3."
+		+ "?dtc3 :name ?friend3} " + "FILTER fn:contains(?topic3, " + topic + ")"
+		+ "} (\"P30M\"^^xsd:duration, sliding)";
 
 		try {
-			String s = queryDispatchApi.registerQuery(queryString);
-			Logger.info(s);
+		String s = queryDispatchApi.registerQuery("patternId_" + Math.random(),queryString, "http://streams.event-processing.org/ids/FacebookCEPResults");
+		Logger.info(s);
 		} catch (Exception e) {
-			Logger.error(e.toString());
-			return false;
+		Logger.error(e.toString());
+		return false;
 		}
 		return true;
 	}
 
 	public static Boolean sendFullPatternQuery(String queryString) {
+		
 		URL wsdl = null;
 		try {
-			wsdl = new URL("http://demo.play-project.eu:8085/play/QueryDispatchApi?wsdl");
+		wsdl = new URL("http://demo.play-project.eu:8085/play/QueryDispatchApi?wsdl");
 		} catch (MalformedURLException e) {
-			e.printStackTrace();
+		e.printStackTrace();
 		}
 
 		QName serviceName = new QName("http://play_platformservices.play_project.eu/", "QueryDispatchApi");
 
 		Service service = Service.create(wsdl, serviceName);
 		QueryDispatchApi queryDispatchApi = service
-				.getPort(eu.play_project.play_platformservices.api.QueryDispatchApi.class);
+		.getPort(eu.play_project.play_platformservices.api.QueryDispatchApi.class);
 
 		try {
-			String s = queryDispatchApi.registerQuery(queryString);
-			Logger.info(s);
+		String s = queryDispatchApi.registerQuery("patternId_" + Math.random(),queryString, "http://streams.event-processing.org/ids/FacebookCEPResults");
+		Logger.info(s);
 		} catch (Exception e) {
-			Logger.error(e.toString());
-			return false;
+		Logger.error(e.toString());
+		return false;
 		}
 		return true;
+
 	}
 
 	/**
@@ -374,4 +379,26 @@ public class WebService extends Controller {
 		}
 	}
 
+	private String getSparqlQuerys(String queryFile){
+		try {
+			InputStream is = this.getClass().getClassLoader().getResourceAsStream(queryFile);
+			BufferedReader br =new BufferedReader(new InputStreamReader(is));
+			StringBuffer sb = new StringBuffer();
+			String line;
+			
+			while (null != (line = br.readLine())) {
+					sb.append(line);
+			}
+			//System.out.println(sb.toString());
+			br.close();
+			is.close();
+
+			return sb.toString();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	
+	}
 }

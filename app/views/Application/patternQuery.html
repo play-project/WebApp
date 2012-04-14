@@ -27,7 +27,7 @@ nobanner:true /} #{set nofooter:true /}
 				<form action="@{Application.processTokenPatternQuery()}" method="POST">
 					<fieldset>
 						<legend>Here, you can register a new word to be notified</legend>
-						Notify me when <input id="token" name="token" type="text" value="" />
+						Notify me when <input id="token" name="token" type="text" value="JEANS" required="required" />
 						occurs 3 times within 30 minutes in my Facebook friends statuses.
 					</fieldset>
 					<fieldset>
@@ -45,7 +45,7 @@ nobanner:true /} #{set nofooter:true /}
 					</fieldset>
 					<fieldset>
 						<legend>Event Topic for query :</legend>
-						Enter en topic name : <input type="text" name="eventtopic"
+						Enter en topic name : <input type="text" name="eventtopic" required="required"
 							placeholder="http://streams.event-processing.org/ids/FacebookCEPResults"
 							size="80" />
 					</fieldset>
@@ -144,7 +144,7 @@ WHERE
 					</fieldset>
 					<fieldset>
 						<legend>Event Topic for query :</legend>
-						Enter en topic name : <input type="text" name="eventtopic"
+						Enter en topic name : <input type="text" name="eventtopic" required="required"
 							placeholder="http://streams.event-processing.org/ids/FacebookCEPResults"
 							size="80" />
 					</fieldset>

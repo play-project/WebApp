@@ -136,9 +136,9 @@ public class Application extends Controller {
 		patternQuery();
 	}
 
-	public static void processFullPatternQuery(String text) {
+	public static void processFullPatternQuery(String text, String eventtopic) {
 		if (text != null && text != "") {
-			Boolean result = WebService.sendFullPatternQuery(text);
+			Boolean result = WebService.sendFullPatternQuery(text, eventtopic);
 			if (!result) {
 				flash.error("The operation encoutered an error.");
 			}

@@ -45,7 +45,7 @@ nobanner:true /} #{set nofooter:true /}
 					</fieldset>
 					<fieldset>
 						<legend>Event Topic for query :</legend>
-						Enter en topic name : <input type="text" name="eventtopic-name"
+						Enter en topic name : <input type="text" name="eventtopic"
 							placeholder="http://streams.event-processing.org/ids/FacebookCEPResults"
 							size="80" />
 					</fieldset>
@@ -94,7 +94,7 @@ nobanner:true /} #{set nofooter:true /}
 						<textarea id="text" name="text" type="text" cols="60" rows="24">
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX user: <http://graph.facebook.com/schema/user#>
-PREFIX : <http: //events.event-processing.org/types/>
+PREFIX : <http://events.event-processing.org/types/>
 
 CONSTRUCT {    :e rdf:type :FacebookCepResult.
               :e user:name ?friend1.
@@ -144,7 +144,7 @@ WHERE
 					</fieldset>
 					<fieldset>
 						<legend>Event Topic for query :</legend>
-						Enter en topic name : <input type="text" name="eventtopic-name"
+						Enter en topic name : <input type="text" name="eventtopic"
 							placeholder="http://streams.event-processing.org/ids/FacebookCEPResults"
 							size="80" />
 					</fieldset>

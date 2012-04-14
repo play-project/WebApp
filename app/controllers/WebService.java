@@ -273,7 +273,7 @@ public class WebService extends Controller {
 		return true;
 	}
 
-	public static Boolean sendFullPatternQuery(String queryString) {
+	public static Boolean sendFullPatternQuery(String queryString, String eventtopic) {
 		
 		URL wsdl = null;
 		try {
@@ -289,7 +289,7 @@ public class WebService extends Controller {
 		.getPort(eu.play_project.play_platformservices.api.QueryDispatchApi.class);
 
 		try {
-		String s = queryDispatchApi.registerQuery("patternId_" + Math.random(),queryString, "http://streams.event-processing.org/ids/FacebookCEPResults");
+		String s = queryDispatchApi.registerQuery("patternId_" + Math.random(),queryString, eventtopic);
 		Logger.info(s);
 		} catch (Exception e) {
 		Logger.error(e.toString());

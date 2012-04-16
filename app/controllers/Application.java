@@ -3,7 +3,6 @@ package controllers;
 import play.*;
 import play.cache.Cache;
 import play.data.validation.*;
-import play.data.validation.Error;
 import play.libs.Codec;
 import play.libs.F.IndexedEvent;
 import play.libs.F.Promise;
@@ -138,9 +137,10 @@ public class Application extends Controller {
 
 	public static void processFullPatternQuery(String text, String eventtopic) {
 		if (text != null && text != "") {
+			try{
 			Boolean result = WebService.sendFullPatternQuery(text, eventtopic);
-			if (!result) {
-				flash.error("The operation encoutered an error.");
+			} catch (Exception e) {
+				flash.error(e.getMessage());
 			}
 		}
 		patternQuery();

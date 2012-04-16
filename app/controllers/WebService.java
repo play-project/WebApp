@@ -246,9 +246,6 @@ public class WebService extends Controller {
 	@Util
 	public static boolean sendTokenPatternQuery(String token) {
 		
-		if(!m12QueryLoaded){
-			//String queryString = getSparqlQuerys("play-epsparql-m12-jeans-example-query.eprq");
-		}
 		String defaultQueryString = GetPredefinedPattern.getPattern("play-epsparql-m12-jeans-example-query.eprq");
 		String queryString = defaultQueryString.replaceAll("\"JEANS\"", "\"" + token + "\"");
 		
@@ -274,7 +271,7 @@ public class WebService extends Controller {
 		return true;
 	}
 
-	public static Boolean sendFullPatternQuery(String queryString, String eventtopic) {
+	public static Boolean sendFullPatternQuery(String queryString, String eventtopic) throws com.hp.hpl.jena.query.QueryParseException{
 		
 		URL wsdl = null;
 		try {
@@ -289,13 +286,13 @@ public class WebService extends Controller {
 		QueryDispatchApi queryDispatchApi = service
 		.getPort(eu.play_project.play_platformservices.api.QueryDispatchApi.class);
 
-		try {
+
 		String s = queryDispatchApi.registerQuery("patternId_" + Math.random(),queryString, eventtopic);
 		Logger.info(s);
-		} catch (Exception e) {
-		Logger.error(e.toString());
-		return false;
-		}
+//		} catch (Exception e) {
+//		Logger.error(e.toString());
+//		return false;
+//		}
 		return true;
 
 	}

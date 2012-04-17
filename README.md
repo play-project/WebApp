@@ -39,6 +39,7 @@ Installation
 4. Fetch all Maven dependencies for WebApp:
 
         $ cd WebApp
+        $ rm -Rf lib/ (delete old dependencies if there are any)
         $ mvn dependency:copy-dependencies
         $ play dependencies
 

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
@@ -25,8 +26,6 @@ import models.BoyerMoore;
 import models.ModelManager;
 import models.PutGetClient;
 import models.SupportedTopicsXML;
-import models.translator.*;
-import models.eventformat.*;
 import models.eventstream.EventTopic;
 import models.GetPredefinedPattern;
 
@@ -36,8 +35,12 @@ import org.event_processing.events.types.FacebookStatusFeedEvent;
 import org.event_processing.events.types.TwitterEvent;
 import org.junit.Test;
 import org.ontoware.rdf2go.exception.ModelRuntimeException;
+import org.ontoware.rdf2go.model.Model;
+import org.ontoware.rdf2go.model.Statement;
 import org.ontoware.rdf2go.model.Syntax;
+import org.ontoware.rdf2go.model.node.Variable;
 import org.ontoware.rdf2go.model.node.impl.URIImpl;
+import org.ontoware.rdf2go.vocabulary.RDF;
 import org.ontoware.rdfreactor.runtime.CardinalityException;
 import org.ontoware.rdfreactor.schema.rdfs.List;
 import org.petalslink.dsb.notification.client.http.HTTPNotificationProducerRPClient;
@@ -45,6 +48,7 @@ import org.petalslink.dsb.notification.client.http.simple.HTTPProducerClient;
 import org.petalslink.dsb.notification.client.http.simple.HTTPSubscriptionManagerClient;
 import org.petalslink.dsb.notification.commons.NotificationException;
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 import play.Logger;
 import play.Play;
@@ -74,6 +78,9 @@ import com.hp.hpl.jena.query.QuerySolution;
 
 import eu.play_project.play_platformservices.api.QueryDispatchApi;
 import eu.play_project.play_commons.constants.Constants;
+import eu.play_project.play_commons.eventformat.Stream;
+import eu.play_project.play_commons.eventtypes.EventHelpers;
+import eu.play_project.play_eventadapter.AbstractReceiver;
 import fr.inria.eventcloud.api.CompoundEvent;
 import fr.inria.eventcloud.api.Quadruple;
 import fr.inria.eventcloud.api.QuadruplePattern;
@@ -92,7 +99,8 @@ public class WebService extends Controller {
 	public static String DSB_RESOURCE_SERVICE = Constants.getProperties().getProperty("dsb.notify.endpoint");
 	public static String EC_PUTGET_SERVICE = Constants.getProperties().getProperty(
 			"eventcloud.default.putget.endpoint");
-
+	private static AbstractReceiver receiver = new AbstractReceiver() {};
+	
 	static {
 		Wsnb4ServUtils.initModelFactories(new WsrfbfModelFactoryImpl(), new WsrfrModelFactoryImpl(),
 				new WsrfrlModelFactoryImpl(), new WsrfrpModelFactoryImpl(), new WstopModelFactoryImpl(),
@@ -107,25 +115,38 @@ public class WebService extends Controller {
 	 */
 	public static void soapNotifEndPoint(String topicId) {
 
-		URI eventId = generateRandomUri();
-		CompoundEvent event = TranslationUtils.translateWsNotifNotificationToEvent(request.body,
-				inputStreamFrom("public/xml/xsd-01.xml"), eventId);
-
-		Collection<Triple> triples = event.getTriples();
-		String title = "-";
-		String content = "";
-		for (Triple t : triples) {
-			String predicate = t.getPredicate().toString();
-			String object = t.getObject().getLiteralLexicalForm();
-			if (BoyerMoore.match("Topic", predicate).size() > 0) {
-				title = object;
-			} else {
-				content += splitUri(t.getSubject().toString())[1] + " : " + splitUri(predicate)[1] + " : "
-						+ object + "<br/>";
-			}
+		String eventTitle;
+		String notifyMessage;
+		
+		// A trick to read from a Stream to String:
+		try {
+		        notifyMessage = new java.util.Scanner(request.body).useDelimiter("\\A").next();
+		} catch (java.util.NoSuchElementException e) {
+		        notifyMessage = "";
 		}
 
-		ModelManager.get().getTopicById(topicId).multicast(new models.eventstream.Event(title, content));
+		Model rdf;
+		try {
+			rdf = receiver.parseRdf(notifyMessage);
+			// If we found RDF
+			if (rdf.size() > 0) {
+				Iterator<Statement> it = rdf.findStatements(Variable.ANY, RDF.type, Variable.ANY);
+				if (it.hasNext()) {
+					Statement stat = it.next();
+					eventTitle = stat.getObject() + ": " + stat.getSubject();
+				}
+				else {
+					eventTitle = "RDF Event";
+				}
+				ModelManager.get().getTopicById(topicId).multicast(new models.eventstream.RdfEvent(eventTitle, rdf));
+			}
+			else {
+				eventTitle = "XML Event";
+				ModelManager.get().getTopicById(topicId).multicast(new models.eventstream.Event(eventTitle, notifyMessage));
+			}
+		} catch (Exception e) {
+			Logger.warn(e, "Error reading event from HTTP request.");
+		} 
 	}
 
 	/**

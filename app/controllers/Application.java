@@ -216,9 +216,9 @@ public class Application extends Controller {
 		}
 		if (validation.hasErrors()) {
 			ArrayList<String> errorMsg = new ArrayList<String>();
-			for (Error error : validation.errors()) {
-				errorMsg.add(error.message());
-			}
+//			for (Error error : validation.errors()) {
+//				errorMsg.add(error.message());
+//			}
 			flash.put("error", errorMsg);
 			renderTemplate("Application/register.html", email, emailconf, name, gender, mailnotif, randomID, su);
 		}
@@ -401,9 +401,9 @@ public class Application extends Controller {
 		}
 		if (validation.hasErrors()) {
 			ArrayList<String> errorMsg = new ArrayList<String>();
-			for (Error error : validation.errors()) {
-				errorMsg.add(error.message());
-			}
+//			for (Error error : validation.errors()) {
+//				errorMsg.add(error.message());
+//			}
 			flash.put("error", errorMsg);
 			settings();
 		}

@@ -48,6 +48,6 @@ public class Event {
 
 	@Override
 	public String toString() {
-		return "Event [topicId=" + topicId + ", title=" + title + ", content=" + content + "]";
+		return "Event [topicId=" + getTopicId() + ", title=" + getTitle() + ", content=" + getContent() + "]";
 	}
 }

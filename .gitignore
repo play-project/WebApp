@@ -26,3 +26,4 @@ conf/securesocial*
 .project
 server.pid
 system.out
+webapp.ucls

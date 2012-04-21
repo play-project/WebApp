@@ -10,12 +10,15 @@ lib/
 modules/
 public/crud
 public/securesocial*
+public/secure
 securesocial*
+secure
 target/
 tmp/
 conf/application.conf
 conf/crud
 conf/securesocial*
+conf/secure
 *.class
 *.jar
 *.log

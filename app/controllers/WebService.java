@@ -3,7 +3,6 @@ package controllers;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
@@ -14,7 +13,6 @@ import java.net.URL;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -23,44 +21,30 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
 import models.BoyerMoore;
+import models.GetPredefinedPattern;
 import models.ModelManager;
 import models.PutGetClient;
 import models.SupportedTopicsXML;
 import models.eventstream.EventTopic;
-import models.GetPredefinedPattern;
 
-import org.jdom.input.SAXBuilder;
-import org.event_processing.events.types.FacebookCepResult;
 import org.event_processing.events.types.FacebookStatusFeedEvent;
-import org.event_processing.events.types.TwitterEvent;
-import org.junit.Test;
-import org.ontoware.rdf2go.exception.ModelRuntimeException;
+import org.jdom.input.SAXBuilder;
 import org.ontoware.rdf2go.model.Model;
 import org.ontoware.rdf2go.model.Statement;
-import org.ontoware.rdf2go.model.Syntax;
 import org.ontoware.rdf2go.model.node.Variable;
 import org.ontoware.rdf2go.model.node.impl.URIImpl;
 import org.ontoware.rdf2go.vocabulary.RDF;
-import org.ontoware.rdfreactor.runtime.CardinalityException;
-import org.ontoware.rdfreactor.schema.rdfs.List;
 import org.petalslink.dsb.notification.client.http.HTTPNotificationProducerRPClient;
 import org.petalslink.dsb.notification.client.http.simple.HTTPProducerClient;
 import org.petalslink.dsb.notification.client.http.simple.HTTPSubscriptionManagerClient;
 import org.petalslink.dsb.notification.commons.NotificationException;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 import play.Logger;
 import play.Play;
-import play.libs.F.Promise;
-import play.libs.WS;
-import play.libs.WS.HttpResponse;
-import play.libs.WS.WSRequest;
 import play.mvc.Controller;
 import play.mvc.Router;
-import play.mvc.Router.Route;
 import play.mvc.Util;
-import play.templates.TemplateLoader;
 
 import com.ebmwebsourcing.easycommons.xml.XMLHelper;
 import com.ebmwebsourcing.wsstar.basefaults.datatypes.impl.impl.WsrfbfModelFactoryImpl;
@@ -72,19 +56,13 @@ import com.ebmwebsourcing.wsstar.topics.datatypes.api.WstopConstants;
 import com.ebmwebsourcing.wsstar.topics.datatypes.impl.impl.WstopModelFactoryImpl;
 import com.ebmwebsourcing.wsstar.wsnb.services.INotificationProducerRP;
 import com.ebmwebsourcing.wsstar.wsnb.services.impl.util.Wsnb4ServUtils;
-import com.hp.hpl.jena.graph.Triple;
 import com.hp.hpl.jena.query.QuerySolution;
 
-
-import eu.play_project.play_platformservices.api.QueryDispatchApi;
 import eu.play_project.play_commons.constants.Constants;
 import eu.play_project.play_commons.eventformat.Stream;
 import eu.play_project.play_commons.eventtypes.EventHelpers;
 import eu.play_project.play_eventadapter.AbstractReceiver;
-import fr.inria.eventcloud.api.CompoundEvent;
-import fr.inria.eventcloud.api.Quadruple;
-import fr.inria.eventcloud.api.QuadruplePattern;
-import fr.inria.eventcloud.api.generators.QuadrupleGenerator;
+import eu.play_project.play_platformservices.api.QueryDispatchApi;
 import fr.inria.eventcloud.api.responses.SparqlSelectResponse;
 import fr.inria.eventcloud.api.wrappers.ResultSetWrapper;
 
@@ -118,7 +96,7 @@ public class WebService extends Controller {
 		String eventTitle;
 		String notifyMessage;
 		
-		// A trick to read from a Stream to String:
+		// A trick to read a Stream into to String:
 		try {
 		        notifyMessage = new java.util.Scanner(request.body).useDelimiter("\\A").next();
 		} catch (java.util.NoSuchElementException e) {
@@ -129,23 +107,34 @@ public class WebService extends Controller {
 		try {
 			rdf = receiver.parseRdf(notifyMessage);
 			// If we found RDF
-			if (rdf.size() > 0) {
-				Iterator<Statement> it = rdf.findStatements(Variable.ANY, RDF.type, Variable.ANY);
-				if (it.hasNext()) {
-					Statement stat = it.next();
-					eventTitle = stat.getObject() + ": " + stat.getSubject();
-				}
-				else {
-					eventTitle = "RDF Event";
-				}
-				ModelManager.get().getTopicById(topicId).multicast(new models.eventstream.RdfEvent(eventTitle, rdf));
+			Iterator<Statement> it = rdf.findStatements(Variable.ANY, RDF.type,
+					Variable.ANY);
+			if (it.hasNext()) {
+				Statement stat = it.next();
+				String eventType = stat.getObject().asURI().asJavaURI().getPath();
+				eventType = eventType.substring(eventType.lastIndexOf("/") + 1);
+				String eventId = stat.getSubject().asURI().asJavaURI().getPath();
+				eventId = eventId.substring(eventId.lastIndexOf("/") + 1);
+				eventId += (stat.getSubject().asURI().asJavaURI().getFragment() != null) ? "#" + stat.getSubject().asURI().asJavaURI().getFragment() : "";
+
+				eventTitle = eventType + ": " + eventId;
+			} else {
+				eventTitle = "RDF Event";
 			}
-			else {
-				eventTitle = "XML Event";
-				ModelManager.get().getTopicById(topicId).multicast(new models.eventstream.Event(eventTitle, notifyMessage));
-			}
+			Logger.info("RDF event was found with %s triples and title: '%s'", rdf.size(), eventTitle);
+			ModelManager
+					.get()
+					.getTopicById(topicId)
+					.multicast(new models.eventstream.RdfEvent(eventTitle, rdf));
 		} catch (Exception e) {
-			Logger.warn(e, "Error reading event from HTTP request.");
+			Logger.info("No RDF event was found from HTTP request. Maybe an XML event.");
+			eventTitle = "XML Event";
+			ModelManager
+					.get()
+					.getTopicById(topicId)
+					.multicast(
+							new models.eventstream.Event(eventTitle,
+									notifyMessage));
 		} 
 	}
 
@@ -283,7 +272,7 @@ public class WebService extends Controller {
 		QueryDispatchApi queryDispatchApi = service.getPort(QueryDispatchApi.class);
 
 		try {
-		String s = queryDispatchApi.registerQuery("patternId_" + Math.random(),queryString, "http://streams.event-processing.org/ids/FacebookCEPResults");
+		String s = queryDispatchApi.registerQuery("patternId_" + Math.random(), queryString, "http://streams.event-processing.org/ids/FacebookCEPResults");
 		Logger.info(s);
 		} catch (Exception e) {
 		Logger.error(e.toString());
@@ -322,7 +311,7 @@ public class WebService extends Controller {
 	 * Notify action triggered by buttons on the web interface Generates a
 	 * Facebook status event event and sends it to the DSB
 	 */
-	public static void testFacebookStatusFeedEvent() throws ModelRuntimeException, IOException {
+	public static void testFacebookStatusFeedEvent() {
 		String eventId = Stream.FacebookStatusFeed.getUri() + new SecureRandom().nextLong();
 
 		FacebookStatusFeedEvent event = new FacebookStatusFeedEvent(EventHelpers.createEmptyModel(eventId),
@@ -335,8 +324,7 @@ public class WebService extends Controller {
 		event.setUserLocation("Karlsruhe, Germany");
 		event.setEndTime(Calendar.getInstance());
 		event.setStream(new URIImpl(Stream.FacebookStatusFeed.getUri()));
-		event.getModel().writeTo(System.out, Syntax.Turtle);
-		System.out.println();
+		// FIXME do something here
 	}
 
 	/**
@@ -376,21 +364,6 @@ public class WebService extends Controller {
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 			return null;
-		}
-	}
-
-	@Util
-	private static String[] splitUri(String uri) {
-		if (uri.endsWith("/")) {
-			uri = uri.substring(0, uri.length() - 1);
-		}
-
-		int slashIndex = uri.lastIndexOf('/');
-
-		if (slashIndex == -1) {
-			return new String[] { "", uri };
-		} else {
-			return new String[] { uri.substring(0, slashIndex), uri.substring(slashIndex + 1) };
 		}
 	}
 

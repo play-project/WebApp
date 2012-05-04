@@ -114,21 +114,16 @@ public class WebService extends Controller {
 				Statement stat = it.next();
 				String eventType = stat.getObject().asURI().asJavaURI().getPath();
 				eventType = eventType.substring(eventType.lastIndexOf("/") + 1);
-				String eventId = stat.getSubject().asURI().asJavaURI().getPath();
-				eventId = eventId.substring(eventId.lastIndexOf("/") + 1);
-				eventId += (stat.getSubject().asURI().asJavaURI().getFragment() != null) ? "#" + stat.getSubject().asURI().asJavaURI().getFragment() : "";
 
-				eventTitle = eventType + ": " + eventId;
+				eventTitle = eventType;
 			} else {
 				eventTitle = "RDF Event";
 			}
-			Logger.info("RDF event was found with %s triples and title: '%s'", rdf.size(), eventTitle);
 			ModelManager
 					.get()
 					.getTopicById(topicId)
 					.multicast(new models.eventstream.Event(eventTitle, rdf.serialize(Syntax.Turtle)));
 		} catch (Exception e) {
-			Logger.info("No RDF event was found from HTTP request. Maybe an XML event.");
 			eventTitle = "XML Event";
 			ModelManager
 					.get()

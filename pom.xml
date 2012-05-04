@@ -86,11 +86,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<version>1.7.2</version>
-		</dependency>
-		<dependency>
 			<groupId>eu.play-project</groupId>
 			<artifactId>play-eventadapter-abstractrdfreceiver</artifactId>
 			<version>1.0-SNAPSHOT</version>

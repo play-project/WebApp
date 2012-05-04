@@ -27,6 +27,7 @@ import models.PutGetClient;
 import models.SupportedTopicsXML;
 import models.eventstream.EventTopic;
 
+import org.apache.velocity.anakia.Escape;
 import org.event_processing.events.types.FacebookStatusFeedEvent;
 import org.jdom.input.SAXBuilder;
 import org.ontoware.rdf2go.model.Model;

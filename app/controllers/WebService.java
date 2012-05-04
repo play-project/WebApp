@@ -111,6 +111,7 @@ public class WebService extends Controller {
 		CompoundEvent event = TranslationUtils.translateWsNotifNotificationToEvent(request.body,
 				inputStreamFrom("public/xml/xsd-01.xml"), eventId);
 
+<<<<<<< HEAD
 		Collection<Triple> triples = event.getTriples();
 		String title = "-";
 		String content = "";
@@ -119,13 +120,43 @@ public class WebService extends Controller {
 			String object = t.getObject().getLiteralLexicalForm();
 			if (BoyerMoore.match("Topic", predicate).size() > 0) {
 				title = object;
+=======
+		Model rdf;
+		try {
+			rdf = receiver.parseRdf(notifyMessage);
+			// If we found RDF
+			Iterator<Statement> it = rdf.findStatements(Variable.ANY, RDF.type,
+					Variable.ANY);
+			if (it.hasNext()) {
+				Statement stat = it.next();
+				String eventType = stat.getObject().asURI().asJavaURI().getPath();
+				eventType = eventType.substring(eventType.lastIndexOf("/") + 1);
+
+				eventTitle = eventType;
+>>>>>>> df59299a7ade485f5852d899f59b5b70b2fbc8f0
 			} else {
 				content += splitUri(t.getSubject().toString())[1] + " : " + splitUri(predicate)[1] + " : "
 						+ object + "<br/>";
 			}
+<<<<<<< HEAD
 		}
 
 		ModelManager.get().getTopicById(topicId).multicast(new models.eventstream.Event(title, content));
+=======
+			ModelManager
+					.get()
+					.getTopicById(topicId)
+					.multicast(new models.eventstream.Event(eventTitle, rdf.serialize(Syntax.Turtle)));
+		} catch (Exception e) {
+			eventTitle = "XML Event";
+			ModelManager
+					.get()
+					.getTopicById(topicId)
+					.multicast(
+							new models.eventstream.Event(eventTitle,
+									notifyMessage));
+		} 
+>>>>>>> df59299a7ade485f5852d899f59b5b70b2fbc8f0
 	}
 
 	/**

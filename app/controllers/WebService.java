@@ -3,6 +3,7 @@ package controllers;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
@@ -27,9 +28,9 @@ import models.PutGetClient;
 import models.SupportedTopicsXML;
 import models.eventstream.EventTopic;
 
-import org.apache.velocity.anakia.Escape;
 import org.event_processing.events.types.FacebookStatusFeedEvent;
 import org.jdom.input.SAXBuilder;
+import org.ontoware.rdf2go.exception.ModelRuntimeException;
 import org.ontoware.rdf2go.model.Model;
 import org.ontoware.rdf2go.model.Statement;
 import org.ontoware.rdf2go.model.Syntax;
@@ -251,7 +252,7 @@ public class WebService extends Controller {
 	}
 
 	@Util
-	public static boolean sendTokenPatternQuery(String token) {
+	public static boolean sendTokenPatternQuery(String token, String eventtopic) {
 		
 		String defaultQueryString = GetPredefinedPattern.getPattern("play-epsparql-m12-jeans-example-query.eprq");
 		String queryString = defaultQueryString.replaceAll("\"JEANS\"", "\"" + token + "\"");
@@ -269,7 +270,7 @@ public class WebService extends Controller {
 		QueryDispatchApi queryDispatchApi = service.getPort(QueryDispatchApi.class);
 
 		try {
-		String s = queryDispatchApi.registerQuery("patternId_" + Math.random(), queryString, "http://streams.event-processing.org/ids/FacebookCEPResults");
+		String s = queryDispatchApi.registerQuery("patternId_" + Math.random(),queryString, eventtopic);
 		Logger.info(s);
 		} catch (Exception e) {
 		Logger.error(e.toString());
@@ -296,19 +297,14 @@ public class WebService extends Controller {
 
 		String s = queryDispatchApi.registerQuery("patternId_" + Math.random(),queryString, eventtopic);
 		Logger.info(s);
-//		} catch (Exception e) {
-//		Logger.error(e.toString());
-//		return false;
-//		}
 		return true;
-
 	}
 
 	/**
 	 * Notify action triggered by buttons on the web interface Generates a
 	 * Facebook status event event and sends it to the DSB
 	 */
-	public static void testFacebookStatusFeedEvent() {
+	public static void testFacebookStatusFeedEvent() throws ModelRuntimeException, IOException {
 		String eventId = Stream.FacebookStatusFeed.getUri() + new SecureRandom().nextLong();
 
 		FacebookStatusFeedEvent event = new FacebookStatusFeedEvent(EventHelpers.createEmptyModel(eventId),
@@ -321,7 +317,8 @@ public class WebService extends Controller {
 		event.setUserLocation("Karlsruhe, Germany");
 		event.setEndTime(Calendar.getInstance());
 		event.setStream(new URIImpl(Stream.FacebookStatusFeed.getUri()));
-		// FIXME do something here
+		event.getModel().writeTo(System.out, Syntax.Turtle);
+		System.out.println();
 	}
 
 	/**

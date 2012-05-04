@@ -31,6 +31,7 @@ import org.event_processing.events.types.FacebookStatusFeedEvent;
 import org.jdom.input.SAXBuilder;
 import org.ontoware.rdf2go.model.Model;
 import org.ontoware.rdf2go.model.Statement;
+import org.ontoware.rdf2go.model.Syntax;
 import org.ontoware.rdf2go.model.node.Variable;
 import org.ontoware.rdf2go.model.node.impl.URIImpl;
 import org.ontoware.rdf2go.vocabulary.RDF;
@@ -125,7 +126,7 @@ public class WebService extends Controller {
 			ModelManager
 					.get()
 					.getTopicById(topicId)
-					.multicast(new models.eventstream.RdfEvent(eventTitle, rdf));
+					.multicast(new models.eventstream.Event(eventTitle, rdf.serialize(Syntax.Turtle)));
 		} catch (Exception e) {
 			Logger.info("No RDF event was found from HTTP request. Maybe an XML event.");
 			eventTitle = "XML Event";

@@ -48,6 +48,7 @@ import play.Play;
 import play.mvc.Controller;
 import play.mvc.Router;
 import play.mvc.Util;
+import play.utils.HTML;
 
 import com.ebmwebsourcing.easycommons.xml.XMLHelper;
 import com.ebmwebsourcing.wsstar.basefaults.datatypes.impl.impl.WsrfbfModelFactoryImpl;
@@ -124,7 +125,7 @@ public class WebService extends Controller {
 			ModelManager
 					.get()
 					.getTopicById(topicId)
-					.multicast(new models.eventstream.Event(eventTitle, rdf.serialize(Syntax.Turtle)));
+					.multicast(new models.eventstream.Event(eventTitle, HTML.htmlEscape(rdf.serialize(Syntax.Turtle)).replaceAll("\n", "<br/>")));
 		} catch (Exception e) {
 			eventTitle = "XML Event";
 			ModelManager

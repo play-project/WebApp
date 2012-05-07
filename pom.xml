@@ -74,13 +74,6 @@
 					<outputDirectory>lib/</outputDirectory>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<configuration>
-					<outputDirectory>lib/</outputDirectory>
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
 

@@ -121,9 +121,9 @@ public class Application extends Controller {
 		render();
 	}
 
-	public static void processTokenPatternQuery(String token) {
+	public static void processTokenPatternQuery(String token, String eventtopic) {
 		if (token != null && token != "") {
-			Boolean result = WebService.sendTokenPatternQuery(token);
+			Boolean result = WebService.sendTokenPatternQuery(token, eventtopic);
 			if (!result) {
 				flash.error("The operation encoutered an error.");
 			}

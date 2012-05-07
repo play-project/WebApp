@@ -72,6 +72,11 @@
 				<artifactId>maven-dependency-plugin</artifactId>
 				<configuration>
 					<outputDirectory>lib/</outputDirectory>
+					<!-- The combination of these switches should not leave stale files in lib/ -->
+					<stripVersion>true</stripVersion>
+					<overWriteIfNewer>true</overWriteIfNewer>
+					<overWriteReleases>true</overWriteReleases>
+					<overWriteSnapshots>true</overWriteSnapshots>
 				</configuration>
 			</plugin>
 		</plugins>

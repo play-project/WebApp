@@ -63,6 +63,7 @@ import com.ebmwebsourcing.wsstar.wsnb.services.impl.util.Wsnb4ServUtils;
 import com.hp.hpl.jena.query.QuerySolution;
 
 import eu.play_project.play_commons.constants.Constants;
+import eu.play_project.play_commons.eventformat.EventFormatHelpers;
 import eu.play_project.play_commons.eventformat.Stream;
 import eu.play_project.play_commons.eventtypes.EventHelpers;
 import eu.play_project.play_eventadapter.AbstractReceiver;
@@ -98,6 +99,7 @@ public class WebService extends Controller {
 	public static void soapNotifEndPoint(String topicId) {
 
 		String eventTitle;
+		String eventText;
 		String notifyMessage;
 		
 		// A trick to read a Stream into to String:
@@ -115,25 +117,25 @@ public class WebService extends Controller {
 					Variable.ANY);
 			if (it.hasNext()) {
 				Statement stat = it.next();
-				String eventType = stat.getObject().asURI().asJavaURI().getPath();
-				eventType = eventType.substring(eventType.lastIndexOf("/") + 1);
-
-				eventTitle = eventType;
+				eventTitle = stat.getObject().asURI().asJavaURI().getPath();
+				eventTitle = eventTitle.substring(eventTitle.lastIndexOf("/") + 1);
 			} else {
 				eventTitle = "RDF Event";
 			}
+			eventText = HTML.htmlEscape(rdf.serialize(Syntax.Turtle)).replaceAll("\n", "<br />").replaceAll("\\s{4}", "&nbsp;&nbsp;&nbsp;&nbsp;");
 			ModelManager
 					.get()
 					.getTopicById(topicId)
-					.multicast(new models.eventstream.Event(eventTitle, HTML.htmlEscape(rdf.serialize(Syntax.Turtle)).replaceAll("\n", "<br/>")));
+					.multicast(new models.eventstream.Event(eventTitle, eventText));
 		} catch (Exception e) {
 			eventTitle = "XML Event";
+			eventText = HTML.htmlEscape(EventFormatHelpers.unwrapFromNativeMessageElement(notifyMessage)).replaceAll("\n", "<br />").replaceAll("\\s{4}", "&nbsp;&nbsp;&nbsp;&nbsp;");
 			ModelManager
 					.get()
 					.getTopicById(topicId)
 					.multicast(
 							new models.eventstream.Event(eventTitle,
-									notifyMessage));
+									eventText));
 		} 
 	}
 

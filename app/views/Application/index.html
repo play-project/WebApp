@@ -3,8 +3,7 @@
 #{set nobanner:true /}
 #{set nofooter:true /}
 
-<link rel="stylesheet" media="screen"
-	href="@{'/public/stylesheets/tabsindex.css'}">
+<link rel="stylesheet" media="screen" href="@{'/public/stylesheets/tabsindex.css'}">
 
 #{if su != null}
 <div id="indextitle">
@@ -54,9 +53,7 @@
 <div id="topics">
 	<div id="tabs">
 		<ul id="topic-tabs">
-			<li><a href="#tab-alltopics"><span id="unread-all"
-					class="unread-count">0</span>All topics</a>
-			</li> 
+			<li><a href="#tab-alltopics"><span id="unread-all" class="unread-count">0</span>All topics</a></li> 
 			%{ for(int i=0; i < userTopics.size(); i++){
 			}%
 			<li><a href="#tab-topic-${userTopics.get(i).getId()}"><span

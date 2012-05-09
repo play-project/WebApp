@@ -3,8 +3,7 @@
 #{set nobanner:true /}
 #{set nofooter:true /}
 
-<link rel="stylesheet" media="screen"
-	href="@{'/public/stylesheets/tabsindex.css'}">
+<link rel="stylesheet" media="screen" href="@{'/public/stylesheets/tabsindex.css'}">
 
 <h1>Historical Events</h1>
 
@@ -13,7 +12,8 @@
 		<ul id="topic-tabs">
 			%{ for(int i=0; i < userTopics.size(); i++){
 			}%
-			<li><a href="#tab-topic-${userTopics.get(i).getId()}">${userTopics.get(i).title}
+			<li><a href="#tab-topic-${userTopics.get(i).getId()}">
+				<span class="subscribed-topic-title">${userTopics.get(i).title}</span>
 				<img src="${userTopics.get(i).icon}" class="tab-topic-icon"></a>
 			</li>
 			%{

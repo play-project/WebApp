@@ -30,6 +30,7 @@ import models.eventstream.EventTopic;
 
 import org.event_processing.events.types.FacebookStatusFeedEvent;
 import org.jdom.input.SAXBuilder;
+import org.mortbay.log.Log;
 import org.ontoware.rdf2go.exception.ModelRuntimeException;
 import org.ontoware.rdf2go.model.Model;
 import org.ontoware.rdf2go.model.Statement;
@@ -108,9 +109,12 @@ public class WebService extends Controller {
 		} catch (java.util.NoSuchElementException e) {
 		        notifyMessage = "";
 		}
-
+		
 		Model rdf;
 		try {
+			/*
+			 * Deal with RDF events:
+			 */
 			rdf = receiver.parseRdf(notifyMessage);
 			// If we found RDF
 			Iterator<Statement> it = rdf.findStatements(Variable.ANY, RDF.type,
@@ -128,7 +132,10 @@ public class WebService extends Controller {
 					.getTopicById(topicId)
 					.multicast(new models.eventstream.Event(eventTitle, eventText));
 		} catch (Exception e) {
-			eventTitle = "XML Event";
+			/*
+			 * Deal with non-RDF events:
+			 */
+			eventTitle = "Event";
 			eventText = HTML.htmlEscape(EventFormatHelpers.unwrapFromNativeMessageElement(notifyMessage)).replaceAll("\n", "<br />").replaceAll("\\s{4}", "&nbsp;&nbsp;&nbsp;&nbsp;");
 			ModelManager
 					.get()

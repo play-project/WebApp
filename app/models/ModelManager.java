@@ -34,7 +34,7 @@ public class ModelManager {
 
 	public static ModelManager instance = null;
 	private List<User> connectedUsers = Collections.synchronizedList(new ArrayList<User>());
-	private ArrayList<EventTopic> topics = new ArrayList<EventTopic>();
+	private ArrayList<EventTopic> topics;
 
 	/**
 	 * ModelManager initialization

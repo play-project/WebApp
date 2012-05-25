@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import static eu.play_project.play_commons.constants.Event.EVENT_ID_SUFFIX;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
@@ -30,7 +31,6 @@ import models.eventstream.EventTopic;
 
 import org.event_processing.events.types.FacebookStatusFeedEvent;
 import org.jdom.input.SAXBuilder;
-import org.mortbay.log.Log;
 import org.ontoware.rdf2go.exception.ModelRuntimeException;
 import org.ontoware.rdf2go.model.Model;
 import org.ontoware.rdf2go.model.Statement;
@@ -65,7 +65,7 @@ import com.hp.hpl.jena.query.QuerySolution;
 
 import eu.play_project.play_commons.constants.Constants;
 import eu.play_project.play_commons.eventformat.EventFormatHelpers;
-import eu.play_project.play_commons.eventformat.Stream;
+import eu.play_project.play_commons.constants.Stream;
 import eu.play_project.play_commons.eventtypes.EventHelpers;
 import eu.play_project.play_eventadapter.AbstractReceiver;
 import eu.play_project.play_platformservices.api.QueryDispatchApi;
@@ -78,8 +78,6 @@ import fr.inria.eventcloud.api.wrappers.ResultSetWrapper;
  * @author Alexandre Bourdin
  */
 public class WebService extends Controller {
-
-	private static boolean m12QueryLoaded = false;
 	public static String DSB_RESOURCE_SERVICE = Constants.getProperties().getProperty("dsb.notify.endpoint");
 	public static String EC_PUTGET_SERVICE = Constants.getProperties().getProperty(
 			"eventcloud.default.putget.endpoint");
@@ -110,7 +108,12 @@ public class WebService extends Controller {
 		} catch (java.util.NoSuchElementException e) {
 			notifyMessage = "";
 		}
-
+		
+		// Print some event to debug android output:
+		if (ModelManager.get().getTopicById(topicId).getId().equals("s_FacebookCepResults")) {
+			Logger.info(notifyMessage);		
+		}
+		
 		Model rdf;
 		try {
 			/*
@@ -147,7 +150,11 @@ public class WebService extends Controller {
 	 */
 	@Util
 	public static ArrayList<EventTopic> getSupportedTopics() {
+		Logger.info("Getting topics from DSB at %s", DSB_RESOURCE_SERVICE);
+		
 		INotificationProducerRP resourceClient = new HTTPNotificationProducerRPClient(DSB_RESOURCE_SERVICE);
+
+		ArrayList<EventTopic> topics = new ArrayList<EventTopic>();
 
 		try {
 			QName qname = WstopConstants.TOPIC_SET_QNAME;
@@ -162,18 +169,16 @@ public class WebService extends Controller {
 			SAXBuilder sxb = new SAXBuilder();
 			org.jdom.Document xml = new org.jdom.Document();
 			org.jdom.Element root = null;
-			ArrayList<EventTopic> topics = new ArrayList<EventTopic>();
 			xml = sxb.build(new StringReader(topicsString));
 			root = xml.getRootElement();
 
 			SupportedTopicsXML.parseXMLTree(topics, root, "");
 
-			return topics;
 		} catch (Exception e) {
-			e.printStackTrace();
+			Logger.warn(e, "A problem occurred while fetching the list of available topics from the DSB. Continuing with empty set of topics.");
 		}
 
-		return null;
+		return topics;
 	}
 
 	/**
@@ -315,7 +320,7 @@ public class WebService extends Controller {
 		String eventId = Stream.FacebookStatusFeed.getUri() + new SecureRandom().nextLong();
 
 		FacebookStatusFeedEvent event = new FacebookStatusFeedEvent(EventHelpers.createEmptyModel(eventId),
-				eventId + "#event", true);
+				eventId + EVENT_ID_SUFFIX, true);
 
 		event.setName("Roland Stühmer");
 		event.setId("100000058455726");

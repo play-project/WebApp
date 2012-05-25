@@ -30,7 +30,7 @@ div#topics {
 
 .ui-tabs-vertical .ui-tabs-nav li a {
 	display: block;
-	width: 90%;
+	width: 92%;
 }
 
 .ui-tabs-vertical .ui-tabs-nav li.ui-tabs-selected {
@@ -98,7 +98,7 @@ img.tab-topic-icon {
 	position:absolute;
 	width:16px;
 	height:16px;
-	margin-left: 10px;
+	margin-left: 8px;
 }
 
 .subscribed-topic-title {

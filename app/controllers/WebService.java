@@ -78,13 +78,14 @@ import fr.inria.eventcloud.api.wrappers.ResultSetWrapper;
  * @author Alexandre Bourdin
  */
 public class WebService extends Controller {
-	
+
 	private static boolean m12QueryLoaded = false;
 	public static String DSB_RESOURCE_SERVICE = Constants.getProperties().getProperty("dsb.notify.endpoint");
 	public static String EC_PUTGET_SERVICE = Constants.getProperties().getProperty(
 			"eventcloud.default.putget.endpoint");
-	private static AbstractReceiver receiver = new AbstractReceiver() {};
-	
+	private static AbstractReceiver receiver = new AbstractReceiver() {
+	};
+
 	static {
 		Wsnb4ServUtils.initModelFactories(new WsrfbfModelFactoryImpl(), new WsrfrModelFactoryImpl(),
 				new WsrfrlModelFactoryImpl(), new WsrfrpModelFactoryImpl(), new WstopModelFactoryImpl(),
@@ -102,14 +103,14 @@ public class WebService extends Controller {
 		String eventTitle;
 		String eventText;
 		String notifyMessage;
-		
+
 		// A trick to read a Stream into to String:
 		try {
-		        notifyMessage = new java.util.Scanner(request.body).useDelimiter("\\A").next();
+			notifyMessage = new java.util.Scanner(request.body).useDelimiter("\\A").next();
 		} catch (java.util.NoSuchElementException e) {
-		        notifyMessage = "";
+			notifyMessage = "";
 		}
-		
+
 		Model rdf;
 		try {
 			/*
@@ -117,8 +118,7 @@ public class WebService extends Controller {
 			 */
 			rdf = receiver.parseRdf(notifyMessage);
 			// If we found RDF
-			Iterator<Statement> it = rdf.findStatements(Variable.ANY, RDF.type,
-					Variable.ANY);
+			Iterator<Statement> it = rdf.findStatements(Variable.ANY, RDF.type, Variable.ANY);
 			if (it.hasNext()) {
 				Statement stat = it.next();
 				eventTitle = stat.getObject().asURI().asJavaURI().getPath();
@@ -126,24 +126,20 @@ public class WebService extends Controller {
 			} else {
 				eventTitle = "RDF Event";
 			}
-			eventText = HTML.htmlEscape(rdf.serialize(Syntax.Turtle)).replaceAll("\n", "<br />").replaceAll("\\s{4}", "&nbsp;&nbsp;&nbsp;&nbsp;");
-			ModelManager
-					.get()
-					.getTopicById(topicId)
+			eventText = HTML.htmlEscape(rdf.serialize(Syntax.Turtle)).replaceAll("\n", "<br />")
+					.replaceAll("\\s{4}", "&nbsp;&nbsp;&nbsp;&nbsp;");
+			ModelManager.get().getTopicById(topicId)
 					.multicast(new models.eventstream.Event(eventTitle, eventText));
 		} catch (Exception e) {
 			/*
 			 * Deal with non-RDF events:
 			 */
 			eventTitle = "Event";
-			eventText = HTML.htmlEscape(EventFormatHelpers.unwrapFromNativeMessageElement(notifyMessage)).replaceAll("\n", "<br />").replaceAll("\\s{4}", "&nbsp;&nbsp;&nbsp;&nbsp;");
-			ModelManager
-					.get()
-					.getTopicById(topicId)
-					.multicast(
-							new models.eventstream.Event(eventTitle,
-									eventText));
-		} 
+			eventText = HTML.htmlEscape(EventFormatHelpers.unwrapFromNativeMessageElement(notifyMessage))
+					.replaceAll("\n", "<br />").replaceAll("\\s{4}", "&nbsp;&nbsp;&nbsp;&nbsp;");
+			ModelManager.get().getTopicById(topicId)
+					.multicast(new models.eventstream.Event(eventTitle, eventText));
+		}
 	}
 
 	/**
@@ -234,7 +230,7 @@ public class WebService extends Controller {
 	@Util
 	public static ArrayList<models.eventstream.Event> getHistorical(EventTopic et) {
 		ArrayList<models.eventstream.Event> events = new ArrayList<models.eventstream.Event>();
-		
+
 		PutGetClient pgc = new PutGetClient(EC_PUTGET_SERVICE);
 
 		SparqlSelectResponse response = pgc
@@ -263,15 +259,16 @@ public class WebService extends Controller {
 
 	@Util
 	public static boolean sendTokenPatternQuery(String token, String eventtopic) {
-		
-		String defaultQueryString = GetPredefinedPattern.getPattern("play-epsparql-m12-jeans-example-query.eprq");
+
+		String defaultQueryString = GetPredefinedPattern
+				.getPattern("play-epsparql-m12-jeans-example-query.eprq");
 		String queryString = defaultQueryString.replaceAll("\"JEANS\"", "\"" + token + "\"");
-		
+
 		URL wsdl = null;
 		try {
-		wsdl = new URL("http://demo.play-project.eu:8085/play/QueryDispatchApi?wsdl");
+			wsdl = new URL("http://demo.play-project.eu:8085/play/QueryDispatchApi?wsdl");
 		} catch (MalformedURLException e) {
-		e.printStackTrace();
+			e.printStackTrace();
 		}
 
 		QName serviceName = new QName("http://play_platformservices.play_project.eu/", "QueryDispatchApi");
@@ -280,32 +277,32 @@ public class WebService extends Controller {
 		QueryDispatchApi queryDispatchApi = service.getPort(QueryDispatchApi.class);
 
 		try {
-		String s = queryDispatchApi.registerQuery("patternId_" + Math.random(),queryString, eventtopic);
-		Logger.info(s);
+			String s = queryDispatchApi.registerQuery("patternId_" + Math.random(), queryString, eventtopic);
+			Logger.info(s);
 		} catch (Exception e) {
-		Logger.error(e.toString());
-		return false;
+			Logger.error(e.toString());
+			return false;
 		}
 		return true;
 	}
 
-	public static Boolean sendFullPatternQuery(String queryString, String eventtopic) throws com.hp.hpl.jena.query.QueryParseException{
-		
+	public static Boolean sendFullPatternQuery(String queryString, String eventtopic)
+			throws com.hp.hpl.jena.query.QueryParseException {
+
 		URL wsdl = null;
 		try {
-		wsdl = new URL("http://demo.play-project.eu:8085/play/QueryDispatchApi?wsdl");
+			wsdl = new URL("http://demo.play-project.eu:8085/play/QueryDispatchApi?wsdl");
 		} catch (MalformedURLException e) {
-		e.printStackTrace();
+			e.printStackTrace();
 		}
 
 		QName serviceName = new QName("http://play_platformservices.play_project.eu/", "QueryDispatchApi");
 
 		Service service = Service.create(wsdl, serviceName);
 		QueryDispatchApi queryDispatchApi = service
-		.getPort(eu.play_project.play_platformservices.api.QueryDispatchApi.class);
+				.getPort(eu.play_project.play_platformservices.api.QueryDispatchApi.class);
 
-
-		String s = queryDispatchApi.registerQuery("patternId_" + Math.random(),queryString, eventtopic);
+		String s = queryDispatchApi.registerQuery("patternId_" + Math.random(), queryString, eventtopic);
 		Logger.info(s);
 		return true;
 	}
@@ -371,17 +368,17 @@ public class WebService extends Controller {
 		}
 	}
 
-	private String getSparqlQuerys(String queryFile){
+	private String getSparqlQuerys(String queryFile) {
 		try {
 			InputStream is = this.getClass().getClassLoader().getResourceAsStream(queryFile);
-			BufferedReader br =new BufferedReader(new InputStreamReader(is));
+			BufferedReader br = new BufferedReader(new InputStreamReader(is));
 			StringBuffer sb = new StringBuffer();
 			String line;
-			
+
 			while (null != (line = br.readLine())) {
-					sb.append(line);
+				sb.append(line);
 			}
-			//System.out.println(sb.toString());
+			// System.out.println(sb.toString());
 			br.close();
 			is.close();
 
@@ -391,6 +388,6 @@ public class WebService extends Controller {
 			e.printStackTrace();
 		}
 		return null;
-	
+
 	}
 }

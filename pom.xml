@@ -118,6 +118,18 @@
 					<artifactId>hibernate-commons-annotations</artifactId>
 					<groupId>org.hibernate</groupId>
 				</exclusion>
+				<exclusion>
+					<groupId>org.objectweb.proactive</groupId>
+					<artifactId>proactive-programming-bundle</artifactId>		
+				</exclusion>
+				<exclusion>
+					<groupId>org.ow2.proactive</groupId>
+					<artifactId>scheduling-common-core</artifactId>		
+				</exclusion>
+				<exclusion>
+					<groupId>org.ow2.proactive</groupId>
+					<artifactId>scheduling-scheduler-core</artifactId>		
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>

@@ -46,7 +46,7 @@ nobanner:true /} #{set nofooter:true /}
 					<fieldset>
 						<legend>Event Topic for query :</legend>
 						Enter a topic name : <input type="text" name="eventtopic" required="required"
-							value="http://streams.event-processing.org/ids/FacebookCEPResults"
+							value="${eu.play_project.play_commons.constants.Stream.Stream.FacebookCepResults.getTopicUri()}"
 							size="80" />
 					</fieldset>
 					<input type="submit" value="Send query" />
@@ -77,7 +77,7 @@ nobanner:true /} #{set nofooter:true /}
 					<fieldset>
 						<legend>Event Topic for query :</legend>
 						Enter en topic name : <input type="text" name="eventtopic-name"
-							value="http://streams.event-processing.org/ids/FacebookCEPResults"
+							value="${eu.play_project.play_commons.constants.Stream.Stream.FacebookCepResults.getTopicUri()}"
 							size="80" />
 					</fieldset>
 					<input type="submit" value="Send query" />
@@ -91,7 +91,7 @@ nobanner:true /} #{set nofooter:true /}
 					method="POST">
 					<fieldset>
 						<legend>Here, you can write the full EP-SPARQL query :</legend>
-						<textarea id="text" name="text" type="text" cols="60" rows="24">
+						<textarea id="text" name="text" type="text" cols="90" rows="24">
 ${models.PredefinedPatterns.getPattern("play-epsparql-m12-jeans-example-query.eprq")}
 						</textarea>
 					</fieldset>
@@ -111,7 +111,7 @@ ${models.PredefinedPatterns.getPattern("play-epsparql-m12-jeans-example-query.ep
 					<fieldset>
 						<legend>Event Topic for query :</legend>
 						Enter en topic name : <input type="text" name="eventtopic" required="required"
-							value="http://streams.event-processing.org/ids/FacebookCEPResults"
+							value="${eu.play_project.play_commons.constants.Stream.Stream.FacebookCepResults.getTopicUri()}"
 							size="80" />
 					</fieldset>
 					<input type="submit" value="Send query" />

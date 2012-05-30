@@ -110,10 +110,10 @@ public class WebService extends Controller {
 		        notifyMessage = "";
 		}
 		
-		// Print some event to debug android output:
-		if (ModelManager.get().getTopicById(topicId).getId().equals("s_FacebookCepResults")) {
-			Logger.info(notifyMessage);		
-		}
+//		// Print some event to debug android output:
+//		if (ModelManager.get().getTopicById(topicId).getId().equals("s_FacebookCepResults")) {
+//			Logger.info(notifyMessage);		
+//		}
 		
 		Model rdf;
 		try {

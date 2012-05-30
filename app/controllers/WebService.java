@@ -2,16 +2,9 @@ package controllers;
 
 import static eu.play_project.play_commons.constants.Event.EVENT_ID_SUFFIX;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -46,7 +39,6 @@ import org.petalslink.dsb.notification.commons.NotificationException;
 import org.w3c.dom.Document;
 
 import play.Logger;
-import play.Play;
 import play.mvc.Controller;
 import play.mvc.Router;
 import play.mvc.Util;
@@ -110,10 +102,10 @@ public class WebService extends Controller {
 		        notifyMessage = "";
 		}
 		
-//		// Print some event to debug android output:
-//		if (ModelManager.get().getTopicById(topicId).getId().equals("s_FacebookCepResults")) {
-//			Logger.info(notifyMessage);		
-//		}
+		// Print some event to debug android output:
+		//if (ModelManager.get().getTopicById(topicId).getId().equals("s_PachubeFeed")) {
+		//	Logger.info(notifyMessage);		
+		//}
 		
 		Model rdf;
 		try {
@@ -131,6 +123,7 @@ public class WebService extends Controller {
 			} else {
 				eventTitle = "RDF Event";
 			}
+			
 			eventText = HTML.htmlEscape(rdf.serialize(Syntax.Turtle)).replaceAll("\n", "<br />").replaceAll("\\s{4}", "&nbsp;&nbsp;&nbsp;&nbsp;");
 			ModelManager
 					.get()
@@ -338,66 +331,4 @@ public class WebService extends Controller {
 		System.out.println();
 	}
 
-	/**
-	 * Puts the content of a file on an InputStream
-	 * 
-	 * @param file
-	 * @return
-	 */
-	@Util
-	private static InputStream inputStreamFrom(String file) {
-		InputStream is = null;
-
-		if (file != null) {
-			try {
-				is = new FileInputStream(Play.getFile(file));
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-		}
-
-		return is;
-	}
-
-	@Util
-	private static URI generateRandomUri() {
-		String legalChars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-		StringBuilder result = new StringBuilder("http://www.inria.fr/");
-		SecureRandom random = new SecureRandom();
-
-		for (int i = 0; i < 20; i++) {
-			result.append(random.nextInt(legalChars.length()));
-		}
-
-		try {
-			return new URI(result.toString());
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	private String getSparqlQuerys(String queryFile){
-		try {
-			InputStream is = this.getClass().getClassLoader().getResourceAsStream(queryFile);
-			BufferedReader br =new BufferedReader(new InputStreamReader(is));
-			StringBuffer sb = new StringBuffer();
-			String line;
-			
-			while (null != (line = br.readLine())) {
-					sb.append(line);
-			}
-			//System.out.println(sb.toString());
-			br.close();
-			is.close();
-
-			return sb.toString();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	
-	}
 }

@@ -13,10 +13,11 @@ import javax.management.RuntimeErrorException;
  *
  */
 public class PredefinedPatterns {
+	
 	private static PredefinedPatterns instance;
 	private static HashMap<String,String> loadedPattern;
 
-	public PredefinedPatterns() {
+	static {
 		loadedPattern = new HashMap<String,String> ();
 		loadedPattern.put("play-epsparql-m12-jeans-example-query.eprq", getPatternFormFile("play-epsparql-m12-jeans-example-query.eprq"));
 	}
@@ -31,12 +32,12 @@ public class PredefinedPatterns {
 		return loadedPattern.get(patternName);
 	}
 	
-	private String getPatternFormFile(String queryFile){
+	private static String getPatternFormFile(String queryFile){
 	
 		final String separator = System.getProperty("line.separator");
 		
 		try {
-			InputStream is = this.getClass().getClassLoader().getResourceAsStream(queryFile);
+			InputStream is = PredefinedPatterns.class.getClassLoader().getResourceAsStream(queryFile);
 			BufferedReader br =new BufferedReader(new InputStreamReader(is));
 			StringBuffer sb = new StringBuffer();
 			String line;

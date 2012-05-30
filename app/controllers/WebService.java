@@ -24,8 +24,8 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
 import models.BoyerMoore;
-import models.PredefinedPatterns;
 import models.ModelManager;
+import models.PredefinedPatterns;
 import models.PutGetClient;
 import models.SupportedTopicsXML;
 import models.eventstream.EventTopic;
@@ -84,7 +84,6 @@ public class WebService extends Controller {
 	public static String EC_PUTGET_SERVICE = Constants.getProperties().getProperty(
 			"eventcloud.default.putget.endpoint");
 	private static AbstractReceiver receiver = new AbstractReceiver() {};
-	private static PredefinedPatterns predefinedPatterns = new PredefinedPatterns();
 	
 	static {
 		Wsnb4ServUtils.initModelFactories(new WsrfbfModelFactoryImpl(), new WsrfrModelFactoryImpl(),
@@ -272,7 +271,7 @@ public class WebService extends Controller {
 	@Util
 	public static boolean sendTokenPatternQuery(String token, String eventtopic) {
 		
-		String defaultQueryString = predefinedPatterns.getPattern("play-epsparql-m12-jeans-example-query.eprq");
+		String defaultQueryString = PredefinedPatterns.getPattern("play-epsparql-m12-jeans-example-query.eprq");
 		String queryString = defaultQueryString.replaceAll("\"JEANS\"", "\"" + token + "\"");
 		
 		URL wsdl = null;

@@ -123,8 +123,11 @@ public class WebService extends Controller {
 			} else {
 				eventTitle = "RDF Event";
 			}
-			
-			eventText = HTML.htmlEscape(rdf.serialize(Syntax.Turtle)).replaceAll("\n", "<br />").replaceAll("\\s{4}", "&nbsp;&nbsp;&nbsp;&nbsp;");
+
+			eventText = rdf.serialize(Syntax.Turtle);
+			eventText = eventText.replaceAll("@prefix.*?> \\.", "").trim(); // FIXME stuehmer: this is a hack to hide the many namespace declarations... we should nicely "fold"/"collapse" instead of deleting
+			eventText = HTML.htmlEscape(eventText).replaceAll("\n", "<br />").replaceAll("\\s{4}", "&nbsp;&nbsp;&nbsp;&nbsp;");
+
 			ModelManager
 					.get()
 					.getTopicById(topicId)

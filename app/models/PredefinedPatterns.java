@@ -12,11 +12,11 @@ import javax.management.RuntimeErrorException;
  * @author sobermeier
  *
  */
-public class GetPredefinedPattern {
-	private static GetPredefinedPattern instance;
+public class PredefinedPatterns {
+	private static PredefinedPatterns instance;
 	private static HashMap<String,String> loadedPattern;
 
-	private GetPredefinedPattern(){
+	public PredefinedPatterns() {
 		loadedPattern = new HashMap<String,String> ();
 		loadedPattern.put("play-epsparql-m12-jeans-example-query.eprq", getPatternFormFile("play-epsparql-m12-jeans-example-query.eprq"));
 	}
@@ -25,13 +25,16 @@ public class GetPredefinedPattern {
 	public static String getPattern(String patternName){
 		
 		if(instance==null){
-			instance = new GetPredefinedPattern();
+			instance = new PredefinedPatterns();
 		}
 		
 		return loadedPattern.get(patternName);
 	}
 	
 	private String getPatternFormFile(String queryFile){
+	
+		final String separator = System.getProperty("line.separator");
+		
 		try {
 			InputStream is = this.getClass().getClassLoader().getResourceAsStream(queryFile);
 			BufferedReader br =new BufferedReader(new InputStreamReader(is));
@@ -40,6 +43,7 @@ public class GetPredefinedPattern {
 			
 			while (null != (line = br.readLine())) {
 					sb.append(line);
+					sb.append(separator);
 			}
 			br.close();
 			is.close();

@@ -1,5 +1,7 @@
 package controllers;
 
+import static eu.play_project.play_commons.constants.Event.EVENT_ID_SUFFIX;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -18,12 +20,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import static eu.play_project.play_commons.constants.Event.EVENT_ID_SUFFIX;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
 import models.BoyerMoore;
-import models.GetPredefinedPattern;
+import models.PredefinedPatterns;
 import models.ModelManager;
 import models.PutGetClient;
 import models.SupportedTopicsXML;
@@ -64,8 +65,8 @@ import com.ebmwebsourcing.wsstar.wsnb.services.impl.util.Wsnb4ServUtils;
 import com.hp.hpl.jena.query.QuerySolution;
 
 import eu.play_project.play_commons.constants.Constants;
-import eu.play_project.play_commons.eventformat.EventFormatHelpers;
 import eu.play_project.play_commons.constants.Stream;
+import eu.play_project.play_commons.eventformat.EventFormatHelpers;
 import eu.play_project.play_commons.eventtypes.EventHelpers;
 import eu.play_project.play_eventadapter.AbstractReceiver;
 import eu.play_project.play_platformservices.api.QueryDispatchApi;
@@ -83,6 +84,7 @@ public class WebService extends Controller {
 	public static String EC_PUTGET_SERVICE = Constants.getProperties().getProperty(
 			"eventcloud.default.putget.endpoint");
 	private static AbstractReceiver receiver = new AbstractReceiver() {};
+	private static PredefinedPatterns predefinedPatterns = new PredefinedPatterns();
 	
 	static {
 		Wsnb4ServUtils.initModelFactories(new WsrfbfModelFactoryImpl(), new WsrfrModelFactoryImpl(),
@@ -270,7 +272,7 @@ public class WebService extends Controller {
 	@Util
 	public static boolean sendTokenPatternQuery(String token, String eventtopic) {
 		
-		String defaultQueryString = GetPredefinedPattern.getPattern("play-epsparql-m12-jeans-example-query.eprq");
+		String defaultQueryString = predefinedPatterns.getPattern("play-epsparql-m12-jeans-example-query.eprq");
 		String queryString = defaultQueryString.replaceAll("\"JEANS\"", "\"" + token + "\"");
 		
 		URL wsdl = null;
@@ -286,7 +288,7 @@ public class WebService extends Controller {
 		QueryDispatchApi queryDispatchApi = service.getPort(QueryDispatchApi.class);
 
 		try {
-		String s = queryDispatchApi.registerQuery("patternId_" + Math.random(),queryString, eventtopic);
+		String s = queryDispatchApi.registerQuery("patternId_" + Math.random(), queryString, eventtopic);
 		Logger.info(s);
 		} catch (Exception e) {
 		Logger.error(e.toString());
@@ -311,7 +313,7 @@ public class WebService extends Controller {
 		.getPort(eu.play_project.play_platformservices.api.QueryDispatchApi.class);
 
 
-		String s = queryDispatchApi.registerQuery("patternId_" + Math.random(),queryString, eventtopic);
+		String s = queryDispatchApi.registerQuery("patternId_" + Math.random(), queryString, eventtopic);
 		Logger.info(s);
 		return true;
 	}

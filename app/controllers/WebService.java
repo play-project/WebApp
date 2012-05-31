@@ -1,15 +1,10 @@
 package controllers;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import static eu.play_project.play_commons.constants.Event.EVENT_ID_SUFFIX;
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -19,13 +14,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static eu.play_project.play_commons.constants.Event.EVENT_ID_SUFFIX;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
 import models.BoyerMoore;
-import models.GetPredefinedPattern;
 import models.ModelManager;
+import models.PredefinedPatterns;
 import models.SupportedTopicsXML;
 import models.eventstream.EventTopic;
 
@@ -45,7 +39,6 @@ import org.petalslink.dsb.notification.commons.NotificationException;
 import org.w3c.dom.Document;
 
 import play.Logger;
-import play.Play;
 import play.mvc.Controller;
 import play.mvc.Router;
 import play.mvc.Util;
@@ -64,8 +57,8 @@ import com.ebmwebsourcing.wsstar.wsnb.services.impl.util.Wsnb4ServUtils;
 import com.hp.hpl.jena.query.QuerySolution;
 
 import eu.play_project.play_commons.constants.Constants;
-import eu.play_project.play_commons.eventformat.EventFormatHelpers;
 import eu.play_project.play_commons.constants.Stream;
+import eu.play_project.play_commons.eventformat.EventFormatHelpers;
 import eu.play_project.play_commons.eventtypes.EventHelpers;
 import eu.play_project.play_eventadapter.AbstractReceiver;
 import eu.play_project.play_platformservices.api.QueryDispatchApi;
@@ -86,7 +79,8 @@ public class WebService extends Controller {
 	public static String DSB_RESOURCE_SERVICE = Constants.getProperties().getProperty("dsb.notify.endpoint");
 	public static String EC_MANAGEMENT_WS_SERVICE = Constants.getProperties().getProperty(
 			"eventcloud.default.putget.endpoint");
-	private static AbstractReceiver receiver = new AbstractReceiver() {};
+	private static AbstractReceiver receiver = new AbstractReceiver() {
+	};
 
 	static {
 		Wsnb4ServUtils.initModelFactories(new WsrfbfModelFactoryImpl(), new WsrfrModelFactoryImpl(),
@@ -114,10 +108,11 @@ public class WebService extends Controller {
 		}
 
 		// Print some event to debug android output:
-		if (ModelManager.get().getTopicById(topicId).getId().equals("s_FacebookCepResults")) {
-			Logger.info(notifyMessage);
-		}
-
+		// if
+		// (ModelManager.get().getTopicById(topicId).getId().equals("s_PachubeFeed"))
+		// {
+		// Logger.info(notifyMessage);
+		// }
 		Model rdf;
 		try {
 			/*
@@ -133,8 +128,29 @@ public class WebService extends Controller {
 			} else {
 				eventTitle = "RDF Event";
 			}
-			eventText = HTML.htmlEscape(rdf.serialize(Syntax.Turtle)).replaceAll("\n", "<br />")
+			eventText = rdf.serialize(Syntax.Turtle);
+			eventText = eventText.replaceAll("@prefix.*?> \\.", "").trim(); // FIXME
+																			// stuehmer:
+																			// this
+																			// is
+																			// a
+																			// hack
+																			// to
+																			// hide
+																			// the
+																			// many
+																			// namespace
+																			// declarations...
+																			// we
+																			// should
+																			// nicely
+																			// "fold"/"collapse"
+																			// instead
+																			// of
+																			// deleting
+			eventText = HTML.htmlEscape(eventText).replaceAll("\n", "<br />")
 					.replaceAll("\\s{4}", "&nbsp;&nbsp;&nbsp;&nbsp;");
+
 			ModelManager.get().getTopicById(topicId)
 					.multicast(new models.eventstream.Event(eventTitle, eventText));
 		} catch (Exception e) {
@@ -242,9 +258,9 @@ public class WebService extends Controller {
 	@Util
 	public static ArrayList<models.eventstream.Event> getHistorical(EventTopic et) {
 		ArrayList<models.eventstream.Event> events = new ArrayList<models.eventstream.Event>();
-		
+
 		SparqlSelectResponse response;
-		try{
+		try {
 			// Creates an Event Cloud Management Web Service Client
 			EventCloudManagementWsApi eventCloudManagementWsClient = WsClientFactory.createWsClient(
 					EventCloudManagementWsApi.class, EC_MANAGEMENT_WS_SERVICE);
@@ -255,7 +271,8 @@ public class WebService extends Controller {
 				return null;
 			}
 
-			List<String> listPutgetEndpoints = eventCloudManagementWsClient.getPutgetProxyEndpointUrls(topicId);
+			List<String> listPutgetEndpoints = eventCloudManagementWsClient
+					.getPutgetProxyEndpointUrls(topicId);
 			String putgetProxyEndpoint = null;
 			if (listPutgetEndpoints == null || listPutgetEndpoints.size() == 0) {
 				putgetProxyEndpoint = eventCloudManagementWsClient.createPutGetProxy(topicId);
@@ -266,9 +283,8 @@ public class WebService extends Controller {
 
 			PutGetWsApi pgc = WsClientFactory.createWsClient(PutGetWsApi.class, putgetProxyEndpoint);
 
-			response = pgc
-					.executeSparqlSelect("SELECT ?g ?s ?p ?o WHERE { GRAPH ?g {?s ?p ?o } } LIMIT 30");
-		} catch(Exception e) {
+			response = pgc.executeSparqlSelect("SELECT ?g ?s ?p ?o WHERE { GRAPH ?g {?s ?p ?o } } LIMIT 30");
+		} catch (Exception e) {
 			Logger.error(e.getMessage());
 			return null;
 		}
@@ -295,8 +311,7 @@ public class WebService extends Controller {
 
 	@Util
 	public static boolean sendTokenPatternQuery(String token, String eventtopic) {
-
-		String defaultQueryString = GetPredefinedPattern
+		String defaultQueryString = PredefinedPatterns
 				.getPattern("play-epsparql-m12-jeans-example-query.eprq");
 		String queryString = defaultQueryString.replaceAll("\"JEANS\"", "\"" + token + "\"");
 
@@ -337,7 +352,6 @@ public class WebService extends Controller {
 		Service service = Service.create(wsdl, serviceName);
 		QueryDispatchApi queryDispatchApi = service
 				.getPort(eu.play_project.play_platformservices.api.QueryDispatchApi.class);
-
 		String s = queryDispatchApi.registerQuery("patternId_" + Math.random(), queryString, eventtopic);
 		Logger.info(s);
 		return true;
@@ -362,68 +376,5 @@ public class WebService extends Controller {
 		event.setStream(new URIImpl(Stream.FacebookStatusFeed.getUri()));
 		event.getModel().writeTo(System.out, Syntax.Turtle);
 		System.out.println();
-	}
-
-	/**
-	 * Puts the content of a file on an InputStream
-	 * 
-	 * @param file
-	 * @return
-	 */
-	@Util
-	private static InputStream inputStreamFrom(String file) {
-		InputStream is = null;
-
-		if (file != null) {
-			try {
-				is = new FileInputStream(Play.getFile(file));
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			}
-		}
-
-		return is;
-	}
-
-	@Util
-	private static URI generateRandomUri() {
-		String legalChars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-		StringBuilder result = new StringBuilder("http://www.inria.fr/");
-		SecureRandom random = new SecureRandom();
-
-		for (int i = 0; i < 20; i++) {
-			result.append(random.nextInt(legalChars.length()));
-		}
-
-		try {
-			return new URI(result.toString());
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	private String getSparqlQuerys(String queryFile) {
-		try {
-			InputStream is = this.getClass().getClassLoader().getResourceAsStream(queryFile);
-			BufferedReader br = new BufferedReader(new InputStreamReader(is));
-			StringBuffer sb = new StringBuffer();
-			String line;
-
-			while (null != (line = br.readLine())) {
-				sb.append(line);
-			}
-			// System.out.println(sb.toString());
-			br.close();
-			is.close();
-
-			return sb.toString();
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-
 	}
 }

@@ -46,7 +46,7 @@ nobanner:true /} #{set nofooter:true /}
 					<fieldset>
 						<legend>Event Topic for query :</legend>
 						Enter a topic name : <input type="text" name="eventtopic" required="required"
-							value="http://streams.event-processing.org/ids/FacebookCEPResults"
+							value="${eu.play_project.play_commons.constants.Stream.FacebookCepResults.getTopicUri()}"
 							size="80" />
 					</fieldset>
 					<input type="submit" value="Send query" />
@@ -77,7 +77,7 @@ nobanner:true /} #{set nofooter:true /}
 					<fieldset>
 						<legend>Event Topic for query :</legend>
 						Enter en topic name : <input type="text" name="eventtopic-name"
-							value="http://streams.event-processing.org/ids/FacebookCEPResults"
+							value="${eu.play_project.play_commons.constants.Stream.FacebookCepResults.getTopicUri()}"
 							size="80" />
 					</fieldset>
 					<input type="submit" value="Send query" />
@@ -91,42 +91,8 @@ nobanner:true /} #{set nofooter:true /}
 					method="POST">
 					<fieldset>
 						<legend>Here, you can write the full EP-SPARQL query :</legend>
-						<textarea id="text" name="text" type="text" cols="60" rows="24">
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX user: <http://graph.facebook.com/schema/user#>
-PREFIX : <http://events.event-processing.org/types/>
-
-CONSTRUCT {    :e rdf:type :FacebookCepResult.
-              :e user:name ?friend1.
-              :e user:name ?friend2.
-              :e user:name ?friend3.
-              :e :discussionTopic ?about1.
-              :e :discussionTopic ?about2.
-              :e :discussionTopic ?about3
-}
-WHERE
-       WINDOW{
-           EVENT ?id1{
-               ?e1 rdf:type :FacebookStatusFeedEvent.
-               ?e1 :status ?about1.
-               ?e1 :name ?friend1
-               }
-               FILTER fn:contains(?about1, "JEANS")
-           SEQ
-           EVENT ?id2{
-               ?e2 rdf:type :FacebookStatusFeedEvent.
-               ?e2 :status ?about2.
-               ?e2 :name ?friend2
-               }
-               FILTER fn:contains(?about2, "JEANS")
-           SEQ
-           EVENT ?id3{
-               ?e3 rdf:type :FacebookStatusFeedEvent.
-               ?e3 :status ?about3.
-               ?e3 :name ?friend3
-               }
-               FILTER fn:contains(?about3, "JEANS")
-       } ("P30M"^^xsd:duration, sliding)
+						<textarea id="text" name="text" type="text" cols="90" rows="24">
+${models.PredefinedPatterns.getPattern("play-epsparql-m12-jeans-example-query.eprq")}
 						</textarea>
 					</fieldset>
 					<fieldset>
@@ -145,7 +111,7 @@ WHERE
 					<fieldset>
 						<legend>Event Topic for query :</legend>
 						Enter en topic name : <input type="text" name="eventtopic" required="required"
-							value="http://streams.event-processing.org/ids/FacebookCEPResults"
+							value="${eu.play_project.play_commons.constants.Stream.FacebookCepResults.getTopicUri()}"
 							size="80" />
 					</fieldset>
 					<input type="submit" value="Send query" />

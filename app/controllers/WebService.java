@@ -79,8 +79,7 @@ public class WebService extends Controller {
 	public static String DSB_RESOURCE_SERVICE = Constants.getProperties().getProperty("dsb.notify.endpoint");
 	public static String EC_MANAGEMENT_WS_SERVICE = Constants.getProperties().getProperty(
 			"eventcloud.default.putget.endpoint");
-	private static AbstractReceiver receiver = new AbstractReceiver() {
-	};
+	private static AbstractReceiver receiver = new AbstractReceiver() {};
 
 	static {
 		Wsnb4ServUtils.initModelFactories(new WsrfbfModelFactoryImpl(), new WsrfrModelFactoryImpl(),
@@ -129,29 +128,13 @@ public class WebService extends Controller {
 				eventTitle = "RDF Event";
 			}
 			eventText = rdf.serialize(Syntax.Turtle);
-			eventText = eventText.replaceAll("@prefix.*?> \\.", "").trim(); // FIXME
-																			// stuehmer:
-																			// this
-																			// is
-																			// a
-																			// hack
-																			// to
-																			// hide
-																			// the
-																			// many
-																			// namespace
-																			// declarations...
-																			// we
-																			// should
-																			// nicely
-																			// "fold"/"collapse"
-																			// instead
-																			// of
-																			// deleting
-			eventText = HTML.htmlEscape(eventText).replaceAll("\n", "<br />")
-					.replaceAll("\\s{4}", "&nbsp;&nbsp;&nbsp;&nbsp;");
+			// FIXME stuehmer: this is a hack to hide the many namespace declarations... we should nicely "fold"/"collapse" instead of deleting
+			eventText = eventText.replaceAll("@prefix.*?> \\.", "").trim();
+			eventText = HTML.htmlEscape(eventText).replaceAll("\n", "<br />").replaceAll("\\s{4}", "&nbsp;&nbsp;&nbsp;&nbsp;");
 
-			ModelManager.get().getTopicById(topicId)
+			ModelManager
+					.get()
+					.getTopicById(topicId)
 					.multicast(new models.eventstream.Event(eventTitle, eventText));
 		} catch (Exception e) {
 			/*
@@ -258,9 +241,9 @@ public class WebService extends Controller {
 	@Util
 	public static ArrayList<models.eventstream.Event> getHistorical(EventTopic et) {
 		ArrayList<models.eventstream.Event> events = new ArrayList<models.eventstream.Event>();
-
+		
 		SparqlSelectResponse response;
-		try {
+		try{
 			// Creates an Event Cloud Management Web Service Client
 			EventCloudManagementWsApi eventCloudManagementWsClient = WsClientFactory.createWsClient(
 					EventCloudManagementWsApi.class, EC_MANAGEMENT_WS_SERVICE);
@@ -271,8 +254,7 @@ public class WebService extends Controller {
 				return null;
 			}
 
-			List<String> listPutgetEndpoints = eventCloudManagementWsClient
-					.getPutgetProxyEndpointUrls(topicId);
+			List<String> listPutgetEndpoints = eventCloudManagementWsClient.getPutgetProxyEndpointUrls(topicId);
 			String putgetProxyEndpoint = null;
 			if (listPutgetEndpoints == null || listPutgetEndpoints.size() == 0) {
 				putgetProxyEndpoint = eventCloudManagementWsClient.createPutGetProxy(topicId);
@@ -283,8 +265,9 @@ public class WebService extends Controller {
 
 			PutGetWsApi pgc = WsClientFactory.createWsClient(PutGetWsApi.class, putgetProxyEndpoint);
 
-			response = pgc.executeSparqlSelect("SELECT ?g ?s ?p ?o WHERE { GRAPH ?g {?s ?p ?o } } LIMIT 30");
-		} catch (Exception e) {
+			response = pgc
+					.executeSparqlSelect("SELECT ?g ?s ?p ?o WHERE { GRAPH ?g {?s ?p ?o } } LIMIT 30");
+		} catch(Exception e) {
 			Logger.error(e.getMessage());
 			return null;
 		}
@@ -311,8 +294,7 @@ public class WebService extends Controller {
 
 	@Util
 	public static boolean sendTokenPatternQuery(String token, String eventtopic) {
-		String defaultQueryString = PredefinedPatterns
-				.getPattern("play-epsparql-m12-jeans-example-query.eprq");
+		String defaultQueryString = PredefinedPatterns.getPattern("play-epsparql-m12-jeans-example-query.eprq");
 		String queryString = defaultQueryString.replaceAll("\"JEANS\"", "\"" + token + "\"");
 
 		URL wsdl = null;
@@ -328,8 +310,8 @@ public class WebService extends Controller {
 		QueryDispatchApi queryDispatchApi = service.getPort(QueryDispatchApi.class);
 
 		try {
-			String s = queryDispatchApi.registerQuery("patternId_" + Math.random(), queryString, eventtopic);
-			Logger.info(s);
+		String s = queryDispatchApi.registerQuery("patternId_" + Math.random(), queryString, eventtopic);
+		Logger.info(s);
 		} catch (Exception e) {
 			Logger.error(e.toString());
 			return false;

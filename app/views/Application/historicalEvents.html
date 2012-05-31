@@ -57,9 +57,13 @@ $(function() {
 			histoAction(),
 			{topicId:$sid},
 			function(events) {
-				$(events).each(function() {
-					display(this, $sid);
-				})
+				if(events.error != null){
+					displayError(events, $sid);
+				} else {
+					$(events).each(function() {
+						display(this, $sid);
+					})
+				}
 			},
 			'json');
 	});
@@ -69,6 +73,16 @@ $(function() {
 	var display = function(event, topicid) {		
 		$('#topic-events-'+topicid)
 			.prepend('<div class="event"><h3>'+event.title+'</h3><p>'+event.content+'</p></div>');
+	}
+	
+	var displayError = function(event, topicid) {
+		if(event.error == "notfound"){
+			$('#topic-events-'+topicid).html('<div class="event">Error : Topic not found.</div>');
+		} else if(event.error == "couldnotconnect"){
+			$('#topic-events-'+topicid).html('<div class="event">Error : Could not connect to Event Cloud.</div>');
+		} else if(event.error == "empty"){
+			$('#topic-events-'+topicid).html('<div class="event">No historicals events were found for that topic.</div>');
+		}
 	}
 });
 </script>

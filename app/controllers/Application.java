@@ -108,9 +108,17 @@ public class Application extends Controller {
 
 	public static void historicalByTopic(String topicId) {
 		EventTopic et = ModelManager.get().getTopicById(topicId);
-		ArrayList<Event> events = WebService.getHistorical(et);
-		renderJSON(events, new TypeToken<ArrayList<Event>>() {
-		}.getType());
+		if(et == null){
+			renderJSON("{\"error\":\"notfound\"}");
+		} else {
+			ArrayList<Event> events = WebService.getHistorical(et);
+			if(events == null){
+				renderJSON("{\"error\":\"couldnotconnect\"}");
+			} else if(events.size() == 0){
+				renderJSON("{\"error\":\"empty\"}");
+			}
+			renderJSON(events, new TypeToken<ArrayList<Event>>() {}.getType());
+		}
 	}
 
 	/**

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import static eu.play_project.play_commons.constants.Event.EVENT_ID_SUFFIX;
@@ -25,7 +26,6 @@ import javax.xml.ws.Service;
 import models.BoyerMoore;
 import models.GetPredefinedPattern;
 import models.ModelManager;
-import models.PutGetClient;
 import models.SupportedTopicsXML;
 import models.eventstream.EventTopic;
 
@@ -69,8 +69,13 @@ import eu.play_project.play_commons.constants.Stream;
 import eu.play_project.play_commons.eventtypes.EventHelpers;
 import eu.play_project.play_eventadapter.AbstractReceiver;
 import eu.play_project.play_platformservices.api.QueryDispatchApi;
+import fr.inria.eventcloud.api.PutGetApi;
 import fr.inria.eventcloud.api.responses.SparqlSelectResponse;
 import fr.inria.eventcloud.api.wrappers.ResultSetWrapper;
+import fr.inria.eventcloud.proxies.PutGetProxy;
+import fr.inria.eventcloud.webservices.api.EventCloudManagementWsApi;
+import fr.inria.eventcloud.webservices.api.PutGetWsApi;
+import fr.inria.eventcloud.webservices.factories.WsClientFactory;
 
 /**
  * The WebService controller is in charge of SOAP connection with the DSB.
@@ -79,10 +84,9 @@ import fr.inria.eventcloud.api.wrappers.ResultSetWrapper;
  */
 public class WebService extends Controller {
 	public static String DSB_RESOURCE_SERVICE = Constants.getProperties().getProperty("dsb.notify.endpoint");
-	public static String EC_PUTGET_SERVICE = Constants.getProperties().getProperty(
+	public static String EC_MANAGEMENT_WS_SERVICE = Constants.getProperties().getProperty(
 			"eventcloud.default.putget.endpoint");
-	private static AbstractReceiver receiver = new AbstractReceiver() {
-	};
+	private static AbstractReceiver receiver = new AbstractReceiver() {};
 
 	static {
 		Wsnb4ServUtils.initModelFactories(new WsrfbfModelFactoryImpl(), new WsrfrModelFactoryImpl(),
@@ -108,12 +112,12 @@ public class WebService extends Controller {
 		} catch (java.util.NoSuchElementException e) {
 			notifyMessage = "";
 		}
-		
+
 		// Print some event to debug android output:
 		if (ModelManager.get().getTopicById(topicId).getId().equals("s_FacebookCepResults")) {
-			Logger.info(notifyMessage);		
+			Logger.info(notifyMessage);
 		}
-		
+
 		Model rdf;
 		try {
 			/*
@@ -151,7 +155,7 @@ public class WebService extends Controller {
 	@Util
 	public static ArrayList<EventTopic> getSupportedTopics() {
 		Logger.info("Getting topics from DSB at %s", DSB_RESOURCE_SERVICE);
-		
+
 		INotificationProducerRP resourceClient = new HTTPNotificationProducerRPClient(DSB_RESOURCE_SERVICE);
 
 		ArrayList<EventTopic> topics = new ArrayList<EventTopic>();
@@ -175,7 +179,9 @@ public class WebService extends Controller {
 			SupportedTopicsXML.parseXMLTree(topics, root, "");
 
 		} catch (Exception e) {
-			Logger.warn(e, "A problem occurred while fetching the list of available topics from the DSB. Continuing with empty set of topics.");
+			Logger.warn(
+					e,
+					"A problem occurred while fetching the list of available topics from the DSB. Continuing with empty set of topics.");
 		}
 
 		return topics;
@@ -227,7 +233,8 @@ public class WebService extends Controller {
 	}
 
 	/**
-	 * Retreives historical events for a given topic
+	 * Retreives historical events for a given topic Returns null if topics
+	 * doesn't exist Returns an empty ArrayList if no events were found
 	 * 
 	 * @param et
 	 * @return
@@ -235,12 +242,36 @@ public class WebService extends Controller {
 	@Util
 	public static ArrayList<models.eventstream.Event> getHistorical(EventTopic et) {
 		ArrayList<models.eventstream.Event> events = new ArrayList<models.eventstream.Event>();
+		
+		SparqlSelectResponse response;
+		try{
+			// Creates an Event Cloud Management Web Service Client
+			EventCloudManagementWsApi eventCloudManagementWsClient = WsClientFactory.createWsClient(
+					EventCloudManagementWsApi.class, EC_MANAGEMENT_WS_SERVICE);
 
-		PutGetClient pgc = new PutGetClient(EC_PUTGET_SERVICE);
+			List<String> ecIds = eventCloudManagementWsClient.getEventCloudIds();
+			String topicId = et.uri + et.name;
+			if (ecIds == null || !ecIds.contains(topicId)) {
+				return null;
+			}
 
-		SparqlSelectResponse response = pgc
-				.executeSparqlSelect("SELECT ?g ?s ?p ?o WHERE { GRAPH ?g { <http://eventcloud.inria.fr/replace/me/with/a/correct/namespace/"
-						+ et.namespace + ":" + et.name + "> ?p ?o } } LIMIT 30");
+			List<String> listPutgetEndpoints = eventCloudManagementWsClient.getPutgetProxyEndpointUrls(topicId);
+			String putgetProxyEndpoint = null;
+			if (listPutgetEndpoints == null || listPutgetEndpoints.size() == 0) {
+				putgetProxyEndpoint = eventCloudManagementWsClient.createPutGetProxy(topicId);
+				Logger.info("New putget proxy for " + topicId + " Event Cloud has been created");
+			} else {
+				putgetProxyEndpoint = listPutgetEndpoints.get(0);
+			}
+
+			PutGetWsApi pgc = WsClientFactory.createWsClient(PutGetWsApi.class, putgetProxyEndpoint);
+
+			response = pgc
+					.executeSparqlSelect("SELECT ?g ?s ?p ?o WHERE { GRAPH ?g {?s ?p ?o } } LIMIT 30");
+		} catch(Exception e) {
+			Logger.error(e.getMessage());
+			return null;
+		}
 		String title = "-";
 		String content = "";
 		ResultSetWrapper result = response.getResult();

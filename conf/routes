@@ -38,8 +38,9 @@ POST	/webservice/facebookstatus					WebService.testFacebookStatusFeedEvent
 GET     /favicon.ico                    404
 
 # Map static resources from the /app/public folder to the /public path
-GET     /public-v003/						staticDir:public
-GET		/images/							staticDir:public/images
+GET     /public-v003/					staticDir:public
+GET		/images/						staticDir:public/images
+GET		/streamicons/					staticDir:public/streamicons
 
 # Monitoring
 GET		/monitoring/display				Monitoring.displayInfo

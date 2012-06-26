@@ -106,12 +106,12 @@ public class WebService extends Controller {
 			notifyMessage = "";
 		}
 
-		// Print some event to debug android output:
-		// if
-		// (ModelManager.get().getTopicById(topicId).getId().equals("s_PachubeFeed"))
-		// {
-		// Logger.info(notifyMessage);
-		// }
+		 //Print some event to debug output:
+//		if (ModelManager.get().getTopicById(topicId).getId()
+//				.equals("s_FacebookCepResults")) {
+//			Logger.info(notifyMessage);
+//		} // FIXME stuehmer: added by roland, not important
+		
 		Model rdf;
 		try {
 			/*
@@ -299,7 +299,7 @@ public class WebService extends Controller {
 
 		URL wsdl = null;
 		try {
-			wsdl = new URL("http://demo.play-project.eu:8085/play/QueryDispatchApi?wsdl");
+			wsdl = new URL(Constants.getProperties().getProperty("platfomservices.querydispatchapi.endpoint") + "?wsdl");
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
@@ -310,7 +310,7 @@ public class WebService extends Controller {
 		QueryDispatchApi queryDispatchApi = service.getPort(QueryDispatchApi.class);
 
 		try {
-		String s = queryDispatchApi.registerQuery("patternId_" + Math.random(), queryString, eventtopic);
+		String s = queryDispatchApi.registerQuery("patternId_" + Math.random(), queryString);
 		Logger.info(s);
 		} catch (Exception e) {
 			Logger.error(e.toString());
@@ -324,7 +324,7 @@ public class WebService extends Controller {
 
 		URL wsdl = null;
 		try {
-			wsdl = new URL("http://demo.play-project.eu:8085/play/QueryDispatchApi?wsdl");
+			wsdl = new URL(Constants.getProperties().getProperty("platfomservices.querydispatchapi.endpoint") +  "?wsdl");
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
@@ -334,7 +334,7 @@ public class WebService extends Controller {
 		Service service = Service.create(wsdl, serviceName);
 		QueryDispatchApi queryDispatchApi = service
 				.getPort(eu.play_project.play_platformservices.api.QueryDispatchApi.class);
-		String s = queryDispatchApi.registerQuery("patternId_" + Math.random(), queryString, eventtopic);
+		String s = queryDispatchApi.registerQuery("patternId_" + Math.random(), queryString);
 		Logger.info(s);
 		return true;
 	}

@@ -82,13 +82,11 @@ import fr.inria.eventcloud.webservices.factories.WsClientFactory;
 public class WebService extends Controller {
 	public static String DSB_RESOURCE_SERVICE = Constants.getProperties().getProperty("dsb.notify.endpoint");
 	private static AbstractReceiver receiver = new AbstractReceiver() {};
-	private static AbstractSender eventSender;
 
 	static {
 		Wsnb4ServUtils.initModelFactories(new WsrfbfModelFactoryImpl(), new WsrfrModelFactoryImpl(),
 				new WsrfrlModelFactoryImpl(), new WsrfrpModelFactoryImpl(), new WstopModelFactoryImpl(),
 				new WsnbModelFactoryImpl());
-		eventSender = new AbstractSender(Stream.FacebookStatusFeed.getTopicQName());
 	}
 
 	/**
@@ -264,26 +262,5 @@ public class WebService extends Controller {
 		String s = queryDispatchApi.registerQuery("patternId_" + Math.random(), queryString);
 		Logger.info(s);
 		return true;
-	}
-
-	/**
-	 * Notify action triggered by buttons on the web interface Generates a
-	 * Facebook status event event and sends it to the DSB
-	 */
-	public static void simulateFacebookStatusFeedEvent() {
-		String eventId = Stream.FacebookStatusFeed.getUri() + new SecureRandom().nextLong();
-
-		FacebookStatusFeedEvent event = new FacebookStatusFeedEvent(EventHelpers.createEmptyModel(eventId),
-				eventId + EVENT_ID_SUFFIX, true);
-
-		event.setName("Roland Stühmer");
-		event.setId("100000058455726");
-		event.setLink(new URIImpl("http://graph.facebook.com/roland.stuehmer#"));
-		event.setStatus("I bought some JEANS this morning");
-		event.setUserLocation("Karlsruhe, Germany");
-		event.setEndTime(Calendar.getInstance());
-		event.setStream(new URIImpl(Stream.FacebookStatusFeed.getUri()));
-		Logger.info("Sending event: %s", event.getModel().serialize(Syntax.Turtle));
-		eventSender.notify(event);
 	}
 }

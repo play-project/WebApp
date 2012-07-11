@@ -240,7 +240,6 @@ public class Application extends Controller {
 	/**
 	 * Events handlers
 	 */
-
 	public static void sendEvent(@Required String title, @Required String content, @Required String topic) {
 		ModelManager.get().getTopicById(topic).multicast(new models.eventstream.Event(title, content));
 	}

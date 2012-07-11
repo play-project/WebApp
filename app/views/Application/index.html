@@ -239,7 +239,7 @@ $(function() {
 var $lastReceived = 0
 var waitEvents = #{jsAction @waitEvents(':lastReceived') /}
 
-var sendFbStatusEvent = #{jsAction @WebService.testFacebookStatusFeedEvent() /}
+var sendFbStatusEvent = #{jsAction @WebService.simulateFacebookStatusFeedEvent() /}
 
 $("#send0").click(function(e) {
 	$.post(sendFbStatusEvent())

@@ -32,7 +32,7 @@ POST	/histobytopic					Application.historicalByTopic
 # WS
 POST	/webservice/soapnotifendpoint/{topicId}		WebService.soapNotifEndPoint
 GET		/webservice/topics							WebService.getSupportedTopics
-POST	/webservice/facebookstatus					WebService.testFacebookStatusFeedEvent
+POST	/webservice/facebookstatus					WebService.simulateFacebookStatusFeedEvent
 
 # Ignore favicon requests
 GET     /favicon.ico                    404

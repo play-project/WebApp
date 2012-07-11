@@ -2,6 +2,7 @@ package controllers;
 
 import static eu.play_project.play_commons.constants.Event.EVENT_ID_SUFFIX;
 
+import java.beans.EventSetDescriptor;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.MalformedURLException;
@@ -17,21 +18,27 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
-import models.BoyerMoore;
 import models.ModelManager;
 import models.PredefinedPatterns;
 import models.SupportedTopicsXML;
 import models.eventstream.EventTopic;
 
+import org.event_processing.events.types.Event;
 import org.event_processing.events.types.FacebookStatusFeedEvent;
+import org.hibernate.event.AbstractEvent;
 import org.jdom.input.SAXBuilder;
+import org.ontoware.rdf2go.ModelFactory;
+import org.ontoware.rdf2go.RDF2Go;
+import org.ontoware.rdf2go.Reasoning;
 import org.ontoware.rdf2go.exception.ModelRuntimeException;
+import org.ontoware.rdf2go.impl.jena29.ModelImplJena26;
 import org.ontoware.rdf2go.model.Model;
 import org.ontoware.rdf2go.model.Statement;
 import org.ontoware.rdf2go.model.Syntax;
+import org.ontoware.rdf2go.model.node.Resource;
 import org.ontoware.rdf2go.model.node.Variable;
 import org.ontoware.rdf2go.model.node.impl.URIImpl;
-import org.ontoware.rdf2go.vocabulary.RDF;
+import org.ontoware.rdf2go.util.ModelUtils;
 import org.petalslink.dsb.notification.client.http.HTTPNotificationProducerRPClient;
 import org.petalslink.dsb.notification.client.http.simple.HTTPProducerClient;
 import org.petalslink.dsb.notification.client.http.simple.HTTPSubscriptionManagerClient;
@@ -54,18 +61,15 @@ import com.ebmwebsourcing.wsstar.topics.datatypes.api.WstopConstants;
 import com.ebmwebsourcing.wsstar.topics.datatypes.impl.impl.WstopModelFactoryImpl;
 import com.ebmwebsourcing.wsstar.wsnb.services.INotificationProducerRP;
 import com.ebmwebsourcing.wsstar.wsnb.services.impl.util.Wsnb4ServUtils;
-import com.hp.hpl.jena.query.QuerySolution;
 
 import eu.play_project.play_commons.constants.Constants;
 import eu.play_project.play_commons.constants.Stream;
 import eu.play_project.play_commons.eventformat.EventFormatHelpers;
 import eu.play_project.play_commons.eventtypes.EventHelpers;
 import eu.play_project.play_eventadapter.AbstractReceiver;
+import eu.play_project.play_eventadapter.AbstractSender;
 import eu.play_project.play_platformservices.api.QueryDispatchApi;
-import fr.inria.eventcloud.api.PutGetApi;
-import fr.inria.eventcloud.api.responses.SparqlSelectResponse;
-import fr.inria.eventcloud.api.wrappers.ResultSetWrapper;
-import fr.inria.eventcloud.proxies.PutGetProxy;
+import fr.inria.eventcloud.api.responses.SparqlConstructResponse;
 import fr.inria.eventcloud.webservices.api.EventCloudManagementWsApi;
 import fr.inria.eventcloud.webservices.api.PutGetWsApi;
 import fr.inria.eventcloud.webservices.factories.WsClientFactory;
@@ -80,11 +84,20 @@ public class WebService extends Controller {
 	public static String EC_MANAGEMENT_WS_SERVICE = Constants.getProperties().getProperty(
 			"eventcloud.default.putget.endpoint");
 	private static AbstractReceiver receiver = new AbstractReceiver() {};
+	private static Model eventHierarchy;
+	private static AbstractSender eventSender;
 
 	static {
 		Wsnb4ServUtils.initModelFactories(new WsrfbfModelFactoryImpl(), new WsrfrModelFactoryImpl(),
 				new WsrfrlModelFactoryImpl(), new WsrfrpModelFactoryImpl(), new WstopModelFactoryImpl(),
 				new WsnbModelFactoryImpl());
+		eventHierarchy = new ModelImplJena26(Reasoning.rdfs);
+		try {
+			eventHierarchy.readFrom(WebService.class.getClassLoader().getResourceAsStream("types.n3"));
+		} catch (Exception e) {
+			Logger.error(e, "The event hierarchy could not be read from the classpath. This prevents us from parsing historic events.");
+		}
+		eventSender = new AbstractSender(Stream.FacebookStatusFeed.getTopicQName());
 	}
 
 	/**
@@ -95,8 +108,6 @@ public class WebService extends Controller {
 	 */
 	public static void soapNotifEndPoint(String topicId) {
 
-		String eventTitle;
-		String eventText;
 		String notifyMessage;
 
 		// A trick to read a Stream into to String:
@@ -118,30 +129,15 @@ public class WebService extends Controller {
 			 * Deal with RDF events:
 			 */
 			rdf = receiver.parseRdf(notifyMessage);
-			// If we found RDF
-			Iterator<Statement> it = rdf.findStatements(Variable.ANY, RDF.type, Variable.ANY);
-			if (it.hasNext()) {
-				Statement stat = it.next();
-				eventTitle = stat.getObject().asURI().asJavaURI().getPath();
-				eventTitle = eventTitle.substring(eventTitle.lastIndexOf("/") + 1);
-			} else {
-				eventTitle = "RDF Event";
-			}
-			eventText = rdf.serialize(Syntax.Turtle);
-			// FIXME stuehmer: this is a hack to hide the many namespace declarations... we should nicely "fold"/"collapse" instead of deleting
-			eventText = eventText.replaceAll("@prefix.*?> \\.", "").trim();
-			eventText = HTML.htmlEscape(eventText).replaceAll("\n", "<br />").replaceAll("\\s{4}", "&nbsp;&nbsp;&nbsp;&nbsp;");
 
-			ModelManager
-					.get()
-					.getTopicById(topicId)
-					.multicast(new models.eventstream.Event(eventTitle, eventText));
+			ModelManager.get().getTopicById(topicId)
+					.multicast(models.eventstream.Event.eventFromRdf(rdf));
 		} catch (Exception e) {
 			/*
 			 * Deal with non-RDF events:
 			 */
-			eventTitle = "Event";
-			eventText = HTML.htmlEscape(EventFormatHelpers.unwrapFromNativeMessageElement(notifyMessage))
+			String eventTitle = "Event";
+			String eventText = HTML.htmlEscape(EventFormatHelpers.unwrapFromNativeMessageElement(notifyMessage))
 					.replaceAll("\n", "<br />").replaceAll("\\s{4}", "&nbsp;&nbsp;&nbsp;&nbsp;");
 			ModelManager.get().getTopicById(topicId)
 					.multicast(new models.eventstream.Event(eventTitle, eventText));
@@ -242,7 +238,7 @@ public class WebService extends Controller {
 	public static ArrayList<models.eventstream.Event> getHistorical(EventTopic et) {
 		ArrayList<models.eventstream.Event> events = new ArrayList<models.eventstream.Event>();
 		
-		SparqlSelectResponse response;
+		SparqlConstructResponse response;
 		try{
 			// Creates an Event Cloud Management Web Service Client
 			EventCloudManagementWsApi eventCloudManagementWsClient = WsClientFactory.createWsClient(
@@ -266,30 +262,28 @@ public class WebService extends Controller {
 			PutGetWsApi pgc = WsClientFactory.createWsClient(PutGetWsApi.class, putgetProxyEndpoint);
 
 			response = pgc
-					.executeSparqlSelect("SELECT ?g ?s ?p ?o WHERE { GRAPH ?g {?s ?p ?o } } LIMIT 30");
+					.executeSparqlConstruct("CONSTRUCT ?s ?p ?o WHERE { GRAPH ?g {?s ?p ?o } } LIMIT 30");
+			
 		} catch(Exception e) {
 			Logger.error(e.getMessage());
 			return null;
 		}
-		String title = "-";
-		String content = "";
-		ResultSetWrapper result = response.getResult();
-		while (result.hasNext()) {
-			QuerySolution qs = result.next();
-			String predicate = qs.get("p").toString();
-			String object = qs.get("o").toString();
-			if (BoyerMoore.match("Topic", predicate).size() > 0) {
-				title = object;
-			} else {
-				content = et.namespace + ":" + et.name + " : " + predicate + " : " + object + "<br/>";
-			}
-			events.add(new models.eventstream.Event(title, content));
+
+		// Load the statements
+		Model rdf = new ModelImplJena26(null, response.getResult(), Reasoning.rdfs);
+		// Load event hierarchy information
+		rdf.addModel(eventHierarchy);
+		
+		Iterator<Resource> eventIds = Event.getAllInstances(rdf);
+		while (eventIds.hasNext()) {
+			Resource id = eventIds.next();
+			Iterator<Statement> statements = rdf.findStatements(id, Variable.ANY, Variable.ANY);
+			Model event = RDF2Go.getModelFactory().createModel();
+			event.addAll(statements);
+			events.add(models.eventstream.Event.eventFromRdf(event));
 		}
-		ArrayList<models.eventstream.Event> temp = new ArrayList<models.eventstream.Event>();
-		for (int i = 0; i < events.size(); i++) {
-			temp.add(events.get(events.size() - i - 1));
-		}
-		return temp;
+
+		return events;
 	}
 
 	@Util
@@ -319,12 +313,11 @@ public class WebService extends Controller {
 		return true;
 	}
 
-	public static Boolean sendFullPatternQuery(String queryString, String eventtopic)
-			throws com.hp.hpl.jena.query.QueryParseException {
+	public static Boolean sendFullPatternQuery(String queryString, String eventtopic) {
 
 		URL wsdl = null;
 		try {
-			wsdl = new URL(Constants.getProperties().getProperty("platfomservices.querydispatchapi.endpoint") +  "?wsdl");
+			wsdl = new URL(Constants.getProperties().getProperty("platfomservices.querydispatchapi.endpoint") + "?wsdl");
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
@@ -343,7 +336,7 @@ public class WebService extends Controller {
 	 * Notify action triggered by buttons on the web interface Generates a
 	 * Facebook status event event and sends it to the DSB
 	 */
-	public static void testFacebookStatusFeedEvent() throws ModelRuntimeException, IOException {
+	public static void simulateFacebookStatusFeedEvent() {
 		String eventId = Stream.FacebookStatusFeed.getUri() + new SecureRandom().nextLong();
 
 		FacebookStatusFeedEvent event = new FacebookStatusFeedEvent(EventHelpers.createEmptyModel(eventId),
@@ -356,7 +349,7 @@ public class WebService extends Controller {
 		event.setUserLocation("Karlsruhe, Germany");
 		event.setEndTime(Calendar.getInstance());
 		event.setStream(new URIImpl(Stream.FacebookStatusFeed.getUri()));
-		event.getModel().writeTo(System.out, Syntax.Turtle);
-		System.out.println();
+		Logger.info("Sending event: %s", event.getModel().serialize(Syntax.Turtle));
+		eventSender.notify(event);
 	}
 }

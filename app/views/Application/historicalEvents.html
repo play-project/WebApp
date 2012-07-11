@@ -48,7 +48,7 @@ $(function() {
 	});
 	$("#tabs").tabs().addClass('ui-tabs-vertical ui-helper-clearfix');
 	
-	var histoAction = #{jsAction @historicalByTopic() /}
+	var histoAction = #{jsAction @HistoricalEvents.historicalByTopic() /}
 	$("#tabs").bind("tabsselect", function(event, ui) {
 		var $tab = ui.tab.href;
 		var $sid = $tab.substring($tab.lastIndexOf('-') + 1);
@@ -76,13 +76,7 @@ $(function() {
 	}
 	
 	var displayError = function(event, topicid) {
-		if(event.error == "notfound"){
-			$('#topic-events-'+topicid).html('<div class="event">Error : Topic not found.</div>');
-		} else if(event.error == "couldnotconnect"){
-			$('#topic-events-'+topicid).html('<div class="event">Error : Could not connect to Event Cloud.</div>');
-		} else if(event.error == "empty"){
-			$('#topic-events-'+topicid).html('<div class="event">No historicals events were found for that topic.</div>');
-		}
+		$('#topic-events-'+topicid).html('<div class="event">' + event.error + '</div>');
 	}
 });
 </script>

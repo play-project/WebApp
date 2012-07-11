@@ -26,8 +26,8 @@ POST	/unsubscribe					Application.unsubscribe
 # Events
 GET		/waitevents						Application.waitEvents
 POST    /sendevent             		 	Application.sendEvent
-GET		/historical						Application.historicalEvents
-POST	/histobytopic					Application.historicalByTopic
+GET		/historical						HistoricalEvents.historicalEvents
+POST	/histobytopic					HistoricalEvents.historicalByTopic
 
 # WS
 POST	/webservice/soapnotifendpoint/{topicId}		WebService.soapNotifEndPoint

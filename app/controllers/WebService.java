@@ -81,22 +81,13 @@ import fr.inria.eventcloud.webservices.factories.WsClientFactory;
  */
 public class WebService extends Controller {
 	public static String DSB_RESOURCE_SERVICE = Constants.getProperties().getProperty("dsb.notify.endpoint");
-	public static String EC_MANAGEMENT_WS_SERVICE = Constants.getProperties().getProperty(
-			"eventcloud.default.putget.endpoint");
 	private static AbstractReceiver receiver = new AbstractReceiver() {};
-	private static Model eventHierarchy;
 	private static AbstractSender eventSender;
 
 	static {
 		Wsnb4ServUtils.initModelFactories(new WsrfbfModelFactoryImpl(), new WsrfrModelFactoryImpl(),
 				new WsrfrlModelFactoryImpl(), new WsrfrpModelFactoryImpl(), new WstopModelFactoryImpl(),
 				new WsnbModelFactoryImpl());
-		eventHierarchy = new ModelImplJena26(Reasoning.rdfs);
-		try {
-			eventHierarchy.readFrom(WebService.class.getClassLoader().getResourceAsStream("types.n3"));
-		} catch (Exception e) {
-			Logger.error(e, "The event hierarchy could not be read from the classpath. This prevents us from parsing historic events.");
-		}
 		eventSender = new AbstractSender(Stream.FacebookStatusFeed.getTopicQName());
 	}
 
@@ -227,64 +218,7 @@ public class WebService extends Controller {
 		return 1;
 	}
 
-	/**
-	 * Retreives historical events for a given topic Returns null if topics
-	 * doesn't exist Returns an empty ArrayList if no events were found
-	 * 
-	 * @param et
-	 * @return
-	 */
-	@Util
-	public static ArrayList<models.eventstream.Event> getHistorical(EventTopic et) {
-		ArrayList<models.eventstream.Event> events = new ArrayList<models.eventstream.Event>();
-		
-		SparqlConstructResponse response;
-		try{
-			// Creates an Event Cloud Management Web Service Client
-			EventCloudManagementWsApi eventCloudManagementWsClient = WsClientFactory.createWsClient(
-					EventCloudManagementWsApi.class, EC_MANAGEMENT_WS_SERVICE);
 
-			List<String> ecIds = eventCloudManagementWsClient.getEventCloudIds();
-			String topicId = et.uri + et.name;
-			if (ecIds == null || !ecIds.contains(topicId)) {
-				return null;
-			}
-
-			List<String> listPutgetEndpoints = eventCloudManagementWsClient.getPutgetProxyEndpointUrls(topicId);
-			String putgetProxyEndpoint = null;
-			if (listPutgetEndpoints == null || listPutgetEndpoints.size() == 0) {
-				putgetProxyEndpoint = eventCloudManagementWsClient.createPutGetProxy(topicId);
-				Logger.info("New putget proxy for " + topicId + " Event Cloud has been created");
-			} else {
-				putgetProxyEndpoint = listPutgetEndpoints.get(0);
-			}
-
-			PutGetWsApi pgc = WsClientFactory.createWsClient(PutGetWsApi.class, putgetProxyEndpoint);
-
-			response = pgc
-					.executeSparqlConstruct("CONSTRUCT ?s ?p ?o WHERE { GRAPH ?g {?s ?p ?o } } LIMIT 30");
-			
-		} catch(Exception e) {
-			Logger.error(e.getMessage());
-			return null;
-		}
-
-		// Load the statements
-		Model rdf = new ModelImplJena26(null, response.getResult(), Reasoning.rdfs);
-		// Load event hierarchy information
-		rdf.addModel(eventHierarchy);
-		
-		Iterator<Resource> eventIds = Event.getAllInstances(rdf);
-		while (eventIds.hasNext()) {
-			Resource id = eventIds.next();
-			Iterator<Statement> statements = rdf.findStatements(id, Variable.ANY, Variable.ANY);
-			Model event = RDF2Go.getModelFactory().createModel();
-			event.addAll(statements);
-			events.add(models.eventstream.Event.eventFromRdf(event));
-		}
-
-		return events;
-	}
 
 	@Util
 	public static boolean sendTokenPatternQuery(String token, String eventtopic) {

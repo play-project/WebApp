@@ -94,37 +94,10 @@ public class Application extends Controller {
 		render(u, topics, userTopics, su);
 	}
 
-	/**
-	 * Historical events
-	 */
-	public static void historicalEvents() {
-		User u = (User) request.args.get("user");
-		if (u == null) {
-			logout();
-		}
-		ArrayList<EventTopic> userTopics = u.getTopics();
-		render(userTopics);
-	}
-
-	public static void historicalByTopic(String topicId) {
-		EventTopic et = ModelManager.get().getTopicById(topicId);
-		if(et == null){
-			renderJSON("{\"error\":\"notfound\"}");
-		} else {
-			ArrayList<Event> events = WebService.getHistorical(et);
-			if(events == null){
-				renderJSON("{\"error\":\"couldnotconnect\"}");
-			} else if(events.size() == 0){
-				renderJSON("{\"error\":\"empty\"}");
-			}
-			renderJSON(events, new TypeToken<ArrayList<Event>>() {}.getType());
-		}
-	}
 
 	/**
 	 * Pattern Queries
 	 */
-
 	public static void patternQuery() {
 		render();
 	}

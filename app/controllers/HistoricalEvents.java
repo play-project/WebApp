@@ -1,5 +1,6 @@
 package controllers;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -34,23 +35,20 @@ import fr.inria.eventcloud.webservices.api.EventCloudManagementWsApi;
 import fr.inria.eventcloud.webservices.api.PutGetWsApi;
 import fr.inria.eventcloud.webservices.factories.WsClientFactory;
 
+/**
+ * 
+ * @author Alexandre Bourdin
+ * @author Roland Stühmer
+ * @author Laurent Pellegrino
+ *
+ * @version $Revision$
+ *
+ */
 public class HistoricalEvents extends Controller {
 	
 	public static String EC_MANAGEMENT_WS_SERVICE = 
 	        Constants.getProperties().getProperty("eventcloud.default.putget.endpoint");
 	
-	private static Model eventHierarchy;
-
-	static {
-		eventHierarchy = new ModelImplJena26(Reasoning.rdfs);
-		eventHierarchy.open();
-		try {
-			eventHierarchy.readFrom(WebService.class.getClassLoader().getResourceAsStream("types.n3"));
-		} catch (Exception e) {
-			Logger.error(e, "The event hierarchy could not be read from the classpath. This prevents us from parsing historic events.");
-		}
-	}
-
 	/**
 	 * Historical events
 	 */
@@ -88,10 +86,10 @@ public class HistoricalEvents extends Controller {
      * 
      * @return Returns null if topics doesn't exist. Returns an empty 
      * ArrayList if no events were found.
+	 * @throws IOException 
      */
     @Util
-    public static ArrayList<models.eventstream.Event> getHistorical(EventTopic et) {
-        try{
+    public static ArrayList<models.eventstream.Event> getHistorical(EventTopic et) throws IOException {
             // Creates an Event Cloud Management Web Service Client
             EventCloudManagementWsApi eventCloudManagementWsClient =
                     WsClientFactory.createWsClient(
@@ -100,7 +98,7 @@ public class HistoricalEvents extends Controller {
             String topicUrl = et.getTopicUrl();
 
             if (!eventCloudManagementWsClient.isCreated(topicUrl)) {
-                return null;
+                throw new IOException("Error: The Web Service client for this topic could not be created. Aborting.");
             }
 
             String putgetProxyEndpoint =
@@ -121,11 +119,11 @@ public class HistoricalEvents extends Controller {
             SparqlSelectResponse response = 
                     putgetProxyClient.executeSparqlSelect(sparqlQuery);
 
-            com.hp.hpl.jena.rdf.model.Model model = ModelFactory.createMemModelMaker().createDefaultModel();
-
             ResultSetWrapper result = response.getResult();
             
-            int count = 0;
+            ArrayList<models.eventstream.Event> events = 
+                    new ArrayList<models.eventstream.Event>();
+            
             while (result.hasNext()) {
                 QuerySolution qs = result.next();
                 Node id = qs.get("id").asNode();
@@ -138,31 +136,12 @@ public class HistoricalEvents extends Controller {
                 SparqlConstructResponse constructResponse =
                         putgetProxyClient.executeSparqlConstruct(sparqlQuery);
 
-                model.add(constructResponse.getResult());
-                count++;
+                Model rdf = new ModelImplJena26(constructResponse.getResult());
+
+                events.add(models.eventstream.Event.eventFromRdf(rdf));
             }
-
-            ArrayList<models.eventstream.Event> events = 
-                    new ArrayList<models.eventstream.Event>(count);
-            // Load the statements
-            Model rdf = new ModelImplJena26(null, model, Reasoning.rdfs);
-            // Load event hierarchy information
-            rdf.addModel(eventHierarchy);
-
-            Iterator<Resource> eventIds = org.event_processing.events.types.Event.getAllInstances(rdf);
-            while (eventIds.hasNext()) {
-                Resource id = eventIds.next();
-                Iterator<Statement> statements = rdf.findStatements(id, Variable.ANY, Variable.ANY);
-                Model event = RDF2Go.getModelFactory().createModel();
-                event.addAll(statements);
-                events.add(models.eventstream.Event.eventFromRdf(event));
-            }
-
             return events;
-        } catch(Exception e) {
-            Logger.error(e.getMessage());
-            return null;
-        }
+            
     }
  
     private static String findPutGetProxyEndpoint(EventCloudManagementWsApi eventCloudManagementWsClient,

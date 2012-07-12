@@ -2,6 +2,7 @@ package controllers;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -19,6 +20,7 @@ import org.ontoware.rdf2go.model.node.Resource;
 import org.ontoware.rdf2go.model.node.Variable;
 
 import play.Logger;
+import play.mvc.Before;
 import play.mvc.Controller;
 import play.mvc.Util;
 
@@ -28,6 +30,7 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import eu.play_project.play_commons.constants.Constants;
+import eu.play_project.play_commons.eventtypes.EventHelpers;
 import fr.inria.eventcloud.api.responses.SparqlConstructResponse;
 import fr.inria.eventcloud.api.responses.SparqlSelectResponse;
 import fr.inria.eventcloud.api.wrappers.ResultSetWrapper;
@@ -49,18 +52,28 @@ public class HistoricalEvents extends Controller {
 	public static String EC_MANAGEMENT_WS_SERVICE = 
 	        Constants.getProperties().getProperty("eventcloud.default.putget.endpoint");
 	
-	/**
-	 * Historical events
-	 */
-	public static void historicalEvents() {
-		User u = (User) request.args.get("user");
-		if (u == null) {
-			Application.logout();
+	@Before
+	private static void checkAuthentification() {
+		if (session.get("socialauth") != null) {
+			session.remove("socialauth");
+			Application.register();
+			return;
 		}
-		ArrayList<EventTopic> userTopics = u.getTopics();
-		render(userTopics);
+		String uid = session.get("userid");
+		if (uid == null) {
+			Application.login();
+			return;
+		}
+		User user = ModelManager.get().getUserById(Long.parseLong(uid));
+		if (user == null) {
+			Application.logout();
+			return;
+		}
+		user.lastRequest = new Date();
+		request.args.put("user", user);
 	}
-
+	
+	
 	public static void historicalByTopic(String topicId) {
 		EventTopic et = ModelManager.get().getTopicById(topicId);
 		if(et == null){
@@ -136,7 +149,8 @@ public class HistoricalEvents extends Controller {
                 SparqlConstructResponse constructResponse =
                         putgetProxyClient.executeSparqlConstruct(sparqlQuery);
 
-                Model rdf = new ModelImplJena26(constructResponse.getResult());
+                Model rdf = new ModelImplJena26(constructResponse.getResult()).open();
+                EventHelpers.addNamespaces(rdf);
 
                 events.add(models.eventstream.Event.eventFromRdf(rdf));
             }

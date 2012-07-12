@@ -5,7 +5,11 @@ import static eu.play_project.play_commons.constants.Namespace.EVENTS;
 
 import java.security.SecureRandom;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Random;
+
+import models.ModelManager;
+import models.User;
 
 import org.event_processing.events.types.FacebookStatusFeedEvent;
 import org.event_processing.events.types.TaxiUCCall;
@@ -21,6 +25,7 @@ import com.ebmwebsourcing.wsstar.topics.datatypes.impl.impl.WstopModelFactoryImp
 import com.ebmwebsourcing.wsstar.wsnb.services.impl.util.Wsnb4ServUtils;
 
 import play.Logger;
+import play.mvc.Before;
 import play.mvc.Controller;
 import eu.play_project.play_commons.constants.Stream;
 import eu.play_project.play_commons.eventtypes.EventHelpers;
@@ -30,6 +35,27 @@ public class EventSender extends Controller {
 
 	private static AbstractSender sender = new AbstractSender(Stream.FacebookStatusFeed.getTopicQName());
 	private static Random random = new Random();
+	
+	@Before
+	private static void checkAuthentification() {
+		if (session.get("socialauth") != null) {
+			session.remove("socialauth");
+			Application.register();
+			return;
+		}
+		String uid = session.get("userid");
+		if (uid == null) {
+			Application.login();
+			return;
+		}
+		User user = ModelManager.get().getUserById(Long.parseLong(uid));
+		if (user == null) {
+			Application.logout();
+			return;
+		}
+		user.lastRequest = new Date();
+		request.args.put("user", user);
+	}
 	
 	/**
 	 * Notify action triggered by buttons on the web interface Generates a
@@ -42,7 +68,7 @@ public class EventSender extends Controller {
 		
 		String eventId = EVENTS.getUri() + "webapp" + Math.abs(random.nextLong());
 
-		if (eventType == "fb") {
+		if (eventType.equals("fb")) {
 			FacebookStatusFeedEvent event = new FacebookStatusFeedEvent(EventHelpers.createEmptyModel(eventId),
 					eventId + EVENT_ID_SUFFIX, true);
 			event.setName("Roland Stühmer");
@@ -56,7 +82,7 @@ public class EventSender extends Controller {
 			
 			sender.notify(event, Stream.FacebookStatusFeed.getTopicQName());
 		}
-		else if (eventType == "call") {
+		else if (eventType.equals("call")) {
 			TaxiUCCall event = new TaxiUCCall(EventHelpers.createEmptyModel(eventId),
 					eventId + EVENT_ID_SUFFIX, true);
 			// Run some setters of the event
@@ -70,7 +96,7 @@ public class EventSender extends Controller {
 			sender.notify(event, Stream.TaxiUCCall.getTopicQName());
 		}
 		else {
-			Logger.error("A dummy event was to be simulated but it's type is unknown.");
+			Logger.error("A dummy event was to be simulated but it's type '%s' is unknown.", eventType);
 		}
 	}
 }

@@ -26,7 +26,7 @@ POST	/unsubscribe					Application.unsubscribe
 # Events
 GET		/waitevents						Application.waitEvents
 POST    /sendevent             		 	Application.sendEvent
-GET		/historical						HistoricalEvents.historicalEvents
+GET		/historical						Application.historicalEvents
 POST	/histobytopic					HistoricalEvents.historicalByTopic
 
 # WS

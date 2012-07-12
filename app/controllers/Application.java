@@ -94,7 +94,19 @@ public class Application extends Controller {
 		render(u, topics, userTopics, su);
 	}
 
-
+	/**
+	 * Historical events.
+	 */
+	public static void historicalEvents() {
+		User u = (User) request.args.get("user");
+		if (u == null) {
+			Logger.info("The request did not include the user argument. Logging out...");
+			Application.logout();
+		}
+		ArrayList<EventTopic> userTopics = u.getTopics();
+		render(userTopics);
+	}
+	
 	/**
 	 * Pattern Queries
 	 */

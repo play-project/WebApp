@@ -16,6 +16,7 @@ import org.ontoware.rdf2go.Reasoning;
 import org.ontoware.rdf2go.impl.jena29.ModelImplJena26;
 import org.ontoware.rdf2go.model.Model;
 import org.ontoware.rdf2go.model.Statement;
+import org.ontoware.rdf2go.model.Syntax;
 import org.ontoware.rdf2go.model.node.Resource;
 import org.ontoware.rdf2go.model.node.Variable;
 
@@ -122,12 +123,12 @@ public class HistoricalEvents extends Controller {
                     WsClientFactory.createWsClient(PutGetWsApi.class, putgetProxyEndpoint);
 
             String sparqlQuery = "PREFIX : <http://events.event-processing.org/types/>\n";
-            sparqlQuery += "SELECT ?id WHERE {\n    GRAPH ?g {\n";
+            sparqlQuery += "SELECT ?graph WHERE {\n    GRAPH ?graph {\n";
             // sparqlQuery += "        ?id :stream <" + topicUrl + "#stream> .\n";
             sparqlQuery += "        ?id :endTime ?publicationDateTime .\n";
             sparqlQuery += "    }\n} ORDER BY DESC(?publicationDateTime) LIMIT 10";
 
-            Logger.info("Executing the following historical SPARQL query " + sparqlQuery);
+            Logger.info("Executing the following historical SPARQL query: " + sparqlQuery);
 
             SparqlSelectResponse response = 
                     putgetProxyClient.executeSparqlSelect(sparqlQuery);
@@ -139,18 +140,22 @@ public class HistoricalEvents extends Controller {
             
             while (result.hasNext()) {
                 QuerySolution qs = result.next();
-                Node id = qs.get("id").asNode();
+                Node graph = qs.get("graph").asNode();
 
                 sparqlQuery =
-                        "CONSTRUCT { ?g ?p ?o } WHERE {\n    GRAPH ?g {\n" + 
-                        "        <" + id.getURI()
-                        + "> ?p ?o .\n    }\n" + "}";
+                        "CONSTRUCT { ?s ?p ?o } WHERE {" +
+                        "    GRAPH <" + graph.getURI() + "> {?s ?p ?o .}" +
+                        "}";
+
+                Logger.info("Executing the following historical SPARQL query: " + sparqlQuery);
 
                 SparqlConstructResponse constructResponse =
                         putgetProxyClient.executeSparqlConstruct(sparqlQuery);
 
                 Model rdf = new ModelImplJena26(constructResponse.getResult()).open();
                 EventHelpers.addNamespaces(rdf);
+
+                Logger.info("Resulting RDF: %s", rdf.serialize(Syntax.Turtle));
 
                 events.add(models.eventstream.Event.eventFromRdf(rdf));
             }

@@ -158,6 +158,7 @@ public class HistoricalEvents extends Controller {
             
     }
  
+	@Util
     private static String findPutGetProxyEndpoint(EventCloudManagementWsApi eventCloudManagementWsClient,
                                                   String topicUrl) {
         List<String> putgetProxyEndpoints = 

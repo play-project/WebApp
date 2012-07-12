@@ -80,6 +80,7 @@ import fr.inria.eventcloud.webservices.factories.WsClientFactory;
  * @author Alexandre Bourdin
  */
 public class WebService extends Controller {
+    
 	public static String DSB_RESOURCE_SERVICE = Constants.getProperties().getProperty("dsb.notify.endpoint");
 	private static AbstractReceiver receiver = new AbstractReceiver() {};
 

@@ -86,4 +86,15 @@ public class EventTopic {
 		}
 		return false;
 	}
+	
+	public String getTopicUrl() {
+	    String result = this.uri;
+	    
+	    if (!this.uri.endsWith("/")) {
+	        result += '/';
+	    }
+	    
+	    return result + this.name;
+	}
+	
 }

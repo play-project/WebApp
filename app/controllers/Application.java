@@ -114,9 +114,9 @@ public class Application extends Controller {
 		render();
 	}
 
-	public static void processTokenPatternQuery(String token, String eventtopic) {
+	public static void processTokenPatternQuery(String token) {
 		if (token != null && token != "") {
-			Boolean result = WebService.sendTokenPatternQuery(token, eventtopic);
+			Boolean result = QueryDispatch.sendTokenPatternQuery(token);
 			if (!result) {
 				flash.error("The operation encoutered an error.");
 			}
@@ -128,10 +128,10 @@ public class Application extends Controller {
 		patternQuery();
 	}
 
-	public static void processFullPatternQuery(String text, String eventtopic) {
+	public static void processFullPatternQuery(String text) {
 		if (text != null && text != "") {
 			try{
-			Boolean result = WebService.sendFullPatternQuery(text, eventtopic);
+			Boolean result = QueryDispatch.sendFullPatternQuery(text);
 			} catch (Exception e) {
 				flash.error(e.getMessage());
 			}

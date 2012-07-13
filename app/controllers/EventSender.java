@@ -92,6 +92,7 @@ public class EventSender extends Controller {
 			// Create a Calendar for the current date and time
 			event.setEndTime(Calendar.getInstance());
 			event.setStream(new URIImpl(Stream.TaxiUCCall.getUri()));
+			EventHelpers.addLocationToEvent(event, 111, 222);
 			
 			sender.notify(event, Stream.TaxiUCCall.getTopicQName());
 		}

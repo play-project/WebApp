@@ -88,7 +88,7 @@ public class EventSender extends Controller {
 			// Run some setters of the event
 			event.setUctelcoCalleePhoneNumber("49123456789");
 			event.setUctelcoCallerPhoneNumber("49123498765");
-			event.setUctelcoDirection("Alice");
+			event.setUctelcoDirection("incoming");
 			// Create a Calendar for the current date and time
 			event.setEndTime(Calendar.getInstance());
 			event.setStream(new URIImpl(Stream.TaxiUCCall.getUri()));

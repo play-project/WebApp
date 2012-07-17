@@ -122,16 +122,22 @@ public class HistoricalEvents extends Controller {
             PutGetWsApi putgetProxyClient = 
                     WsClientFactory.createWsClient(PutGetWsApi.class, putgetProxyEndpoint);
 
+            /*
+			 * Ask for the graph names first (and finish with a second query later
+			 * in another query, for efficiency in EventCloud. The first query
+			 * returns the internal long graph names to be re-used without
+			 * modification in the second query.
+			 */
+            String sparqlQuery = "PREFIX eventcloud: <http://eventcloud.inria.fr/function#> "
+            	+ "PREFIX : <http://events.event-processing.org/types/> "
+            	+ "SELECT ?graph WHERE { "
+				+ "   GRAPH ?graph {?id :endTime ?publicationDateTime . } "
+				+ "} ORDER BY DESC(?publicationDateTime) LIMIT 10 ";
 //            String sparqlQuery = "PREFIX : <http://events.event-processing.org/types/>\n";
-//            sparqlQuery += "SELECT ?graph WHERE {\n    GRAPH ?graph {\n";
+//            sparqlQuery += "SELECT ?id WHERE {\n    GRAPH ?graph {\n";
 //            // sparqlQuery += "        ?id :stream <" + topicUrl + "#stream> .\n";
 //            sparqlQuery += "        ?id :endTime ?publicationDateTime .\n";
 //            sparqlQuery += "    }\n} ORDER BY DESC(?publicationDateTime) LIMIT 10";
-            String sparqlQuery = "PREFIX : <http://events.event-processing.org/types/>\n";
-            sparqlQuery += "SELECT ?id WHERE {\n    GRAPH ?graph {\n";
-            // sparqlQuery += "        ?id :stream <" + topicUrl + "#stream> .\n";
-            sparqlQuery += "        ?id :endTime ?publicationDateTime .\n";
-            sparqlQuery += "    }\n} ORDER BY DESC(?publicationDateTime) LIMIT 10";
 
             Logger.info("Executing the following historical SPARQL query: " + sparqlQuery);
 
@@ -145,16 +151,16 @@ public class HistoricalEvents extends Controller {
             
             while (result.hasNext()) {
                 QuerySolution qs = result.next();
-//                Node graph = qs.get("graph").asNode();
-//                sparqlQuery =
-//                        "CONSTRUCT { ?s ?p ?o } WHERE {" +
-//                        "    GRAPH <" + graph.getURI() + "> {?s ?p ?o .}" +
-//                        "}";
-                Node id = qs.get("id").asNode();
+                Node graph = qs.get("graph").asNode();
                 sparqlQuery =
-                        "CONSTRUCT { <" + id.getURI() + "> ?p ?o } WHERE {" +
-                        "    GRAPH ?g {<" + id.getURI() + "> ?p ?o .}" +
+                        "CONSTRUCT { ?s ?p ?o } WHERE {" +
+                        "    GRAPH <" + graph.getURI() + "> {?s ?p ?o .}" +
                         "}";
+//                Node id = qs.get("id").asNode();
+//                sparqlQuery =
+//                        "CONSTRUCT { <" + id.getURI() + "> ?p ?o } WHERE {" +
+//                        "    GRAPH ?g {<" + id.getURI() + "> ?p ?o .}" +
+//                        "}";
 
                 Logger.info("Executing the following historical SPARQL query: " + sparqlQuery);
 

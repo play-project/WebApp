@@ -80,15 +80,14 @@ import fr.inria.eventcloud.webservices.factories.WsClientFactory;
  * @author Alexandre Bourdin
  */
 public class WebService extends Controller {
+    
 	public static String DSB_RESOURCE_SERVICE = Constants.getProperties().getProperty("dsb.notify.endpoint");
 	private static AbstractReceiver receiver = new AbstractReceiver() {};
-	private static AbstractSender eventSender;
 
 	static {
 		Wsnb4ServUtils.initModelFactories(new WsrfbfModelFactoryImpl(), new WsrfrModelFactoryImpl(),
 				new WsrfrlModelFactoryImpl(), new WsrfrpModelFactoryImpl(), new WstopModelFactoryImpl(),
 				new WsnbModelFactoryImpl());
-		eventSender = new AbstractSender(Stream.FacebookStatusFeed.getTopicQName());
 	}
 
 	/**
@@ -216,74 +215,5 @@ public class WebService extends Controller {
 		}
 
 		return 1;
-	}
-
-
-
-	@Util
-	public static boolean sendTokenPatternQuery(String token, String eventtopic) {
-		String defaultQueryString = PredefinedPatterns.getPattern("play-epsparql-m12-jeans-example-query.eprq");
-		String queryString = defaultQueryString.replaceAll("\"JEANS\"", "\"" + token + "\"");
-
-		URL wsdl = null;
-		try {
-			wsdl = new URL(Constants.getProperties().getProperty("platfomservices.querydispatchapi.endpoint") + "?wsdl");
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
-
-		QName serviceName = new QName("http://play_platformservices.play_project.eu/", "QueryDispatchApi");
-
-		Service service = Service.create(wsdl, serviceName);
-		QueryDispatchApi queryDispatchApi = service.getPort(QueryDispatchApi.class);
-
-		try {
-		String s = queryDispatchApi.registerQuery("patternId_" + Math.random(), queryString);
-		Logger.info(s);
-		} catch (Exception e) {
-			Logger.error(e.toString());
-			return false;
-		}
-		return true;
-	}
-
-	public static Boolean sendFullPatternQuery(String queryString, String eventtopic) {
-
-		URL wsdl = null;
-		try {
-			wsdl = new URL(Constants.getProperties().getProperty("platfomservices.querydispatchapi.endpoint") + "?wsdl");
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
-
-		QName serviceName = new QName("http://play_platformservices.play_project.eu/", "QueryDispatchApi");
-
-		Service service = Service.create(wsdl, serviceName);
-		QueryDispatchApi queryDispatchApi = service
-				.getPort(eu.play_project.play_platformservices.api.QueryDispatchApi.class);
-		String s = queryDispatchApi.registerQuery("patternId_" + Math.random(), queryString);
-		Logger.info(s);
-		return true;
-	}
-
-	/**
-	 * Notify action triggered by buttons on the web interface Generates a
-	 * Facebook status event event and sends it to the DSB
-	 */
-	public static void simulateFacebookStatusFeedEvent() {
-		String eventId = Stream.FacebookStatusFeed.getUri() + new SecureRandom().nextLong();
-
-		FacebookStatusFeedEvent event = new FacebookStatusFeedEvent(EventHelpers.createEmptyModel(eventId),
-				eventId + EVENT_ID_SUFFIX, true);
-
-		event.setName("Roland Stühmer");
-		event.setId("100000058455726");
-		event.setLink(new URIImpl("http://graph.facebook.com/roland.stuehmer#"));
-		event.setStatus("I bought some JEANS this morning");
-		event.setUserLocation("Karlsruhe, Germany");
-		event.setEndTime(Calendar.getInstance());
-		event.setStream(new URIImpl(Stream.FacebookStatusFeed.getUri()));
-		Logger.info("Sending event: %s", event.getModel().serialize(Syntax.Turtle));
-		eventSender.notify(event);
 	}
 }

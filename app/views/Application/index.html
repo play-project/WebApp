@@ -113,12 +113,10 @@
 </div>
 
 <div style="clear: left; padding-top: 30px;">
-	<input id="send0" type="button" value="Send a dummy FacebookStatusEvent" /><br />
-	<!-- 
-	<input id="send1" type="button" value="Send event on internalns_childTopic1" /><br />
-	<input id="send2" type="button" value="Send event on internalns_grandChildTopic21" /><br />
-	<input id="send3" type="button" value="Send event on internalns_childTopic3" /><br />
-	 -->
+	<fieldset><legend>Trigger dummy events:</legend>
+	<input id="send0" type="button" value="Facebook Event" /><br />
+	<input id="send1" type="button" value="Call Event" /><br />
+	</fieldset>
 </div>
 
 <script type="text/javascript">
@@ -239,10 +237,13 @@ $(function() {
 var $lastReceived = 0
 var waitEvents = #{jsAction @waitEvents(':lastReceived') /}
 
-var sendFbStatusEvent = #{jsAction @WebService.simulateFacebookStatusFeedEvent() /}
+var sendEvent = #{jsAction @EventSender.simulate(':eventType') /}
 
 $("#send0").click(function(e) {
-	$.post(sendFbStatusEvent())
+	$.post(sendEvent({eventType: 'fb'}))
+});
+$("#send1").click(function(e) {
+	$.post(sendEvent({eventType: 'call'}))
 });
 
 var $consecutiveErrorsCount = 0;

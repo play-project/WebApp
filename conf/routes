@@ -26,13 +26,15 @@ POST	/unsubscribe					Application.unsubscribe
 # Events
 GET		/waitevents						Application.waitEvents
 POST    /sendevent             		 	Application.sendEvent
-GET		/historical						HistoricalEvents.historicalEvents
+GET		/historical						Application.historicalEvents
 POST	/histobytopic					HistoricalEvents.historicalByTopic
 
 # WS
 POST	/webservice/soapnotifendpoint/{topicId}		WebService.soapNotifEndPoint
 GET		/webservice/topics							WebService.getSupportedTopics
-POST	/webservice/facebookstatus					WebService.simulateFacebookStatusFeedEvent
+
+# Triggering dummy events
+POST	/eventsender/simulate			EventSender.simulate
 
 # Ignore favicon requests
 GET     /favicon.ico                    404

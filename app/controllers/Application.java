@@ -94,7 +94,19 @@ public class Application extends Controller {
 		render(u, topics, userTopics, su);
 	}
 
-
+	/**
+	 * Historical events.
+	 */
+	public static void historicalEvents() {
+		User u = (User) request.args.get("user");
+		if (u == null) {
+			Logger.info("The request did not include the user argument. Logging out...");
+			Application.logout();
+		}
+		ArrayList<EventTopic> userTopics = u.getTopics();
+		render(userTopics);
+	}
+	
 	/**
 	 * Pattern Queries
 	 */
@@ -102,9 +114,9 @@ public class Application extends Controller {
 		render();
 	}
 
-	public static void processTokenPatternQuery(String token, String eventtopic) {
+	public static void processTokenPatternQuery(String token) {
 		if (token != null && token != "") {
-			Boolean result = WebService.sendTokenPatternQuery(token, eventtopic);
+			Boolean result = QueryDispatch.sendTokenPatternQuery(token);
 			if (!result) {
 				flash.error("The operation encoutered an error.");
 			}
@@ -116,10 +128,10 @@ public class Application extends Controller {
 		patternQuery();
 	}
 
-	public static void processFullPatternQuery(String text, String eventtopic) {
+	public static void processFullPatternQuery(String text) {
 		if (text != null && text != "") {
 			try{
-			Boolean result = WebService.sendFullPatternQuery(text, eventtopic);
+			Boolean result = QueryDispatch.sendFullPatternQuery(text);
 			} catch (Exception e) {
 				flash.error(e.getMessage());
 			}
@@ -240,7 +252,6 @@ public class Application extends Controller {
 	/**
 	 * Events handlers
 	 */
-
 	public static void sendEvent(@Required String title, @Required String content, @Required String topic) {
 		ModelManager.get().getTopicById(topic).multicast(new models.eventstream.Event(title, content));
 	}

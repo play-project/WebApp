@@ -1,70 +1,80 @@
 package controllers;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-
-import org.ontoware.rdf2go.RDF2Go;
-import org.ontoware.rdf2go.Reasoning;
-import org.ontoware.rdf2go.impl.jena29.ModelImplJena26;
-import org.ontoware.rdf2go.model.Model;
-import org.ontoware.rdf2go.model.Statement;
-import org.ontoware.rdf2go.model.node.Resource;
-import org.ontoware.rdf2go.model.node.Variable;
 
 import models.ModelManager;
 import models.User;
 import models.eventstream.Event;
 import models.eventstream.EventTopic;
 
-import com.ebmwebsourcing.wsstar.basefaults.datatypes.impl.impl.WsrfbfModelFactoryImpl;
-import com.ebmwebsourcing.wsstar.basenotification.datatypes.impl.impl.WsnbModelFactoryImpl;
-import com.ebmwebsourcing.wsstar.resource.datatypes.impl.impl.WsrfrModelFactoryImpl;
-import com.ebmwebsourcing.wsstar.resourcelifetime.datatypes.impl.impl.WsrfrlModelFactoryImpl;
-import com.ebmwebsourcing.wsstar.resourceproperties.datatypes.impl.impl.WsrfrpModelFactoryImpl;
-import com.ebmwebsourcing.wsstar.topics.datatypes.impl.impl.WstopModelFactoryImpl;
-import com.ebmwebsourcing.wsstar.wsnb.services.impl.util.Wsnb4ServUtils;
+import org.ontoware.rdf2go.RDF2Go;
+import org.ontoware.rdf2go.Reasoning;
+import org.ontoware.rdf2go.impl.jena29.ModelImplJena26;
+import org.ontoware.rdf2go.model.Model;
+import org.ontoware.rdf2go.model.Statement;
+import org.ontoware.rdf2go.model.Syntax;
+import org.ontoware.rdf2go.model.node.Resource;
+import org.ontoware.rdf2go.model.node.Variable;
+
+import play.Logger;
+import play.mvc.Before;
+import play.mvc.Controller;
+import play.mvc.Util;
+
 import com.google.gson.reflect.TypeToken;
+import com.hp.hpl.jena.graph.Node;
+import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import eu.play_project.play_commons.constants.Constants;
-import eu.play_project.play_commons.constants.Stream;
-import eu.play_project.play_eventadapter.AbstractSender;
+import eu.play_project.play_commons.eventtypes.EventHelpers;
 import fr.inria.eventcloud.api.responses.SparqlConstructResponse;
+import fr.inria.eventcloud.api.responses.SparqlSelectResponse;
+import fr.inria.eventcloud.api.wrappers.ResultSetWrapper;
 import fr.inria.eventcloud.webservices.api.EventCloudManagementWsApi;
 import fr.inria.eventcloud.webservices.api.PutGetWsApi;
 import fr.inria.eventcloud.webservices.factories.WsClientFactory;
 
-import play.Logger;
-import play.mvc.Controller;
-import play.mvc.Util;
-
+/**
+ * 
+ * @author Alexandre Bourdin
+ * @author Roland Stühmer
+ * @author Laurent Pellegrino
+ *
+ * @version $Revision$
+ *
+ */
 public class HistoricalEvents extends Controller {
 	
-	public static String EC_MANAGEMENT_WS_SERVICE = Constants.getProperties().getProperty(
-			"eventcloud.default.putget.endpoint");
-	private static Model eventHierarchy;
-
-	static {
-		eventHierarchy = new ModelImplJena26(Reasoning.rdfs);
-		try {
-			eventHierarchy.readFrom(WebService.class.getClassLoader().getResourceAsStream("types.n3"));
-		} catch (Exception e) {
-			Logger.error(e, "The event hierarchy could not be read from the classpath. This prevents us from parsing historic events.");
+	public static String EC_MANAGEMENT_WS_SERVICE = 
+	        Constants.getProperties().getProperty("eventcloud.default.putget.endpoint");
+	
+	@Before
+	private static void checkAuthentification() {
+		if (session.get("socialauth") != null) {
+			session.remove("socialauth");
+			Application.register();
+			return;
 		}
-	}
-
-	/**
-	 * Historical events
-	 */
-	public static void historicalEvents() {
-		User u = (User) request.args.get("user");
-		if (u == null) {
+		String uid = session.get("userid");
+		if (uid == null) {
+			Application.login();
+			return;
+		}
+		User user = ModelManager.get().getUserById(Long.parseLong(uid));
+		if (user == null) {
 			Application.logout();
+			return;
 		}
-		ArrayList<EventTopic> userTopics = u.getTopics();
-		render(userTopics);
+		user.lastRequest = new Date();
+		request.args.put("user", user);
 	}
-
+	
+	
 	public static void historicalByTopic(String topicId) {
 		EventTopic et = ModelManager.get().getTopicById(topicId);
 		if(et == null){
@@ -84,62 +94,102 @@ public class HistoricalEvents extends Controller {
 	}
 
 	/**
-	 * Retreives historical events for a given topic Returns null if topics
-	 * doesn't exist Returns an empty ArrayList if no events were found
-	 * 
-	 * @param et
-	 * @return
-	 * @throws Exception 
-	 */
+     * Retrieves the last 30 historical events for a given topic.
+     * 
+     * @param et event topic.
+     * 
+     * @return Returns null if topics doesn't exist. Returns an empty 
+     * ArrayList if no events were found.
+	 * @throws IOException 
+     */
+    @Util
+    public static ArrayList<models.eventstream.Event> getHistorical(EventTopic et) throws IOException {
+            // Creates an Event Cloud Management Web Service Client
+            EventCloudManagementWsApi eventCloudManagementWsClient =
+                    WsClientFactory.createWsClient(
+                            EventCloudManagementWsApi.class, EC_MANAGEMENT_WS_SERVICE);
+
+            String topicUrl = et.getTopicUrl();
+
+            if (!eventCloudManagementWsClient.isCreated(topicUrl)) {
+                throw new IOException("Error: The Web Service client for this topic could not be created. Aborting.");
+            }
+
+            String putgetProxyEndpoint =
+                    findPutGetProxyEndpoint(
+                            eventCloudManagementWsClient, topicUrl);
+
+            PutGetWsApi putgetProxyClient = 
+                    WsClientFactory.createWsClient(PutGetWsApi.class, putgetProxyEndpoint);
+
+            /*
+			 * Ask for the graph names first (and finish with a second query later
+			 * in another query, for efficiency in EventCloud. The first query
+			 * returns the internal long graph names to be re-used without
+			 * modification in the second query.
+			 */
+            String sparqlQuery = "PREFIX eventcloud: <http://eventcloud.inria.fr/function#> "
+            	+ "PREFIX : <http://events.event-processing.org/types/> "
+            	+ "SELECT ?graph WHERE { "
+				+ "   GRAPH ?graph {?id :endTime ?publicationDateTime . } "
+				+ "} ORDER BY DESC(?publicationDateTime) LIMIT 10 ";
+//            String sparqlQuery = "PREFIX : <http://events.event-processing.org/types/>\n";
+//            sparqlQuery += "SELECT ?id WHERE {\n    GRAPH ?graph {\n";
+//            // sparqlQuery += "        ?id :stream <" + topicUrl + "#stream> .\n";
+//            sparqlQuery += "        ?id :endTime ?publicationDateTime .\n";
+//            sparqlQuery += "    }\n} ORDER BY DESC(?publicationDateTime) LIMIT 10";
+
+            Logger.info("Executing the following historical SPARQL query: " + sparqlQuery);
+
+            SparqlSelectResponse response = 
+                    putgetProxyClient.executeSparqlSelect(sparqlQuery);
+
+            ResultSetWrapper result = response.getResult();
+            
+            ArrayList<models.eventstream.Event> events = 
+                    new ArrayList<models.eventstream.Event>();
+            
+            while (result.hasNext()) {
+                QuerySolution qs = result.next();
+                Node graph = qs.get("graph").asNode();
+                sparqlQuery =
+                        "CONSTRUCT { ?s ?p ?o } WHERE {" +
+                        "    GRAPH <" + graph.getURI() + "> {?s ?p ?o .}" +
+                        "}";
+//                Node id = qs.get("id").asNode();
+//                sparqlQuery =
+//                        "CONSTRUCT { <" + id.getURI() + "> ?p ?o } WHERE {" +
+//                        "    GRAPH ?g {<" + id.getURI() + "> ?p ?o .}" +
+//                        "}";
+
+                Logger.info("Executing the following historical SPARQL query: " + sparqlQuery);
+
+                SparqlConstructResponse constructResponse =
+                        putgetProxyClient.executeSparqlConstruct(sparqlQuery);
+
+                Model rdf = new ModelImplJena26(constructResponse.getResult()).open();
+                EventHelpers.addNamespaces(rdf);
+
+                Logger.info("Resulting RDF: %s", rdf.serialize(Syntax.Turtle));
+
+                events.add(models.eventstream.Event.eventFromRdf(rdf));
+            }
+            return events;
+            
+    }
+ 
 	@Util
-	public static ArrayList<models.eventstream.Event> getHistorical(EventTopic et) throws Exception {
-		ArrayList<models.eventstream.Event> events = new ArrayList<models.eventstream.Event>();
-		
-		SparqlConstructResponse response;
-		try{
-			// Creates an Event Cloud Management Web Service Client
-			EventCloudManagementWsApi eventCloudManagementWsClient = WsClientFactory.createWsClient(
-					EventCloudManagementWsApi.class, EC_MANAGEMENT_WS_SERVICE);
-
-			List<String> ecIds = eventCloudManagementWsClient.getEventCloudIds();
-			String topicId = et.uri + et.name;
-			if (ecIds == null || !ecIds.contains(topicId)) {
-				throw new Exception("Error: Event Cloud not found.");
-			}
-
-			List<String> listPutgetEndpoints = eventCloudManagementWsClient.getPutgetProxyEndpointUrls(topicId);
-			String putgetProxyEndpoint = null;
-			if (listPutgetEndpoints == null || listPutgetEndpoints.size() == 0) {
-				putgetProxyEndpoint = eventCloudManagementWsClient.createPutGetProxy(topicId);
-				Logger.info("New putget proxy for " + topicId + " Event Cloud has been created");
-			} else {
-				putgetProxyEndpoint = listPutgetEndpoints.get(0);
-			}
-
-			PutGetWsApi pgc = WsClientFactory.createWsClient(PutGetWsApi.class, putgetProxyEndpoint);
-
-			response = pgc
-					.executeSparqlConstruct("CONSTRUCT {?s ?p ?o} WHERE { GRAPH ?g {?s ?p ?o } } LIMIT 30");
-			
-		} catch(Exception e) {
-			Logger.error(e.getMessage());
-			throw new Exception("Error: A problem occurred while asking for historic events: " + e.getMessage());
-		}
-
-		// Load the statements
-		Model rdf = new ModelImplJena26(null, response.getResult(), Reasoning.rdfs);
-		// Load event hierarchy information
-		rdf.addModel(eventHierarchy);
-		
-		Iterator<Resource> eventIds = org.event_processing.events.types.Event.getAllInstances(rdf);
-		while (eventIds.hasNext()) {
-			Resource id = eventIds.next();
-			Iterator<Statement> statements = rdf.findStatements(id, Variable.ANY, Variable.ANY);
-			Model event = RDF2Go.getModelFactory().createModel();
-			event.addAll(statements);
-			events.add(models.eventstream.Event.eventFromRdf(event));
-		}
-
-		return events;
-	}
+    private static String findPutGetProxyEndpoint(EventCloudManagementWsApi eventCloudManagementWsClient,
+                                                  String topicUrl) {
+        List<String> putgetProxyEndpoints = 
+                eventCloudManagementWsClient.getPutgetProxyEndpointUrls(topicUrl);
+        
+        if (putgetProxyEndpoints == null || putgetProxyEndpoints.size() == 0) {
+            Logger.info("Creating new putget proxy for eventcloud " + topicUrl);
+            return eventCloudManagementWsClient.createPutGetProxy(topicUrl);
+        } else {
+            return putgetProxyEndpoints.get(0);
+        }
+    }
+    
 }

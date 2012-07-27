@@ -91,7 +91,7 @@
 		<dependency>
 			<groupId>fr.inria.eventcloud</groupId>
 			<artifactId>eventcloud-webservices-core</artifactId>
-			<version>1.1.0-SNAPSHOT</version>
+			<version>1.0.0</version>
 			<exclusions>
 				<!-- exclude various files mostly because of conflicts with playframework -->
 				<exclusion>
@@ -155,6 +155,11 @@
 		<dependency>
 			<groupId>eu.play-project</groupId>
 			<artifactId>play-eventadapter-abstractrdfsender</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.ow2.play</groupId>
+			<artifactId>governance-api</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>

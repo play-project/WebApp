@@ -18,8 +18,8 @@ import play.libs.F.*;
  */
 public class EventTopic {
 	public String name;
+	public String prefix;
 	public String namespace;
-	public String uri;
 	public String title;
 	public String icon;
 	public String content;
@@ -28,11 +28,11 @@ public class EventTopic {
 	public String subscriptionID;
 	public boolean alreadySubscribedDSB;
 
-	public EventTopic(String namespace, String name, String uri, String title, String icon, String content,
+	public EventTopic(String prefix, String name, String namespace, String title, String icon, String content,
 			String path) {
-		this.namespace = namespace;
+		this.prefix = prefix;
 		this.name = name;
-		this.uri = uri;
+		this.namespace = namespace;
 		this.title = title;
 		this.icon = icon;
 		this.content = content;
@@ -71,7 +71,7 @@ public class EventTopic {
 	}
 
 	public String getId() {
-		return namespace + "_" + name;
+		return prefix + "_" + name;
 	}
 
 	@Override
@@ -81,16 +81,16 @@ public class EventTopic {
 		if (!(o instanceof EventTopic))
 			return false;
 		EventTopic u = (EventTopic) o;
-		if (u.namespace.equals(namespace) && u.name.equals(name)) {
+		if (u.prefix.equals(prefix) && u.name.equals(name)) {
 			return true;
 		}
 		return false;
 	}
 	
 	public String getTopicUrl() {
-	    String result = this.uri;
+	    String result = this.namespace;
 	    
-	    if (!this.uri.endsWith("/")) {
+	    if (!this.namespace.endsWith("/")) {
 	        result += '/';
 	    }
 	    

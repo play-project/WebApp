@@ -23,6 +23,9 @@ import models.PredefinedPatterns;
 import models.SupportedTopicsXML;
 import models.eventstream.EventTopic;
 
+import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.event_processing.events.types.Event;
 import org.event_processing.events.types.FacebookStatusFeedEvent;
 import org.hibernate.event.AbstractEvent;
@@ -39,6 +42,12 @@ import org.ontoware.rdf2go.model.node.Resource;
 import org.ontoware.rdf2go.model.node.Variable;
 import org.ontoware.rdf2go.model.node.impl.URIImpl;
 import org.ontoware.rdf2go.util.ModelUtils;
+import org.ow2.play.governance.api.EventGovernance;
+import org.ow2.play.governance.api.bean.Topic;
+import org.ow2.play.metadata.api.Data;
+import org.ow2.play.metadata.api.Metadata;
+import org.ow2.play.metadata.api.service.MetadataService;
+import org.ow2.play.metadata.client.MetadataClient;
 import org.petalslink.dsb.notification.client.http.HTTPNotificationProducerRPClient;
 import org.petalslink.dsb.notification.client.http.simple.HTTPProducerClient;
 import org.petalslink.dsb.notification.client.http.simple.HTTPSubscriptionManagerClient;
@@ -80,13 +89,17 @@ import fr.inria.eventcloud.webservices.factories.WsClientFactory;
  * @author Alexandre Bourdin
  */
 public class WebService extends Controller {
-    
-	public static String DSB_RESOURCE_SERVICE = Constants.getProperties().getProperty("dsb.notify.endpoint");
-	private static AbstractReceiver receiver = new AbstractReceiver() {};
+
+	public static String DSB_NOTIFICATION_PRODUCER_SERVICE = Constants.getProperties().getProperty("dsb.subscribe.endpoint");
+	public static String EVENT_GOVERNANCE_SERVICE = Constants.getProperties().getProperty("governance.eventgovernance.endpoint");
+	public static String METADATA_SERVICE = Constants.getProperties().getProperty("governance.metadataservice.endpoint");
+	private static AbstractReceiver receiver = new AbstractReceiver() {
+	};
 
 	static {
-		Wsnb4ServUtils.initModelFactories(new WsrfbfModelFactoryImpl(), new WsrfrModelFactoryImpl(),
-				new WsrfrlModelFactoryImpl(), new WsrfrpModelFactoryImpl(), new WstopModelFactoryImpl(),
+		Wsnb4ServUtils.initModelFactories(new WsrfbfModelFactoryImpl(),
+				new WsrfrModelFactoryImpl(), new WsrfrlModelFactoryImpl(),
+				new WsrfrpModelFactoryImpl(), new WstopModelFactoryImpl(),
 				new WsnbModelFactoryImpl());
 	}
 
@@ -102,17 +115,18 @@ public class WebService extends Controller {
 
 		// A trick to read a Stream into to String:
 		try {
-			notifyMessage = new java.util.Scanner(request.body).useDelimiter("\\A").next();
+			notifyMessage = new java.util.Scanner(request.body).useDelimiter("\\A")
+					.next();
 		} catch (java.util.NoSuchElementException e) {
 			notifyMessage = "";
 		}
 
-		 //Print some event to debug output:
-//		if (ModelManager.get().getTopicById(topicId).getId()
-//				.equals("s_FacebookCepResults")) {
-//			Logger.info(notifyMessage);
-//		} // FIXME stuehmer: added by roland, not important
-		
+		// Print some event to debug output:
+		// if (ModelManager.get().getTopicById(topicId).getId()
+		// .equals("s_FacebookCepResults")) {
+		// Logger.info(notifyMessage);
+		// } // FIXME stuehmer: added by roland, not important
+
 		Model rdf;
 		try {
 			/*
@@ -127,8 +141,12 @@ public class WebService extends Controller {
 			 * Deal with non-RDF events:
 			 */
 			String eventTitle = "Event";
-			String eventText = HTML.htmlEscape(EventFormatHelpers.unwrapFromNativeMessageElement(notifyMessage))
-					.replaceAll("\n", "<br />").replaceAll("\\s{4}", "&nbsp;&nbsp;&nbsp;&nbsp;");
+			String eventText = HTML
+					.htmlEscape(
+							EventFormatHelpers
+									.unwrapFromNativeMessageElement(notifyMessage))
+					.replaceAll("\n", "<br />")
+					.replaceAll("\\s{4}", "&nbsp;&nbsp;&nbsp;&nbsp;");
 			ModelManager.get().getTopicById(topicId)
 					.multicast(new models.eventstream.Event(eventTitle, eventText));
 		}
@@ -139,29 +157,47 @@ public class WebService extends Controller {
 	 */
 	@Util
 	public static ArrayList<EventTopic> getSupportedTopics() {
-		Logger.info("Getting topics from DSB at %s", DSB_RESOURCE_SERVICE);
+		Logger.info("Getting topics from Event Governance at %s",
+				EVENT_GOVERNANCE_SERVICE);
 
-		INotificationProducerRP resourceClient = new HTTPNotificationProducerRPClient(DSB_RESOURCE_SERVICE);
+		ArrayList<EventTopic> result = new ArrayList<EventTopic>();
 
-		ArrayList<EventTopic> topics = new ArrayList<EventTopic>();
+		JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+		factory.getInInterceptors().add(new LoggingInInterceptor());
+		factory.getOutInterceptors().add(new LoggingOutInterceptor());
+		factory.setServiceClass(EventGovernance.class);
+		factory.setAddress(EVENT_GOVERNANCE_SERVICE);
+		EventGovernance eventGovernance = (EventGovernance) factory.create();
+
+		MetadataClient client = new MetadataClient(METADATA_SERVICE);
 
 		try {
-			QName qname = WstopConstants.TOPIC_SET_QNAME;
-			com.ebmwebsourcing.wsstar.resourceproperties.datatypes.api.abstraction.GetResourcePropertyResponse response = resourceClient
-					.getResourceProperty(qname);
-
-			Document dom = Wsnb4ServUtils.getWsrfrpWriter().writeGetResourcePropertyResponseAsDOM(response);
-			String topicsString = XMLHelper.createStringFromDOMDocument(dom);
-
-			Logger.info("TOPICS STRING: " + topicsString);
-
-			SAXBuilder sxb = new SAXBuilder();
-			org.jdom.Document xml = new org.jdom.Document();
-			org.jdom.Element root = null;
-			xml = sxb.build(new StringReader(topicsString));
-			root = xml.getRootElement();
-
-			SupportedTopicsXML.parseXMLTree(topics, root, "");
+			List<Topic> topics = eventGovernance.getTopics();
+			Logger.info("Number of topics : " + topics.size());
+			String icon = "/images/noicon.png";
+			String content = "No description available.";
+			String title = "";
+			for (Topic t : topics) {
+				Logger.info("name:" + t.getName() + " ns:" + t.getNs() + " prefix:"
+						+ t.getPrefix());
+				List<Metadata> metadataList = client
+						.getMetaData(new org.ow2.play.metadata.api.Resource("stream", t
+								.getNs() + t.getName()));
+				for (Metadata m : metadataList) {
+					for (Data d : m.getData()) {
+						if (m.getName().equals("http://www.w3.org/2002/06/xhtml2/icon")) {
+							icon = d.getValue();
+						} else if (m.getName().equals(
+								"http://purl.org/dc/elements/1.1/title")) {
+							title = d.getValue();
+						} else if (m.getName().equals(
+								"http://purl.org/dc/elements/1.1/desciption")) {
+							content = d.getValue();
+						}
+					}
+				}
+				result.add(new EventTopic(t.getPrefix(), t.getName(), t.getNs(), title, icon, content, ""));
+			}
 
 		} catch (Exception e) {
 			Logger.warn(
@@ -169,7 +205,7 @@ public class WebService extends Controller {
 					"A problem occurred while fetching the list of available topics from the DSB. Continuing with empty set of topics.");
 		}
 
-		return topics;
+		return result;
 	}
 
 	/**
@@ -179,14 +215,19 @@ public class WebService extends Controller {
 	 */
 	@Util
 	public static int subscribe(EventTopic et) {
-		Logger.info("Subscribing to topic '%s%s' at broker '%s'", et.uri, et.name, DSB_RESOURCE_SERVICE);
+		Logger.info("Subscribing to topic '%s%s' at broker '%s'", et.namespace, et.name,
+				DSB_NOTIFICATION_PRODUCER_SERVICE);
 
-		HTTPProducerClient client = new HTTPProducerClient(DSB_RESOURCE_SERVICE);
-		QName topic = new QName(et.uri, et.name, et.namespace);
+		HTTPProducerClient client = new HTTPProducerClient(
+				DSB_NOTIFICATION_PRODUCER_SERVICE);
+		QName topic = new QName(et.namespace, et.name, et.prefix);
 
+		Logger.info("QNAME: %s, %s, %s", topic.getNamespaceURI(), topic.getLocalPart(), topic.getPrefix());
+		
 		Map params = new HashMap<String, Object>();
 		params.put("topicId", et.getId());
-		String notificationsEndPoint = Router.getFullUrl("WebService.soapNotifEndPoint", params);
+		String notificationsEndPoint = Router.getFullUrl("WebService.soapNotifEndPoint",
+				params);
 		try {
 			et.subscriptionID = client.subscribe(topic, notificationsEndPoint);
 			et.alreadySubscribedDSB = true;
@@ -205,7 +246,7 @@ public class WebService extends Controller {
 	@Util
 	public static int unsubscribe(EventTopic et) {
 		HTTPSubscriptionManagerClient subscriptionManagerClient = new HTTPSubscriptionManagerClient(
-				DSB_RESOURCE_SERVICE);
+				DSB_NOTIFICATION_PRODUCER_SERVICE);
 		try {
 			subscriptionManagerClient.unsubscribe(et.subscriptionID);
 			et.alreadySubscribedDSB = false;

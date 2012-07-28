@@ -3,7 +3,6 @@
 <html>
 
 <head>
-<meta name="google-site-verification" content="mrxiaAsAvJL7t9fWNl8io9MH8fU_uM9I0Ac4qhR2FBw" />
 <title>#{get 'title' /}</title>
 <meta charset="utf-8">
 <link rel="stylesheet" media="screen"
@@ -21,9 +20,9 @@
 <link rel="shortcut icon" type="image/png"
 	href="@{'/public/images/favicon.png'}">
 
-<script src="@{'/public/javascripts/jquery-1.6.2.min.js'}"
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"
 	type="text/javascript" charset="utf-8"></script>
-<script src="@{'/public/javascripts/jquery-ui-1.8.14.custom.min.js'}"
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js"
 	type="text/javascript" charset="utf-8"></script>
 <script src="@{'/public/javascripts/jquery.validationEngine.js'}"
 	type="text/javascript" charset="utf-8"></script>
@@ -36,10 +35,10 @@
 <body id="page_bg">
 	<div id="main_bg">
 		<div id="top">
-			<img alt="top" src="@{'/public/images/top.png'}">
+			<img alt="top" src="@{'/public/images/top.png'}" width="988" height="12">
 			<div id="logo_bg">
 				<a href="/"> <img hspace="5" align="left" alt="logo"
-					src="@{'/public/images/logo.png'}"> </a>
+					src="@{'/public/images/logo.png'}" width="203" height="56"> </a>
 				<div id="user4"></div>
 				<br clear="all">
 			</div>
@@ -77,6 +76,7 @@
 						#{else}
 							<a class="account-nav-link" href="@{Application.login()}">Login</a>
 							<a class="account-nav-link" href="@{Authentifier.facebookAuth()}">Login with Facebook</a>
+							<a class="account-nav-link" href="@{Authentifier.googleAuth()}">Login with Google</a>
 							<a class="account-nav-link" href="@{Application.register()}">Register</a>
 						#{/else}
 					</div>
@@ -270,7 +270,7 @@
 			#{/else}
 		</div>
 		<br clear="all"> <img id="main_bottom" align="bottom"
-			alt="bottom" src="@{'/public/images/bottom.png'}">
+			alt="bottom" src="@{'/public/images/bottom.png'}" width="988" height="12">
 	</div>
 </body>
 </html>

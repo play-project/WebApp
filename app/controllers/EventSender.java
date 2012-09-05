@@ -74,7 +74,7 @@ public class EventSender extends Controller {
 			event.setFacebookName("Roland Stühmer");
 			event.setFacebookId("100000058455726");
 			event.setFacebookLink(new URIImpl("http://graph.facebook.com/roland.stuehmer#"));
-			event.setFacebookStatus("I bought some JEANS this morning");
+			event.setStatus("I bought some JEANS this morning");
 			event.setFacebookLocation("Karlsruhe, Germany");
 			event.setEndTime(Calendar.getInstance());
 			event.setStream(new URIImpl(Stream.FacebookStatusFeed.getUri()));

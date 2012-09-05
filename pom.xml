@@ -91,7 +91,7 @@
 		<dependency>
 			<groupId>fr.inria.eventcloud</groupId>
 			<artifactId>eventcloud-webservices-core</artifactId>
-			<version>1.0.0</version>
+			<version>1.1.0</version>
 			<exclusions>
 				<!-- exclude various files mostly because of conflicts with playframework -->
 				<exclusion>

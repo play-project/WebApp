@@ -3,7 +3,6 @@ package controllers;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import models.ModelManager;
@@ -11,14 +10,9 @@ import models.User;
 import models.eventstream.Event;
 import models.eventstream.EventTopic;
 
-import org.ontoware.rdf2go.RDF2Go;
-import org.ontoware.rdf2go.Reasoning;
 import org.ontoware.rdf2go.impl.jena29.ModelImplJena26;
 import org.ontoware.rdf2go.model.Model;
-import org.ontoware.rdf2go.model.Statement;
 import org.ontoware.rdf2go.model.Syntax;
-import org.ontoware.rdf2go.model.node.Resource;
-import org.ontoware.rdf2go.model.node.Variable;
 
 import play.Logger;
 import play.mvc.Before;
@@ -28,14 +22,13 @@ import play.mvc.Util;
 import com.google.gson.reflect.TypeToken;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
 
 import eu.play_project.play_commons.constants.Constants;
 import eu.play_project.play_commons.eventtypes.EventHelpers;
 import fr.inria.eventcloud.api.responses.SparqlConstructResponse;
 import fr.inria.eventcloud.api.responses.SparqlSelectResponse;
 import fr.inria.eventcloud.api.wrappers.ResultSetWrapper;
-import fr.inria.eventcloud.webservices.api.EventCloudManagementWsApi;
+import fr.inria.eventcloud.webservices.api.EventCloudManagementApi;
 import fr.inria.eventcloud.webservices.api.PutGetWsApi;
 import fr.inria.eventcloud.webservices.factories.WsClientFactory;
 
@@ -105,9 +98,9 @@ public class HistoricalEvents extends Controller {
     @Util
     public static ArrayList<models.eventstream.Event> getHistorical(EventTopic et) throws IOException {
             // Creates an Event Cloud Management Web Service Client
-            EventCloudManagementWsApi eventCloudManagementWsClient =
+            EventCloudManagementApi eventCloudManagementWsClient =
                     WsClientFactory.createWsClient(
-                            EventCloudManagementWsApi.class, EC_MANAGEMENT_WS_SERVICE);
+                            EventCloudManagementApi.class, EC_MANAGEMENT_WS_SERVICE);
 
             String topicUrl = et.getTopicUrl();
 
@@ -179,7 +172,7 @@ public class HistoricalEvents extends Controller {
     }
  
 	@Util
-    private static String findPutGetProxyEndpoint(EventCloudManagementWsApi eventCloudManagementWsClient,
+    private static String findPutGetProxyEndpoint(EventCloudManagementApi eventCloudManagementWsClient,
                                                   String topicUrl) {
         List<String> putgetProxyEndpoints = 
                 eventCloudManagementWsClient.getPutgetProxyEndpointUrls(topicUrl);

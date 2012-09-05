@@ -1,58 +1,27 @@
 package controllers;
 
-import static eu.play_project.play_commons.constants.Event.EVENT_ID_SUFFIX;
-
-import java.beans.EventSetDescriptor;
-import java.io.IOException;
-import java.io.StringReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.SecureRandom;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
 
 import models.ModelManager;
-import models.PredefinedPatterns;
-import models.SupportedTopicsXML;
 import models.eventstream.EventTopic;
 
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
-import org.event_processing.events.types.Event;
-import org.event_processing.events.types.FacebookStatusFeedEvent;
-import org.hibernate.event.AbstractEvent;
-import org.jdom.input.SAXBuilder;
-import org.ontoware.rdf2go.ModelFactory;
-import org.ontoware.rdf2go.RDF2Go;
-import org.ontoware.rdf2go.Reasoning;
-import org.ontoware.rdf2go.exception.ModelRuntimeException;
-import org.ontoware.rdf2go.impl.jena29.ModelImplJena26;
 import org.ontoware.rdf2go.model.Model;
-import org.ontoware.rdf2go.model.Statement;
-import org.ontoware.rdf2go.model.Syntax;
-import org.ontoware.rdf2go.model.node.Resource;
-import org.ontoware.rdf2go.model.node.Variable;
-import org.ontoware.rdf2go.model.node.impl.URIImpl;
-import org.ontoware.rdf2go.util.ModelUtils;
 import org.ow2.play.governance.api.EventGovernance;
 import org.ow2.play.governance.api.bean.Topic;
 import org.ow2.play.metadata.api.Data;
 import org.ow2.play.metadata.api.Metadata;
-import org.ow2.play.metadata.api.service.MetadataService;
 import org.ow2.play.metadata.client.MetadataClient;
-import org.petalslink.dsb.notification.client.http.HTTPNotificationProducerRPClient;
 import org.petalslink.dsb.notification.client.http.simple.HTTPProducerClient;
 import org.petalslink.dsb.notification.client.http.simple.HTTPSubscriptionManagerClient;
 import org.petalslink.dsb.notification.commons.NotificationException;
-import org.w3c.dom.Document;
 
 import play.Logger;
 import play.mvc.Controller;
@@ -60,28 +29,17 @@ import play.mvc.Router;
 import play.mvc.Util;
 import play.utils.HTML;
 
-import com.ebmwebsourcing.easycommons.xml.XMLHelper;
 import com.ebmwebsourcing.wsstar.basefaults.datatypes.impl.impl.WsrfbfModelFactoryImpl;
 import com.ebmwebsourcing.wsstar.basenotification.datatypes.impl.impl.WsnbModelFactoryImpl;
 import com.ebmwebsourcing.wsstar.resource.datatypes.impl.impl.WsrfrModelFactoryImpl;
 import com.ebmwebsourcing.wsstar.resourcelifetime.datatypes.impl.impl.WsrfrlModelFactoryImpl;
 import com.ebmwebsourcing.wsstar.resourceproperties.datatypes.impl.impl.WsrfrpModelFactoryImpl;
-import com.ebmwebsourcing.wsstar.topics.datatypes.api.WstopConstants;
 import com.ebmwebsourcing.wsstar.topics.datatypes.impl.impl.WstopModelFactoryImpl;
-import com.ebmwebsourcing.wsstar.wsnb.services.INotificationProducerRP;
 import com.ebmwebsourcing.wsstar.wsnb.services.impl.util.Wsnb4ServUtils;
 
 import eu.play_project.play_commons.constants.Constants;
-import eu.play_project.play_commons.constants.Stream;
 import eu.play_project.play_commons.eventformat.EventFormatHelpers;
-import eu.play_project.play_commons.eventtypes.EventHelpers;
 import eu.play_project.play_eventadapter.AbstractReceiver;
-import eu.play_project.play_eventadapter.AbstractSender;
-import eu.play_project.play_platformservices.api.QueryDispatchApi;
-import fr.inria.eventcloud.api.responses.SparqlConstructResponse;
-import fr.inria.eventcloud.webservices.api.EventCloudManagementWsApi;
-import fr.inria.eventcloud.webservices.api.PutGetWsApi;
-import fr.inria.eventcloud.webservices.factories.WsClientFactory;
 
 /**
  * The WebService controller is in charge of SOAP connection with the DSB.

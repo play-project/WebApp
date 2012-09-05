@@ -71,11 +71,11 @@ public class EventSender extends Controller {
 		if (eventType.equals("fb")) {
 			FacebookStatusFeedEvent event = new FacebookStatusFeedEvent(EventHelpers.createEmptyModel(eventId),
 					eventId + EVENT_ID_SUFFIX, true);
-			event.setName("Roland Stühmer");
-			event.setId("100000058455726");
-			event.setLink(new URIImpl("http://graph.facebook.com/roland.stuehmer#"));
-			event.setStatus("I bought some JEANS this morning");
-			event.setUserLocation("Karlsruhe, Germany");
+			event.setFacebookName("Roland Stühmer");
+			event.setFacebookId("100000058455726");
+			event.setFacebookLink(new URIImpl("http://graph.facebook.com/roland.stuehmer#"));
+			event.setFacebookStatus("I bought some JEANS this morning");
+			event.setFacebookLocation("Karlsruhe, Germany");
 			event.setEndTime(Calendar.getInstance());
 			event.setStream(new URIImpl(Stream.FacebookStatusFeed.getUri()));
 			Logger.info("Sending event: %s", event.getModel().serialize(Syntax.Turtle));

@@ -78,5 +78,24 @@ $(function() {
 	var displayError = function(event, topicid) {
 		$('#topic-events-'+topicid).html('<div class="event">' + event.error + '</div>');
 	}
+
+	#{if userTopics.size() > 0}
+		$(document).ready(function(){
+			var $sid = "${userTopics.get(0).getId()}";
+			$.post(
+				histoAction(),
+				{topicId:$sid},
+				function(events) {
+					if(events.error != null){
+						displayError(events, $sid);
+					} else {
+						$(events).each(function() {
+							display(this, $sid);
+						})
+					}
+				},
+				'json');
+		});
+	#{/if}
 });
 </script>

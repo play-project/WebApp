@@ -3,7 +3,6 @@ package controllers;
 import static eu.play_project.play_commons.constants.Event.EVENT_ID_SUFFIX;
 import static eu.play_project.play_commons.constants.Namespace.EVENTS;
 
-import java.security.SecureRandom;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Random;
@@ -12,17 +11,9 @@ import models.ModelManager;
 import models.User;
 
 import org.event_processing.events.types.FacebookStatusFeedEvent;
-import org.event_processing.events.types.TaxiUCCall;
+import org.event_processing.events.types.UcTelcoCall;
 import org.ontoware.rdf2go.model.Syntax;
 import org.ontoware.rdf2go.model.node.impl.URIImpl;
-
-import com.ebmwebsourcing.wsstar.basefaults.datatypes.impl.impl.WsrfbfModelFactoryImpl;
-import com.ebmwebsourcing.wsstar.basenotification.datatypes.impl.impl.WsnbModelFactoryImpl;
-import com.ebmwebsourcing.wsstar.resource.datatypes.impl.impl.WsrfrModelFactoryImpl;
-import com.ebmwebsourcing.wsstar.resourcelifetime.datatypes.impl.impl.WsrfrlModelFactoryImpl;
-import com.ebmwebsourcing.wsstar.resourceproperties.datatypes.impl.impl.WsrfrpModelFactoryImpl;
-import com.ebmwebsourcing.wsstar.topics.datatypes.impl.impl.WstopModelFactoryImpl;
-import com.ebmwebsourcing.wsstar.wsnb.services.impl.util.Wsnb4ServUtils;
 
 import play.Logger;
 import play.mvc.Before;
@@ -83,12 +74,12 @@ public class EventSender extends Controller {
 			sender.notify(event, Stream.FacebookStatusFeed.getTopicQName());
 		}
 		else if (eventType.equals("call")) {
-			TaxiUCCall event = new TaxiUCCall(EventHelpers.createEmptyModel(eventId),
+			UcTelcoCall event = new UcTelcoCall(EventHelpers.createEmptyModel(eventId),
 					eventId + EVENT_ID_SUFFIX, true);
 			// Run some setters of the event
-			event.setUctelcoCalleePhoneNumber("49123456789");
-			event.setUctelcoCallerPhoneNumber("49123498765");
-			event.setUctelcoDirection("incoming");
+			event.setUcTelcoCalleePhoneNumber("49123456789");
+			event.setUcTelcoCallerPhoneNumber("49123498765");
+			event.setUcTelcoDirection("incoming");
 			// Create a Calendar for the current date and time
 			event.setEndTime(Calendar.getInstance());
 			event.setStream(new URIImpl(Stream.TaxiUCCall.getUri()));

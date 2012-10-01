@@ -191,6 +191,7 @@ public class WebService extends Controller {
 			et.alreadySubscribedDSB = true;
 		} catch (NotificationException e) {
 			e.printStackTrace();
+			return 0;
 		}
 
 		return 1;

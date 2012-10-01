@@ -53,15 +53,22 @@ public class ModelManager {
 	}
 
 	public void initializeSubscriptions() {
+		int sucessfulSubs = 0;
 		for (EventTopic et : topics) {
 			et.subscribersCount = User
 					.count("Select count(*) from User as u inner join u.eventTopicIds as strings where ? in strings",
 							et.getId());
 			if (et.subscribersCount > 0) {
-				WebService.subscribe(et);
+				sucessfulSubs += WebService.subscribe(et);
+				
 			}
 		}
-		Logger.info("- Subscriptions sent to DSB -");
+		if (sucessfulSubs > 0) {
+			Logger.info("- Subscriptions sent to DSB -");
+		}
+		else {
+			Logger.warn("- Subscriptions sent to DSB, no sucess! -");
+		}
 	}
 
 	public void unregisterSubscriptions() {

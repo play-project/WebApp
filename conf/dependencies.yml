@@ -3,4 +3,4 @@
 require:
 - play -> crud
 - play -> secure
-- play -> securesocial 0.2.4
+- play -> securesocial 0.2.5

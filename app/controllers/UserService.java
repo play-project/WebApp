@@ -8,9 +8,9 @@ import models.User;
 import securesocial.provider.ProviderType;
 import securesocial.provider.SocialUser;
 import securesocial.provider.UserId;
-import securesocial.provider.UserService.Service;
+import securesocial.provider.UserServiceDelegate;
 
-public class UserService extends Controller implements Service {
+public class UserService extends Controller implements UserServiceDelegate {
 
 	@Override
 	public SocialUser find(UserId id) {
@@ -127,6 +127,30 @@ public class UserService extends Controller implements Service {
 	public void deletePendingActivations() {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public SocialUser find(String email) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String createPasswordReset(SocialUser user) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public SocialUser fetchForPasswordReset(String username, String uuid) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void disableResetCode(String username, String uuid) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

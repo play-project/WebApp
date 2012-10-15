@@ -25,7 +25,8 @@ import eu.play_project.play_eventadapter.AbstractSender;
 public class EventSender extends Controller {
 
 	private static AbstractSender sender = new AbstractSender(Stream.FacebookStatusFeed.getTopicQName());
-	private static Random random = new Random();
+	
+	private static long lastSequenceNumber = 0;
 	
 	@Before
 	private static void checkAuthentification() {
@@ -48,6 +49,20 @@ public class EventSender extends Controller {
 		request.args.put("user", user);
 	}
 	
+    /**
+     * Ensures that the first 2^63 - 1 calls return a unique number.
+     * If we want to guarantee that for any call, we could detect when the
+     * nextSequenceNumber is Long.MAX_VALUE. If so, we restart from 0 but we
+     * append a new letter to the event id URL.
+     */
+    private static long nextSequenceNumber() {
+        synchronized (EventSender.class) {
+            lastSequenceNumber++;
+        }
+
+        return lastSequenceNumber;
+    }
+	
 	/**
 	 * Notify action triggered by buttons on the web interface Generates a
 	 * Facebook status event event and sends it to the DSB.
@@ -57,7 +72,7 @@ public class EventSender extends Controller {
 	 */
 	public static void simulate(String eventType) {
 		
-		String eventId = EVENTS.getUri() + "webapp" + Math.abs(random.nextLong());
+		String eventId = EVENTS.getUri() + "webapp/" + Long.toString(nextSequenceNumber());
 
 		if (eventType.equals("fb")) {
 			FacebookStatusFeedEvent event = new FacebookStatusFeedEvent(EventHelpers.createEmptyModel(eventId),

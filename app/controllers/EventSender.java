@@ -84,8 +84,8 @@ public class EventSender extends Controller {
 			event.setFacebookLocation("Karlsruhe, Germany");
 			event.setEndTime(Calendar.getInstance());
 			event.setStream(new URIImpl(Stream.FacebookStatusFeed.getUri()));
-			Logger.info("Sending event: %s", event.getModel().serialize(Syntax.Turtle));
-			
+
+			Logger.debug("Sending event: %s", event.getModel().serialize(Syntax.Turtle));
 			Logger.info("A dummy event with type '%s' will be sent.", eventType);
 			sender.notify(event, Stream.FacebookStatusFeed.getTopicQName());
 		}
@@ -101,6 +101,7 @@ public class EventSender extends Controller {
 			event.setStream(new URIImpl(Stream.TaxiUCCall.getUri()));
 			EventHelpers.setLocationToEvent(event, 111, 222);
 			
+			Logger.debug("Sending event: %s", event.getModel().serialize(Syntax.Turtle));
 			Logger.info("A dummy event with type '%s' will be sent.", eventType);
 			sender.notify(event, Stream.TaxiUCCall.getTopicQName());
 		}

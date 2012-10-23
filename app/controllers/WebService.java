@@ -79,12 +79,6 @@ public class WebService extends Controller {
 			notifyMessage = "";
 		}
 
-		// Print some event to debug output:
-		// if (ModelManager.get().getTopicById(topicId).getId()
-		// .equals("s_FacebookCepResults")) {
-		// Logger.info(notifyMessage);
-		// } // FIXME stuehmer: added by roland, not important
-
 		Model rdf;
 		try {
 			/*

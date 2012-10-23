@@ -43,12 +43,12 @@ Installation
         $ mvn dependency:copy-dependencies
         $ play dependencies
 
-5. Create Eclipse project files (they are not in Git)
+5. Create your file `conf/application.conf` from the available file `conf/application.conf.dist`. The database (currently Postgres) is configured there.
+
+6. Create Eclipse project files if needed (they are not in Git)
 
         $ play eclipsify
 
-6. Create your file `conf/application.conf` from the available `conf/application.conf.dist`
-		
 7. Import the eclipsified project in Eclipse:
 `File -> Import -> Import existing projects` (add the path where WebApp was cloned)
 

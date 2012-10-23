@@ -26,6 +26,8 @@ public class EventSender extends Controller {
 
 	private static AbstractSender sender = new AbstractSender(Stream.FacebookStatusFeed.getTopicQName());
 	
+	private static Random random = new Random();
+	
 	private static long lastSequenceNumber = 0;
 	
 	@Before
@@ -55,10 +57,9 @@ public class EventSender extends Controller {
      * nextSequenceNumber is Long.MAX_VALUE. If so, we restart from 0 but we
      * append a new letter to the event id URL.
      */
-    private static long nextSequenceNumber() {
-        synchronized (EventSender.class) {
-            lastSequenceNumber++;
-        }
+    private static synchronized long nextSequenceNumber() {
+
+        lastSequenceNumber++;
 
         return lastSequenceNumber;
     }
@@ -72,7 +73,8 @@ public class EventSender extends Controller {
 	 */
 	public static void simulate(String eventType) {
 		
-		String eventId = EVENTS.getUri() + "webapp/" + Long.toString(nextSequenceNumber());
+		String eventId = EVENTS.getUri() + "webapp/" + Long.toString(nextSequenceNumber()) + "_" + Math.abs(random.nextLong());
+		Logger.info("A dummy event with type '%s' was requested.", eventType);
 
 		if (eventType.equals("fb")) {
 			FacebookStatusFeedEvent event = new FacebookStatusFeedEvent(EventHelpers.createEmptyModel(eventId),
@@ -86,7 +88,6 @@ public class EventSender extends Controller {
 			event.setStream(new URIImpl(Stream.FacebookStatusFeed.getUri()));
 
 			Logger.debug("Sending event: %s", event.getModel().serialize(Syntax.Turtle));
-			Logger.info("A dummy event with type '%s' will be sent.", eventType);
 			sender.notify(event, Stream.FacebookStatusFeed.getTopicQName());
 		}
 		else if (eventType.equals("call")) {
@@ -102,7 +103,6 @@ public class EventSender extends Controller {
 			EventHelpers.setLocationToEvent(event, 111, 222);
 			
 			Logger.debug("Sending event: %s", event.getModel().serialize(Syntax.Turtle));
-			Logger.info("A dummy event with type '%s' will be sent.", eventType);
 			sender.notify(event, Stream.TaxiUCCall.getTopicQName());
 		}
 		else {

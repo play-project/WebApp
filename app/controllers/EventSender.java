@@ -86,6 +86,7 @@ public class EventSender extends Controller {
 			event.setStream(new URIImpl(Stream.FacebookStatusFeed.getUri()));
 			Logger.info("Sending event: %s", event.getModel().serialize(Syntax.Turtle));
 			
+			Logger.info("A dummy event with type '%s' will be sent.", eventType);
 			sender.notify(event, Stream.FacebookStatusFeed.getTopicQName());
 		}
 		else if (eventType.equals("call")) {
@@ -98,8 +99,9 @@ public class EventSender extends Controller {
 			// Create a Calendar for the current date and time
 			event.setEndTime(Calendar.getInstance());
 			event.setStream(new URIImpl(Stream.TaxiUCCall.getUri()));
-			EventHelpers.addLocationToEvent(event, 111, 222);
+			EventHelpers.setLocationToEvent(event, 111, 222);
 			
+			Logger.info("A dummy event with type '%s' will be sent.", eventType);
 			sender.notify(event, Stream.TaxiUCCall.getTopicQName());
 		}
 		else {

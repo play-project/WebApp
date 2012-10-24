@@ -64,7 +64,7 @@ public class User extends Model {
 		this.mailnotif = mailnotif;
 		this.connected = 0;
 		this.lastRequest = new Date();
-		UserEventBuffer eventBuffer = new UserEventBuffer();
+		this.eventBuffer = new UserEventBuffer();
 	}
 
 	public User(String email, String password, String name, String gender,

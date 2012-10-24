@@ -30,25 +30,27 @@ everything running including Eclipse integration.
 
 Installation
 -------------																 
-1. Install the Play! framework from www.playframework.org. We tested v. 1.2.x
+1. Install the Play! framework from www.playframework.org. We tested v. 1.2.x. Add the play-x.x.x folder to your systems's PATH variable. Install some dependencies:
 
-2. Add the play-x.x.x folder to your systems's PATH variable
+		$ play install securesocial-0.2.5
 
-3. Clone the WebApp e.g. into your Eclipse workspace:
+2. Clone the WebApp e.g. into your Eclipse workspace:
 
-4. Fetch all Maven dependencies for WebApp:
+		$ git clone https://github.com/play-project/WebApp.git
+
+3. Fetch all Maven dependencies for WebApp:
 
         $ cd WebApp
         $ rm -Rf lib/ (delete old dependencies if there are any)
         $ mvn dependency:copy-dependencies
         $ play dependencies
 
-5. Create your file `conf/application.conf` from the available file `conf/application.conf.dist`. The database (currently Postgres) is configured there.
+4. Create your file `conf/application.conf` from the available file `conf/application.conf.dist`. The database (currently Postgres) is configured there.
 
-6. Create Eclipse project files if needed (they are not in Git)
+5. Create Eclipse project files if needed (they are not in Git)
 
         $ play eclipsify
 
-7. Import the eclipsified project in Eclipse:
+6. Import the eclipsified project in Eclipse:
 `File -> Import -> Import existing projects` (add the path where WebApp was cloned)
 

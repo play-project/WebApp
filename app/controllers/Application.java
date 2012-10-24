@@ -267,7 +267,14 @@ public class Application extends Controller {
 	public static void waitEvents(@Required Long lastReceived) throws InterruptedException, ExecutionException {
 		User u = (User) request.args.get("user");
 		if (u == null) {
+			Logger.error("User was null, maybe we are disconnected");
 			renderJSON("{\"error\":\"disconnected\"}");
+		}
+		if (lastReceived == null) {
+			lastReceived = 0L;
+		}
+		if (u.getEventBuffer() == null) {
+			Logger.error("u.getEventBuffer() was null");
 		}
 		List events = await(u.getEventBuffer().nextEvents(lastReceived));
 		renderJSON(events, new TypeToken<List<IndexedEvent<Event>>>() {

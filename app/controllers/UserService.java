@@ -17,13 +17,13 @@ public class UserService extends Controller implements UserServiceDelegate {
 		Logger.info("UserService.find() - type : " + id.provider);
 		User uById = null;
 		if (id.provider == ProviderType.facebook) {
-			Logger.info("byFacebookId");
+			Logger.debug("byFacebookId");
 			uById = User.find("byFacebookId", id.id).first();
 		} else if (id.provider == ProviderType.twitter) {
-			Logger.info("byTwitterId");
+			Logger.debug("byTwitterId");
 			uById = User.find("byTwitterId", id.id).first();
 		} else if (id.provider == ProviderType.google) {
-			Logger.info("byGoogleId");
+			Logger.debug("byGoogleId");
 			uById = User.find("byGoogleId", id.id).first();
 		}
 		SocialUser su = null;
@@ -34,13 +34,13 @@ public class UserService extends Controller implements UserServiceDelegate {
 			su.displayName = uById.name;
 			su.avatarUrl = uById.avatarUrl;
 		}
-		Logger.info("Social user : " + su);
+		Logger.info("Social user : " + su.displayName);
 		return su;
 	}
 
 	@Override
 	public void save(SocialUser socialUser) {
-		Logger.info("UserService.save()");
+		Logger.debug("UserService.save()");
 		// find SocialUser in database by ID
 		User uById = null;
 		User u = null;
@@ -113,13 +113,14 @@ public class UserService extends Controller implements UserServiceDelegate {
 
 	@Override
 	public String createActivation(SocialUser user) {
-		// TODO Auto-generated method stub
+		Logger.error("Usupported action called in " + this.getClass().getCanonicalName());
 		return null;
 	}
 
 	@Override
 	public boolean activate(String uuid) {
 		// TODO Auto-generated method stub
+		Logger.error("Usupported action called in " + this.getClass().getCanonicalName());
 		return false;
 	}
 
@@ -132,25 +133,28 @@ public class UserService extends Controller implements UserServiceDelegate {
 	@Override
 	public SocialUser find(String email) {
 		// TODO Auto-generated method stub
+		Logger.error("Usupported action called in " + this.getClass().getCanonicalName());
 		return null;
 	}
 
 	@Override
 	public String createPasswordReset(SocialUser user) {
 		// TODO Auto-generated method stub
+		Logger.error("Usupported action called in " + this.getClass().getCanonicalName());
 		return null;
 	}
 
 	@Override
 	public SocialUser fetchForPasswordReset(String username, String uuid) {
 		// TODO Auto-generated method stub
+		Logger.error("Usupported action called in " + this.getClass().getCanonicalName());
 		return null;
 	}
 
 	@Override
 	public void disableResetCode(String username, String uuid) {
 		// TODO Auto-generated method stub
-		
+		Logger.error("Usupported action called in " + this.getClass().getCanonicalName());
 	}
 
 }

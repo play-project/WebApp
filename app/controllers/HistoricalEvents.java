@@ -77,7 +77,7 @@ public class HistoricalEvents extends Controller {
 			try {
 				events = getHistorical(et);
 				if (events.size() == 0) {
-					renderJSON("{\"error\":\"No events were found in this topic.\"}");
+					renderJSON("{\"error\":\"No historic events were found in this topic.\"}");
 				}
 				renderJSON(events, new TypeToken<ArrayList<Event>>() {}.getType());
 			} catch (Exception e) {

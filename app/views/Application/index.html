@@ -11,7 +11,7 @@
 	<span class="valign-middle">Hello ${su.displayName} !</span>
 </div>
 #{/if} #{else}
-<h1 class="pagetitle">Hello ${u.name} !</h1>
+<h1 class="pagetitle">Hello ${u.name}!</h1>
 #{/else}
 <br />
 
@@ -233,7 +233,8 @@ $(function() {
 	});
 });
 
-var $lastReceived = 0
+var lastReceived = 0
+
 var waitEvents = #{jsAction @waitEvents(':lastReceived') /}
 
 var sendEvent = #{jsAction @EventSender.simulate(':eventType') /}
@@ -245,15 +246,15 @@ $("#send1").click(function(e) {
 	$.post(sendEvent({eventType: 'call'}))
 });
 
-var $consecutiveErrorsCount = 0;
+var consecutiveErrorsCount = 0;
 
 var getEvents = function() {
 	$.ajax({
-		url: waitEvents({lastReceived: $lastReceived}),
+		url: waitEvents({lastReceived: lastReceived}),
 		type: 'GET',
 		dataType: 'json',
 		success: function(events) {
-			$consecutiveErrorsCount = 0;
+			consecutiveErrorsCount = 0;
 			if(events.error == "disconnected"){
 				$("#error4").dialog("open");
 				return;
@@ -262,13 +263,13 @@ var getEvents = function() {
 			$(events).each(function() {
 				k--;
 				display(this, (k == 0));
-				$lastReceived = this.id;
+				lastReceived = this.id;
 			})
 			getEvents()
 		},
 		error: function() {
-			$consecutiveErrorsCount++;
-			if($consecutiveErrorsCount > 3){
+			consecutiveErrorsCount++;
+			if(consecutiveErrorsCount > 3){
 				$("#error5").dialog("open");
 				return;
 			} else {

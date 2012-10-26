@@ -22,6 +22,11 @@ import eu.play_project.play_commons.constants.Stream;
 import eu.play_project.play_commons.eventtypes.EventHelpers;
 import eu.play_project.play_eventadapter.AbstractSender;
 
+/**
+ * Allows the simulation of some artifical events for demonstration purposes.
+ * 
+ * @author Roland Stühmer
+ */
 public class EventSender extends Controller {
 
 	private static AbstractSender sender = new AbstractSender(Stream.FacebookStatusFeed.getTopicQName());

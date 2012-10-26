@@ -46,6 +46,7 @@ import eu.play_project.play_eventadapter.AbstractReceiver;
  * The WebService controller is in charge of SOAP connection with the DSB.
  * 
  * @author Alexandre Bourdin
+ * @author Roland Stühmer
  */
 public class WebService extends Controller {
 

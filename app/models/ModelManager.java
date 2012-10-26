@@ -67,7 +67,7 @@ public class ModelManager {
 			Logger.info("- Subscriptions sent to DSB -");
 		}
 		else {
-			Logger.warn("- Subscriptions sent to DSB, no sucess! -");
+			Logger.warn("- Subscriptions sent to DSB, no success! -");
 		}
 	}
 

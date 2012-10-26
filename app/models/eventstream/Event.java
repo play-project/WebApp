@@ -16,7 +16,7 @@ import play.utils.HTML;
  * Simple event class used to display events on the web page
  * 
  * @author Alexandre Bourdin
- *
+ * @author Roland Stühmer
  */
 public class Event {
 	private String topicId;

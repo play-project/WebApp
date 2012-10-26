@@ -38,6 +38,7 @@ import com.ebmwebsourcing.wsstar.topics.datatypes.impl.impl.WstopModelFactoryImp
 import com.ebmwebsourcing.wsstar.wsnb.services.impl.util.Wsnb4ServUtils;
 
 import eu.play_project.play_commons.constants.Constants;
+import eu.play_project.play_commons.constants.Stream;
 import eu.play_project.play_commons.eventformat.EventFormatHelpers;
 import eu.play_project.play_eventadapter.AbstractReceiver;
 
@@ -48,9 +49,12 @@ import eu.play_project.play_eventadapter.AbstractReceiver;
  */
 public class WebService extends Controller {
 
-	public static String DSB_NOTIFICATION_PRODUCER_SERVICE = Constants.getProperties().getProperty("dsb.subscribe.endpoint");
-	public static String EVENT_GOVERNANCE_SERVICE = Constants.getProperties().getProperty("governance.eventgovernance.endpoint");
-	public static String METADATA_SERVICE = Constants.getProperties().getProperty("governance.metadataservice.endpoint");
+	public static String DSB_NOTIFICATION_PRODUCER_SERVICE = 
+			Constants.getProperties().getProperty("dsb.subscribe.endpoint");
+	public static String EVENT_GOVERNANCE_SERVICE = 
+			Constants.getProperties().getProperty("governance.eventgovernance.endpoint");
+	public static String METADATA_SERVICE = 
+			Constants.getProperties().getProperty("governance.metadataservice.endpoint");
 	private static AbstractReceiver receiver = new AbstractReceiver() {
 	};
 
@@ -137,13 +141,13 @@ public class WebService extends Controller {
 								.getNs() + t.getName()));
 				for (Metadata m : metadataList) {
 					for (Data d : m.getData()) {
-						if (m.getName().equals("http://www.w3.org/2002/06/xhtml2/icon")) {
+						if (m.getName().equals(Stream.STREAM_ICON)) {
 							icon = d.getValue();
 						} else if (m.getName().equals(
-								"http://purl.org/dc/elements/1.1/title")) {
+								Stream.STREAM_TITLE)) {
 							title = d.getValue();
 						} else if (m.getName().equals(
-								"http://purl.org/dc/elements/1.1/desciption")) {
+								Stream.STREAM_DESCRIPTION)) {
 							content = d.getValue();
 						}
 					}

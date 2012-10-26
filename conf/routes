@@ -56,5 +56,3 @@ GET		/monitoring/display				Monitoring.displayInfo
 GET		/fbauth							Authentifier.facebookAuth
 GET		/googleauth						Authentifier.googleAuth
 GET		/twitterauth					Authentifier.twitterAuth
-
-GET		/quicktest						QuickTest.test

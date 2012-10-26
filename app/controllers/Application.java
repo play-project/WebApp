@@ -173,7 +173,7 @@ public class Application extends Controller {
 		}
 		User u = ModelManager.get().connect(email, PasswordEncrypt.encrypt(password));
 		if (u != null) {
-			Logger.info("User connected with standard login : " + u);
+			Logger.info("User connected with standard login: " + u);
 			session.put("userid", u.id);
 			index();
 		} else {

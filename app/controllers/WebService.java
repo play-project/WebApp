@@ -189,7 +189,7 @@ public class WebService extends Controller {
 			et.subscriptionID = client.subscribe(topic, notificationsEndPoint);
 			et.alreadySubscribedDSB = true;
 		} catch (NotificationException e) {
-			e.printStackTrace();
+			Logger.error(e, "Error subscribing to topic %s.", topic);
 			return 0;
 		}
 

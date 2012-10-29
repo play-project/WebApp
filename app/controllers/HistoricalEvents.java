@@ -44,7 +44,7 @@ import fr.inria.eventcloud.webservices.factories.WsClientFactory;
 public class HistoricalEvents extends Controller {
 	
 	public static String EC_MANAGEMENT_WS_SERVICE = 
-	        Constants.getProperties().getProperty("eventcloud.default.putget.endpoint");
+	        Constants.getProperties().getProperty("eventclouds.management.endpoint");
 	
 	@Before
 	private static void checkAuthentification() {

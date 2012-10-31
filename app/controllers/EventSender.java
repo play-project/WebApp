@@ -12,12 +12,16 @@ import models.User;
 
 import org.event_processing.events.types.FacebookStatusFeedEvent;
 import org.event_processing.events.types.UcTelcoCall;
+import org.event_processing.events.types.UcTelcoComposeMail;
+import org.event_processing.events.types.UcTelcoEsrRecom;
 import org.ontoware.rdf2go.model.Syntax;
 import org.ontoware.rdf2go.model.node.impl.URIImpl;
 
 import play.Logger;
+import play.data.validation.Required;
 import play.mvc.Before;
 import play.mvc.Controller;
+import eu.play_project.play_commons.constants.Source;
 import eu.play_project.play_commons.constants.Stream;
 import eu.play_project.play_commons.eventtypes.EventHelpers;
 import eu.play_project.play_eventadapter.AbstractSender;
@@ -76,10 +80,11 @@ public class EventSender extends Controller {
 	 * This method selects a different type of event based on the parameter
 	 * passed from JavaScript.
 	 */
-	public static void simulate(String eventType) {
+	public static void simulate(@Required String eventType) {
 		
-		String eventId = EVENTS.getUri() + "webapp/" + Long.toString(nextSequenceNumber()) + "_" + Math.abs(random.nextLong());
-		Logger.info("A dummy event with type '%s' was requested.", eventType);
+		String uniqueId = "webapp/" + Long.toString(nextSequenceNumber()) + "_" + Math.abs(random.nextLong());
+		String eventId = EVENTS.getUri() + uniqueId;
+		Logger.info("An event with type '%s' was requested.", eventType);
 
 		if (eventType.equals("fb")) {
 			FacebookStatusFeedEvent event = new FacebookStatusFeedEvent(EventHelpers.createEmptyModel(eventId),
@@ -91,6 +96,7 @@ public class EventSender extends Controller {
 			event.setFacebookLocation("Karlsruhe, Germany");
 			event.setEndTime(Calendar.getInstance());
 			event.setStream(new URIImpl(Stream.FacebookStatusFeed.getUri()));
+			event.setSource(new URIImpl(Source.WebApp.toString()));
 
 			Logger.debug("Sending event: %s", event.getModel().serialize(Syntax.Turtle));
 			sender.notify(event, Stream.FacebookStatusFeed.getTopicQName());
@@ -105,6 +111,7 @@ public class EventSender extends Controller {
 			// Create a Calendar for the current date and time
 			event.setEndTime(Calendar.getInstance());
 			event.setStream(new URIImpl(Stream.TaxiUCCall.getUri()));
+			event.setSource(new URIImpl(Source.WebApp.toString()));
 			EventHelpers.setLocationToEvent(event, 111, 222);
 			
 			Logger.debug("Sending event: %s", event.getModel().serialize(Syntax.Turtle));
@@ -114,4 +121,35 @@ public class EventSender extends Controller {
 			Logger.error("A dummy event was to be simulated but it's type '%s' is unknown.", eventType);
 		}
 	}
+	
+	public static void simulateRecommendation(@Required String calleePhoneNumber, @Required String message) {
+		
+		String uniqueId = "webapp/" + Long.toString(nextSequenceNumber()) + "_" + Math.abs(random.nextLong());
+		String eventId = EVENTS.getUri() + uniqueId;
+		Logger.info("A recommendation event was requested.");
+
+		UcTelcoEsrRecom event = new UcTelcoEsrRecom(EventHelpers.createEmptyModel(eventId),
+				eventId + EVENT_ID_SUFFIX, true);
+		event.setEndTime(Calendar.getInstance());
+		event.setStream(new URIImpl(Stream.TaxiUCESRRecom.getUri()));
+		event.setSource(new URIImpl(Source.WebApp.toString()));
+		event.setUcTelcoCalleePhoneNumber(calleePhoneNumber);
+		event.setUcTelcoCallerPhoneNumber("33638611117");
+		event.setUcTelcoUniqueId(uniqueId);
+		event.setMessage(message);
+		event.setEsrRecommendation(new URIImpl("http://imu.ntua.gr/san/esr/1.1/recommendation/" + uniqueId));
+		event.setUcTelcoAnswerRequired(true);
+		event.setUcTelcoAckRequired(true);
+		
+		// Create an action object and connect it to the event:
+		UcTelcoComposeMail action1 = new UcTelcoComposeMail(event.getModel(), true);
+		action1.setUcTelcoMailAddress(new URIImpl("mailto:roland.stuehmer@fzi.de"));
+		action1.setUcTelcoMailSubject("Regards");
+		action1.setUcTelcoMailContent("Hello world,\nwith kind regards,\n...");
+		event.addUcTelcoAction(action1);
+
+		Logger.debug("Sending event: %s", event.getModel().serialize(Syntax.Turtle));
+		sender.notify(event, Stream.TaxiUCCall.getTopicQName());
+}
+
 }

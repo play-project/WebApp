@@ -33,8 +33,9 @@ POST	/histobytopic					HistoricalEvents.historicalByTopic
 POST	/webservice/soapnotifendpoint/{topicId}		WebService.soapNotifEndPoint
 GET		/webservice/topics							WebService.getSupportedTopics
 
-# Triggering dummy events
+# Triggering events
 POST	/eventsender/simulate			EventSender.simulate
+POST	/eventsender/simulateRecom		EventSender.simulateRecommendation
 
 # Ignore favicon requests
 GET     /favicon.ico                    404

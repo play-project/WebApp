@@ -112,10 +112,22 @@
 </div>
 
 <div style="clear: left; padding-top: 30px;">
-	<fieldset><legend>Trigger dummy events:</legend>
-	<input id="send0" type="button" value="Facebook Event" /><br />
-	<input id="send1" type="button" value="Call Event" /><br />
-	</fieldset>
+	<form id="sendOther">
+		<fieldset><legend>Trigger Events:</legend>
+		<input id="send0" type="button" value="Facebook Event" /><br />
+		<input id="send1" type="button" value="Call Event" /><br />
+		</fieldset>
+	</form>
+</div>
+
+<div style="clear: left; padding-top: 10px;">
+	<form id="sendRecom">
+		<fieldset><legend>Trigger Recommendation Event:</legend>
+		<input id="calleePhoneNumber" name="calleePhoneNumber" type="text" value="491773603616" />
+		<input id="message" name="message" type="text" value="You are recommended to use email." />
+		<input id="send2" type="submit" value="Recommendation" /><br />
+		</fieldset>
+	</form>
 </div>
 
 <script type="text/javascript">
@@ -238,6 +250,7 @@ var lastReceived = 0
 var waitEvents = #{jsAction @waitEvents(':lastReceived') /}
 
 var sendEvent = #{jsAction @EventSender.simulate(':eventType') /}
+var sendRecom = #{jsAction @EventSender.simulateRecommendation(':calleePhoneNumber', ':message') /}
 
 $("#send0").click(function(e) {
 	$.post(sendEvent({eventType: 'fb'}))
@@ -245,7 +258,9 @@ $("#send0").click(function(e) {
 $("#send1").click(function(e) {
 	$.post(sendEvent({eventType: 'call'}))
 });
-
+$("#send2").click(function(e) {
+	$.post(sendRecom({calleePhoneNumber: $("#calleePhoneNumber").val(), message: $("#message").val()}))
+});
 var consecutiveErrorsCount = 0;
 
 var getEvents = function() {

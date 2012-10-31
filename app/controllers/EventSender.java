@@ -149,7 +149,7 @@ public class EventSender extends Controller {
 		event.addUcTelcoAction(action1);
 
 		Logger.debug("Sending event: %s", event.getModel().serialize(Syntax.Turtle));
-		sender.notify(event, Stream.TaxiUCCall.getTopicQName());
+		sender.notify(event, Stream.TaxiUCESRRecom.getTopicQName());
 }
 
 }

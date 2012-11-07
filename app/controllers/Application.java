@@ -120,18 +120,23 @@ public class Application extends Controller {
 			if (!result) {
 				flash.error("The operation encoutered an error.");
 			}
+			else {
+				flash.success("Pattern registered successfully.");
+			}
 		}
 		patternQuery();
 	}
 
 	public static void processComposedPatternQuery(String text) {
+		flash.error("Not yet implemented."); // FIXME not yet implemented
 		patternQuery();
 	}
 
 	public static void processFullPatternQuery(String text) {
 		if (text != null && text != "") {
 			try{
-			Boolean result = QueryDispatch.sendFullPatternQuery(text);
+				Boolean result = QueryDispatch.sendFullPatternQuery(text);
+				flash.success("Pattern registered successfully.");
 			} catch (Exception e) {
 				flash.error(e.getMessage());
 			}

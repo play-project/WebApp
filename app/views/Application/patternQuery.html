@@ -1,4 +1,4 @@
-#{extends 'main.html' /} #{set title:'Play Project Web Demo' /} #{set
+#{extends 'main.html' /} #{set title:'PLAY Project Web Demo: Pattern Editor' /} #{set
 nobanner:true /} #{set nofooter:true /}
 
 <link rel="stylesheet" media="screen"
@@ -11,6 +11,14 @@ nobanner:true /} #{set nofooter:true /}
 	%{ String[] errors = flash.get("error"); for(String e : errors){
 	if(!e.equals("[") && !e.equals("]")){ out.print(e); }
 	if(e.equals(",")){ out.println("<br />"); } } %}
+</p>
+%{ out.print("<br />"); %} #{/if}
+
+#{if flash.get("success")}
+<p class="success">
+	%{ String[] success = flash.get("success"); for(String s : success){
+	if(!s.equals("[") && !s.equals("]")){ out.print(s); }
+	if(s.equals(",")){ out.println("<br />"); } } %}
 </p>
 %{ out.print("<br />"); %} #{/if}
 

@@ -70,17 +70,19 @@ public class HistoricalEvents extends Controller {
 	
 	public static void historicalByTopic(String topicId) {
 		EventTopic et = ModelManager.get().getTopicById(topicId);
-		if(et == null){
+		if (et == null) {
 			renderJSON("{\"error\":\"Error: Topic not found.\"}");
 		} else {
 			ArrayList<Event> events;
 			try {
 				events = getHistorical(et);
 				if (events.size() == 0) {
+					Logger.warn("Error while getting historic events: No historic events were found in this topic.");
 					renderJSON("{\"error\":\"No historic events were found in this topic.\"}");
 				}
 				renderJSON(events, new TypeToken<ArrayList<Event>>() {}.getType());
 			} catch (Exception e) {
+				Logger.error(e, "Error while getting historic events.");
 				renderJSON("{\"error\":\"" + e.getMessage() + "\"}");
 			}
 		}

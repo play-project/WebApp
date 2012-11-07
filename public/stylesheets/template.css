@@ -286,6 +286,14 @@ div#logo_bg {
 	width: auto;
 }
 
+.success {
+	color: rgb(102, 171, 60);
+	padding: 20px;
+	margin-left: 50px;
+	margin-top: 20px;
+	border: 1px solid #500;
+}
+
 .errors {
 	color: #c00;
 	padding: 20px;

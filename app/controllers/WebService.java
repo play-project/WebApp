@@ -131,10 +131,10 @@ public class WebService extends Controller {
 		try {
 			List<Topic> topics = eventGovernance.getTopics();
 			Logger.info("Number of topics : " + topics.size());
-			String icon = "/images/noicon.png";
-			String content = "No description available.";
-			String title = "";
 			for (Topic t : topics) {
+				String icon = "/images/noicon.png";
+				String description = "No description available.";
+				String title = EventTopic.createId(t.getPrefix(), t.getName());
 				Logger.info("name:" + t.getName() + " ns:" + t.getNs() + " prefix:"
 						+ t.getPrefix());
 				List<Metadata> metadataList = client
@@ -149,11 +149,11 @@ public class WebService extends Controller {
 							title = d.getValue();
 						} else if (m.getName().equals(
 								Stream.STREAM_DESCRIPTION)) {
-							content = d.getValue();
+							description = d.getValue();
 						}
 					}
 				}
-				result.add(new EventTopic(t.getPrefix(), t.getName(), t.getNs(), title, icon, content, ""));
+				result.add(new EventTopic(t.getPrefix(), t.getName(), t.getNs(), title, icon, description, ""));
 			}
 
 		} catch (Exception e) {

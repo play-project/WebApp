@@ -71,6 +71,10 @@ public class EventTopic {
 	}
 
 	public String getId() {
+		return createId(prefix, name);
+	}
+	
+	public static String createId(String prefix, String name) {
 		return prefix + "_" + name;
 	}
 

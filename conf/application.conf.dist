@@ -55,6 +55,7 @@ http.port=80
 # JVM configuration
 # ~~~~~
 #jvm.memory = -Djaxp.debug=1
+jvm.memory = -XX:PermSize=64m -XX:MaxPermSize=256m -Xms64m -Xmx512m
 
 # Define which port is used by JPDA when application is in debug mode (default is set to 8000)
 # jpda.port=8000

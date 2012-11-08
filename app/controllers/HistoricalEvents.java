@@ -13,6 +13,7 @@ import models.eventstream.EventTopic;
 import org.ontoware.rdf2go.impl.jena29.ModelImplJena26;
 import org.ontoware.rdf2go.model.Model;
 import org.ontoware.rdf2go.model.Syntax;
+import org.ontoware.rdf2go.model.node.impl.URIImpl;
 
 import play.Logger;
 import play.mvc.Before;
@@ -157,7 +158,7 @@ public class HistoricalEvents extends Controller {
                 SparqlConstructResponse constructResponse =
                         putgetProxyClient.executeSparqlConstruct(sparqlQuery);
 
-                Model rdf = new ModelImplJena26(constructResponse.getResult()).open();
+                Model rdf = new ModelImplJena26(new URIImpl(graph.getURI()), constructResponse.getResult()).open();
                 EventHelpers.addNamespaces(rdf);
 
                 Logger.debug("Resulting RDF: %s", rdf.serialize(Syntax.Turtle));

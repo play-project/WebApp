@@ -134,9 +134,9 @@ public class Application extends Controller {
 		if (text != null && text != "") {
 			try{
 				Boolean result = QueryDispatch.sendFullPatternQuery(text);
-				renderJSON(new AjaxStatusMessage("success", "Pattern registered successfully.", null));
+				flash.success("Pattern registered successfully.");
 			} catch (Exception e) {
-				renderJSON(new AjaxStatusMessage("error", e.getMessage(), e.getStackTrace().toString()));
+				flash.error(e.getMessage());
 			}
 		}
 	}

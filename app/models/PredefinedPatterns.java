@@ -8,9 +8,9 @@ import java.util.HashMap;
 import javax.management.RuntimeErrorException;
 
 /**
- * Get pertained queries. The queries are loaded form  text files.
+ * Get pertained queries. The queries are loaded from text files.
+ * 
  * @author sobermeier
- *
  */
 public class PredefinedPatterns {
 	

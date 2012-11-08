@@ -47,26 +47,7 @@ public class QueryDispatch extends Controller {
 		String defaultQueryString = PredefinedPatterns.getPattern("play-epsparql-m12-jeans-example-query.eprq");
 		String queryString = defaultQueryString.replaceAll("\"JEANS\"", "\"" + token + "\"");
 
-		URL wsdl = null;
-		try {
-			wsdl = new URL(Constants.getProperties().getProperty("platfomservices.querydispatchapi.endpoint") + "?wsdl");
-		} catch (MalformedURLException e) {
-			e.printStackTrace();
-		}
-
-		QName serviceName = new QName("http://play_platformservices.play_project.eu/", "QueryDispatchApi");
-
-		Service service = Service.create(wsdl, serviceName);
-		QueryDispatchApi queryDispatchApi = service.getPort(QueryDispatchApi.class);
-
-		try {
-		String s = queryDispatchApi.registerQuery("http://patterns.event-processing.org/ids/webapp_" + Math.random(), queryString);
-		Logger.info(s);
-		} catch (Exception e) {
-			Logger.error(e.toString());
-			return false;
-		}
-		return true;
+		return sendFullPatternQuery(queryString);
 	}
 
 	@Util
@@ -84,8 +65,10 @@ public class QueryDispatch extends Controller {
 		Service service = Service.create(wsdl, serviceName);
 		QueryDispatchApi queryDispatchApi = service
 				.getPort(eu.play_project.play_platformservices.api.QueryDispatchApi.class);
+
 		String s = queryDispatchApi.registerQuery("http://patterns.event-processing.org/ids/webapp_" + Math.random(), queryString);
 		Logger.info(s);
+		
 		return true;
 	}
 

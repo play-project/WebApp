@@ -13,6 +13,7 @@ import models.eventstream.EventTopic;
 import org.ontoware.rdf2go.impl.jena29.ModelImplJena26;
 import org.ontoware.rdf2go.model.Model;
 import org.ontoware.rdf2go.model.Syntax;
+import org.ontoware.rdf2go.model.node.impl.URIImpl;
 
 import play.Logger;
 import play.mvc.Before;
@@ -122,17 +123,19 @@ public class HistoricalEvents extends Controller {
 			 * in another query, for efficiency in EventCloud. The first query
 			 * returns the internal long graph names to be re-used without
 			 * modification in the second query.
+			 * 
+			 * graph is the value internal to event cloud to be used in further queries
+			 * shortGraph is the cleaned (logical) value to be used for display
 			 */
-            String sparqlQuery = "PREFIX eventcloud: <http://eventcloud.inria.fr/function#> "
-            	+ "PREFIX : <http://events.event-processing.org/types/> "
-            	+ "SELECT ?graph WHERE { "
-				+ "   GRAPH ?graph {?id :endTime ?publicationDateTime . } "
+            String sparqlQuery =
+            	  "PREFIX eventcloud: <http://eventcloud.inria.fr/function#> "
+            	+ "PREFIX :           <http://events.event-processing.org/types/> "
+            	+ "SELECT ?graph ?shortGraph WHERE { "
+				+ "   GRAPH ?graph { "
+				+ "     ?id :endTime ?publicationDateTime . "
+				+ "     BIND(eventcloud:removeMetadata(?graph) AS ?shortGraph) "
+				+ "    } "
 				+ "} ORDER BY DESC(?publicationDateTime) LIMIT 10 ";
-//            String sparqlQuery = "PREFIX : <http://events.event-processing.org/types/>\n";
-//            sparqlQuery += "SELECT ?id WHERE {\n    GRAPH ?graph {\n";
-//            // sparqlQuery += "        ?id :stream <" + topicUrl + "#stream> .\n";
-//            sparqlQuery += "        ?id :endTime ?publicationDateTime .\n";
-//            sparqlQuery += "    }\n} ORDER BY DESC(?publicationDateTime) LIMIT 10";
 
             Logger.debug("Executing the following historical SPARQL query to get graph names: " + sparqlQuery);
 
@@ -147,17 +150,18 @@ public class HistoricalEvents extends Controller {
             while (result.hasNext()) {
                 QuerySolution qs = result.next();
                 Node graph = qs.get("graph").asNode();
+                Node shortGraph = qs.get("shortGraph").asNode();
                 sparqlQuery =
-                        "CONSTRUCT { ?s ?p ?o } WHERE {" +
-                        "    GRAPH <" + graph.getURI() + "> {?s ?p ?o .}" +
-                        "}";
+                        "CONSTRUCT { ?s ?p ?o } WHERE { " +
+                        "    GRAPH <" + graph.getURI() + "> {?s ?p ?o .} " +
+                        "} ";
 
                 Logger.debug("Executing the following historical SPARQL query to get events: " + sparqlQuery);
 
                 SparqlConstructResponse constructResponse =
                         putgetProxyClient.executeSparqlConstruct(sparqlQuery);
 
-                Model rdf = new ModelImplJena26(constructResponse.getResult()).open();
+                Model rdf = new ModelImplJena26(new URIImpl(shortGraph.getURI()), constructResponse.getResult()).open();
                 EventHelpers.addNamespaces(rdf);
 
                 Logger.debug("Resulting RDF: %s", rdf.serialize(Syntax.Turtle));

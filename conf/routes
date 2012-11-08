@@ -10,6 +10,7 @@ GET		/logout							Application.logout
 GET		/faq							Application.faq
 GET 	/query							Application.patternQuery
 POST 	/processtokenquery				Application.processTokenPatternQuery
+POST 	/processcomposedquery			Application.processComposedPatternQuery
 POST 	/processfullquery				Application.processFullPatternQuery
 
 GET		/settings						Application.settings
@@ -30,7 +31,8 @@ GET		/historical						Application.historicalEvents
 POST	/histobytopic					HistoricalEvents.historicalByTopic
 
 # WS
-POST	/webservice/soapnotifendpoint/{topicId}		WebService.soapNotifEndPoint
+#POST	/webservice/soapnotifendpoint/{topicId}		WebService.soapNotifEndPoint
+# ... this route is now dynamically created with a random path in Bootstrap.java :stuehmer
 GET		/webservice/topics							WebService.getSupportedTopics
 
 # Triggering events

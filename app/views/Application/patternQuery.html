@@ -32,10 +32,10 @@ nobanner:true /} #{set nofooter:true /}
 		<div id="tab-query-word">
 			<h2>Easy query editor</h2>
 			<div>
-				<form action="@{Application.processTokenPatternQuery()}" method="POST">
+				<form id="processTokenPatternQuery">
 					<fieldset>
 						<legend>Here, you can register a new word to be notified</legend>
-						Notify me when <input id="token" name="token" type="text" value="JEANS" required="required" />
+						Notify me when <input name="token" type="text" value="JEANS" required="required" />
 						occurs 3 times within 30 minutes in my Facebook friends statuses.
 					</fieldset>
 					<fieldset>
@@ -58,7 +58,7 @@ nobanner:true /} #{set nofooter:true /}
 		<div id="tab-query-select">
 			<h2>Advanced query editor</h2>
 						<div>
-				<form action="@{Application.processFullPatternQuery()}" method="POST">
+				<form id="processComposedPatternQuery">
 					<fieldset>
 						<legend>Here, you can compose your own query</legend>
 						<div>EVENT</div>
@@ -83,11 +83,10 @@ nobanner:true /} #{set nofooter:true /}
 		<div id="tab-query-text">
 			<h2>Expert query editor</h2>
 			<div>
-				<form action="@{Application.processFullPatternQuery()}"
-					method="POST">
+				<form id="processFullPatternQuery">
 					<fieldset>
-						<legend>Here, you can write the full EP-SPARQL query :</legend>
-						<textarea id="text" name="text" type="text" cols="90" rows="24">
+						<legend>Here, you can write the full <abbr title="Big Data Processing Language (formerly EP-SPARQL)">BDPL</abbr> query :</legend>
+						<textarea name="text" cols="90" rows="24">
 ${models.PredefinedPatterns.getPattern("play-epsparql-m12-jeans-example-query.eprq")}
 						</textarea>
 					</fieldset>
@@ -112,6 +111,22 @@ ${models.PredefinedPatterns.getPattern("play-epsparql-m12-jeans-example-query.ep
 </div>
 
 <script type="text/javascript">
+	var processTokenPatternQuery = #{jsAction @Application.processTokenPatternQuery(':token') /}
+	$('#processTokenPatternQuery input[type="submit"]').click(function(e) {
+		$.post(processTokenPatternQuery({token: $('#processTokenPatternQuery input[name="token"]').val()}))
+	});
+	
+	var processComposedPatternQuery = #{jsAction @Application.processComposedPatternQuery(':text') /}
+	$('#processComposedPatternQuery input[type="submit"]').click(function(e) {
+		$.post(processComposedPatternQuery({text: "TODO add something here"}))
+	});
+
+var processFullPatternQuery = #{jsAction @Application.processFullPatternQuery(':text') /}
+	$('#processFullPatternQuery input[type="submit"]').click(function(e) {
+		$.post(processFullPatternQuery({text: $('#processFullPatternQuery textarea[name="text"]').val()}))
+	});
+
+
 	$(document).ready(
 			function() {
 				$("#query-editor-tabs").tabs().addClass(

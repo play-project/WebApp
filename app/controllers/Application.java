@@ -124,24 +124,21 @@ public class Application extends Controller {
 				flash.success("Pattern registered successfully.");
 			}
 		}
-		patternQuery();
 	}
 
 	public static void processComposedPatternQuery(String text) {
 		flash.error("Not yet implemented."); // FIXME not yet implemented
-		patternQuery();
 	}
 
 	public static void processFullPatternQuery(String text) {
 		if (text != null && text != "") {
 			try{
 				Boolean result = QueryDispatch.sendFullPatternQuery(text);
-				flash.success("Pattern registered successfully.");
+				renderJSON(new AjaxStatusMessage("success", "Pattern registered successfully.", null));
 			} catch (Exception e) {
-				flash.error(e.getMessage());
+				renderJSON(new AjaxStatusMessage("error", e.getMessage(), e.getStackTrace().toString()));
 			}
 		}
-		patternQuery();
 	}
 
 	/**

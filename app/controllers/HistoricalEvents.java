@@ -134,7 +134,7 @@ public class HistoricalEvents extends Controller {
 //            sparqlQuery += "        ?id :endTime ?publicationDateTime .\n";
 //            sparqlQuery += "    }\n} ORDER BY DESC(?publicationDateTime) LIMIT 10";
 
-            Logger.info("Executing the following historical SPARQL query: " + sparqlQuery);
+            Logger.debug("Executing the following historical SPARQL query to get graph names: " + sparqlQuery);
 
             SparqlSelectResponse response = 
                     putgetProxyClient.executeSparqlSelect(sparqlQuery);
@@ -151,13 +151,8 @@ public class HistoricalEvents extends Controller {
                         "CONSTRUCT { ?s ?p ?o } WHERE {" +
                         "    GRAPH <" + graph.getURI() + "> {?s ?p ?o .}" +
                         "}";
-//                Node id = qs.get("id").asNode();
-//                sparqlQuery =
-//                        "CONSTRUCT { <" + id.getURI() + "> ?p ?o } WHERE {" +
-//                        "    GRAPH ?g {<" + id.getURI() + "> ?p ?o .}" +
-//                        "}";
 
-                Logger.info("Executing the following historical SPARQL query: " + sparqlQuery);
+                Logger.debug("Executing the following historical SPARQL query to get events: " + sparqlQuery);
 
                 SparqlConstructResponse constructResponse =
                         putgetProxyClient.executeSparqlConstruct(sparqlQuery);
@@ -165,7 +160,7 @@ public class HistoricalEvents extends Controller {
                 Model rdf = new ModelImplJena26(constructResponse.getResult()).open();
                 EventHelpers.addNamespaces(rdf);
 
-                Logger.info("Resulting RDF: %s", rdf.serialize(Syntax.Turtle));
+                Logger.debug("Resulting RDF: %s", rdf.serialize(Syntax.Turtle));
 
                 events.add(models.eventstream.Event.eventFromRdf(rdf));
             }

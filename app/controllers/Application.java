@@ -124,10 +124,12 @@ public class Application extends Controller {
 				flash.success("Pattern registered successfully.");
 			}
 		}
+		patternQuery();
 	}
 
 	public static void processComposedPatternQuery(String text) {
 		flash.error("Not yet implemented."); // FIXME not yet implemented
+		patternQuery();
 	}
 
 	public static void processFullPatternQuery(String text) {
@@ -139,6 +141,7 @@ public class Application extends Controller {
 				flash.error(e.getMessage());
 			}
 		}
+		patternQuery();
 	}
 
 	/**

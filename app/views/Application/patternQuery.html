@@ -32,7 +32,7 @@ nobanner:true /} #{set nofooter:true /}
 		<div id="tab-query-word">
 			<h2>Easy query editor</h2>
 			<div>
-				<form id="processTokenPatternQuery">
+				<form id="processTokenPatternQuery" action="@{Application.processTokenPatternQuery()}" method="POST">
 					<fieldset>
 						<legend>Here, you can register a new word to be notified</legend>
 						Notify me when <input name="token" type="text" value="JEANS" required="required" />
@@ -58,7 +58,7 @@ nobanner:true /} #{set nofooter:true /}
 		<div id="tab-query-select">
 			<h2>Advanced query editor</h2>
 						<div>
-				<form id="processComposedPatternQuery">
+				<form id="processComposedPatternQuery" action="@{Application.processComposedPatternQuery()}" method="POST">
 					<fieldset>
 						<legend>Here, you can compose your own query</legend>
 						<div>EVENT</div>
@@ -83,7 +83,8 @@ nobanner:true /} #{set nofooter:true /}
 		<div id="tab-query-text">
 			<h2>Expert query editor</h2>
 			<div>
-				<form id="processFullPatternQuery">
+				<form id="processFullPatternQuery" action="@{Application.processFullPatternQuery()}"
+					method="POST">
 					<fieldset>
 						<legend>Here, you can write the full <abbr title="Big Data Processing Language (formerly EP-SPARQL)">BDPL</abbr> query :</legend>
 						<textarea name="text" cols="90" rows="24">
@@ -111,6 +112,8 @@ ${models.PredefinedPatterns.getPattern("play-epsparql-m12-jeans-example-query.ep
 </div>
 
 <script type="text/javascript">
+	/*
+	To be used by AJAX style requests instead of <form POST>
 	var processTokenPatternQuery = #{jsAction @Application.processTokenPatternQuery(':token') /}
 	$('#processTokenPatternQuery input[type="submit"]').click(function(e) {
 		$.post(processTokenPatternQuery({token: $('#processTokenPatternQuery input[name="token"]').val()}))
@@ -121,10 +124,11 @@ ${models.PredefinedPatterns.getPattern("play-epsparql-m12-jeans-example-query.ep
 		$.post(processComposedPatternQuery({text: "TODO add something here"}))
 	});
 
-var processFullPatternQuery = #{jsAction @Application.processFullPatternQuery(':text') /}
+	var processFullPatternQuery = #{jsAction @Application.processFullPatternQuery(':text') /}
 	$('#processFullPatternQuery input[type="submit"]').click(function(e) {
 		$.post(processFullPatternQuery({text: $('#processFullPatternQuery textarea[name="text"]').val()}))
 	});
+	*/
 
 
 	$(document).ready(

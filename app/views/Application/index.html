@@ -123,9 +123,20 @@
 <div style="clear: left; padding-top: 10px;">
 	<form id="sendRecom">
 		<fieldset><legend>Trigger Recommendation Event:</legend>
-		<input id="calleePhoneNumber" name="calleePhoneNumber" type="text" value="491773603616" />
-		<input id="message" name="message" type="text" value="You are recommended to use email." />
-		<input id="send2" type="submit" value="Recommendation" /><br />
+		<table border="0">
+			<tr>
+				<td>Callee</td>
+				<td>Caller</td>
+				<td>Message</td>
+				<td>&nbsp;</td>				
+			</tr>			
+			<tr>
+				<td><input name="calleePhoneNumber" type="text" value="491773603616" /></td>
+				<td><input name="callerPhoneNumber" type="text" value="33638611117" /></td>
+				<td><input name="message" type="text" value="You are recommended to use email." /></td>
+				<td><input type="submit" value="Recommendation" /></td>
+			</tr>
+		</table>
 		</fieldset>
 	</form>
 </div>
@@ -250,7 +261,7 @@ var lastReceived = 0
 var waitEvents = #{jsAction @waitEvents(':lastReceived') /}
 
 var sendEvent = #{jsAction @EventSender.simulate(':eventType') /}
-var sendRecom = #{jsAction @EventSender.simulateRecommendation(':calleePhoneNumber', ':message') /}
+var sendRecom = #{jsAction @EventSender.simulateRecommendation(':calleePhoneNumber', ':callerPhoneNumber', ':message') /}
 
 $("#send0").click(function(e) {
 	$.post(sendEvent({eventType: 'fb'}))
@@ -258,8 +269,9 @@ $("#send0").click(function(e) {
 $("#send1").click(function(e) {
 	$.post(sendEvent({eventType: 'call'}))
 });
-$("#send2").click(function(e) {
-	$.post(sendRecom({calleePhoneNumber: $("#calleePhoneNumber").val(), message: $("#message").val()}))
+$('#sendRecom input[type="submit"]').click(function(e) {
+	$.post(sendRecom({calleePhoneNumber: $('#sendRecom input[name="calleePhoneNumber"]').val(), callerPhoneNumber: $('#sendRecom input[name="callerPhoneNumber"]').val(), message: $('#sendRecom input[name="message"]').val()}))
+	return false;
 });
 var consecutiveErrorsCount = 0;
 

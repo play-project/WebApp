@@ -33,6 +33,7 @@ POST	/histobytopic					HistoricalEvents.historicalByTopic
 # WS
 #POST	/webservice/soapnotifendpoint/{topicId}		WebService.soapNotifEndPoint
 # ... this route is now dynamically created with a random path in Bootstrap.java :stuehmer
+
 GET		/webservice/topics							WebService.getSupportedTopics
 
 # Triggering events

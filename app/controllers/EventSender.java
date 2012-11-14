@@ -122,7 +122,7 @@ public class EventSender extends Controller {
 		}
 	}
 	
-	public static void simulateRecommendation(@Required String calleePhoneNumber, @Required String message) {
+	public static void simulateRecommendation(@Required String calleePhoneNumber, @Required String callerPhoneNumber, @Required String message) {
 		
 		String uniqueId = "webapp/" + Long.toString(nextSequenceNumber()) + "_" + Math.abs(random.nextLong());
 		String eventId = EVENTS.getUri() + uniqueId;
@@ -134,7 +134,7 @@ public class EventSender extends Controller {
 		event.setStream(new URIImpl(Stream.TaxiUCESRRecom.getUri()));
 		event.setSource(new URIImpl(Source.WebApp.toString()));
 		event.setUcTelcoCalleePhoneNumber(calleePhoneNumber);
-		event.setUcTelcoCallerPhoneNumber("33638611117");
+		event.setUcTelcoCallerPhoneNumber(callerPhoneNumber);
 		event.setUcTelcoUniqueId(uniqueId);
 		event.setMessage(message);
 		event.setEsrRecommendation(new URIImpl("http://imu.ntua.gr/san/esr/1.1/recommendation/" + uniqueId));

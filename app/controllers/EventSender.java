@@ -10,6 +10,7 @@ import java.util.Random;
 import models.ModelManager;
 import models.User;
 
+import org.event_processing.events.types.CrisisMeasureEvent;
 import org.event_processing.events.types.FacebookStatusFeedEvent;
 import org.event_processing.events.types.UcTelcoCall;
 import org.event_processing.events.types.UcTelcoComposeMail;
@@ -82,7 +83,7 @@ public class EventSender extends Controller {
 	 */
 	public static void simulate(@Required String eventType) {
 		
-		String uniqueId = "webapp/" + Long.toString(nextSequenceNumber()) + "_" + Math.abs(random.nextLong());
+		String uniqueId = "webapp/" + Long.toString(nextSequenceNumber()) + "_" + eventType + "_" + Math.abs(random.nextLong());
 		String eventId = EVENTS.getUri() + uniqueId;
 		Logger.info("An event with type '%s' was requested.", eventType);
 
@@ -117,6 +118,21 @@ public class EventSender extends Controller {
 			Logger.debug("Sending event: %s", event.getModel().serialize(Syntax.Turtle));
 			sender.notify(event, Stream.TaxiUCCall.getTopicQName());
 		}
+		else if (eventType.equals("measure")) {
+			CrisisMeasureEvent event = new CrisisMeasureEvent(EventHelpers.createEmptyModel(eventId),
+					eventId + EVENT_ID_SUFFIX, true);
+			// Run some setters of the event
+			event.setCrisisValue("110");
+			event.setCrisisUnit("mSv");
+			event.setCrisisLocalisation("Karlsruhe");
+			// Create a Calendar for the current date and time
+			event.setEndTime(Calendar.getInstance());
+			event.setStream(new URIImpl(Stream.SituationalEventStream.getUri()));
+			event.setSource(new URIImpl(Source.WebApp.toString()));
+			
+			Logger.debug("Sending event: %s", event.getModel().serialize(Syntax.Turtle));
+			sender.notify(event, Stream.SituationalEventStream.getTopicQName());
+		}		
 		else {
 			Logger.error("A dummy event was to be simulated but it's type '%s' is unknown.", eventType);
 		}

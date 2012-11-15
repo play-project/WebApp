@@ -114,8 +114,9 @@
 <div style="clear: left; padding-top: 30px;">
 	<form id="sendOther">
 		<fieldset><legend>Trigger Events:</legend>
-		<input id="send0" type="button" value="Facebook Event" /><br />
-		<input id="send1" type="button" value="Call Event" /><br />
+		<input id="fb" type="button" value="Facebook Event" />
+		<input id="call" type="button" value="Call Event" />
+		<input id="measure" type="button" value="Measure Event" />
 		</fieldset>
 	</form>
 </div>
@@ -263,11 +264,14 @@ var waitEvents = #{jsAction @waitEvents(':lastReceived') /}
 var sendEvent = #{jsAction @EventSender.simulate(':eventType') /}
 var sendRecom = #{jsAction @EventSender.simulateRecommendation(':calleePhoneNumber', ':callerPhoneNumber', ':message') /}
 
-$("#send0").click(function(e) {
+$("#fb").click(function(e) {
 	$.post(sendEvent({eventType: 'fb'}))
 });
-$("#send1").click(function(e) {
+$("#call").click(function(e) {
 	$.post(sendEvent({eventType: 'call'}))
+});
+$("#measure").click(function(e) {
+	$.post(sendEvent({eventType: 'measure'}))
 });
 $('#sendRecom input[type="submit"]').click(function(e) {
 	$.post(sendRecom({calleePhoneNumber: $('#sendRecom input[name="calleePhoneNumber"]').val(), callerPhoneNumber: $('#sendRecom input[name="callerPhoneNumber"]').val(), message: $('#sendRecom input[name="message"]').val()}))

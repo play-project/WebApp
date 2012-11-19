@@ -111,6 +111,9 @@ public class EventSender extends Controller {
 			event.setUcTelcoCalleePhoneNumber(CALLEE);
 			event.setUcTelcoCallerPhoneNumber("49123498765");
 			event.setUcTelcoDirection("incoming");
+			event.setTwitterScreenName("roland.stuehmer");
+			event.setUcTelcoMailAddress(new URIImpl("mailto:roland.stuehmer@fzi.de"));
+			event.setFacebookId("100000058455726");
 			// Create a Calendar for the current date and time
 			event.setEndTime(Calendar.getInstance());
 			event.setStream(new URIImpl(Stream.TaxiUCCall.getUri()));

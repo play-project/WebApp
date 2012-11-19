@@ -12,6 +12,7 @@ import models.User;
 
 import org.event_processing.events.types.CrisisMeasureEvent;
 import org.event_processing.events.types.FacebookStatusFeedEvent;
+import org.event_processing.events.types.TwitterEvent;
 import org.event_processing.events.types.UcTelcoCall;
 import org.event_processing.events.types.UcTelcoComposeMail;
 import org.event_processing.events.types.UcTelcoEsrRecom;
@@ -86,7 +87,8 @@ public class EventSender extends Controller {
 		String uniqueId = "webapp/" + Long.toString(nextSequenceNumber()) + "_" + eventType + "_" + Math.abs(random.nextLong());
 		String eventId = EVENTS.getUri() + uniqueId;
 		Logger.info("An event with type '%s' was requested.", eventType);
-
+		final String CALLEE = "49123456789";
+		
 		if (eventType.equals("fb")) {
 			FacebookStatusFeedEvent event = new FacebookStatusFeedEvent(EventHelpers.createEmptyModel(eventId),
 					eventId + EVENT_ID_SUFFIX, true);
@@ -106,7 +108,7 @@ public class EventSender extends Controller {
 			UcTelcoCall event = new UcTelcoCall(EventHelpers.createEmptyModel(eventId),
 					eventId + EVENT_ID_SUFFIX, true);
 			// Run some setters of the event
-			event.setUcTelcoCalleePhoneNumber("49123456789");
+			event.setUcTelcoCalleePhoneNumber(CALLEE);
 			event.setUcTelcoCallerPhoneNumber("49123498765");
 			event.setUcTelcoDirection("incoming");
 			// Create a Calendar for the current date and time
@@ -117,6 +119,22 @@ public class EventSender extends Controller {
 			
 			Logger.debug("Sending event: %s", event.getModel().serialize(Syntax.Turtle));
 			sender.notify(event, Stream.TaxiUCCall.getTopicQName());
+		}
+		else if (eventType.equals("tweet")) {
+			TwitterEvent event = new TwitterEvent(EventHelpers.createEmptyModel(eventId),
+					eventId + EVENT_ID_SUFFIX, true);
+			// Run some setters of the event
+			event.setUcTelcoPhoneNumber(CALLEE);
+			event.setTwitterScreenName("roland.stuehmer");
+			event.setContent("Tweet test.");
+			// Create a Calendar for the current date and time
+			event.setEndTime(Calendar.getInstance());
+			event.setStream(new URIImpl(Stream.TaxiUCTwitter.getUri()));
+			event.setSource(new URIImpl(Source.WebApp.toString()));
+			EventHelpers.setLocationToEvent(event, 111, 222);
+			
+			Logger.debug("Sending event: %s", event.getModel().serialize(Syntax.Turtle));
+			sender.notify(event, Stream.TaxiUCTwitter.getTopicQName());
 		}
 		else if (eventType.equals("measure")) {
 			CrisisMeasureEvent event = new CrisisMeasureEvent(EventHelpers.createEmptyModel(eventId),

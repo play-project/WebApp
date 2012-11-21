@@ -78,7 +78,7 @@
 				<a href="#" id="unsubscribe-button-${userTopics.get(i).getId()}"
 					class="unsubscribe-button">Unsubscribe</a>
 			</h2>
-			<div id="topic-events-${userTopics.get(i).getId()}"></div>
+			<div id="topic-events-${userTopics.get(i).getId()}" class="topic-events"></div>
 		</div>
 		%{
 			}
@@ -356,6 +356,18 @@ var display = function(event, blink) {
 		$('#topic-events-'+event.data.topicId).children().last().remove();
 	}
 }
+
+var clearDisplayedEvents = function() {
+	
+	$('#alltopics-events').children().remove();
+	$('#unread-all').html(0);
+
+	$('.topic-events').children().remove();
+	$('.unread-count').html(0);
+	
+}
+$('#clearDisplayedEvents').bind("click", clearDisplayedEvents);
+
 
 var searchAction = #{jsAction @searchTopics() /}
 $('#search-button').bind("click", function(){

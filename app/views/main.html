@@ -62,7 +62,7 @@
 						#{else}
 						  	<a class="menubar-tab" href="@{Application.index()}">My Events</a>
 						  	<a class="menubar-tab" href="@{Application.historicalEvents()}">Historical</a>
-						  	<a class="menubar-tab" href="@{Application.patternQuery()}">Pattern</a>
+						  	<a class="menubar-tab" href="@{Application.patternQuery()}">Query</a>
 						#{/else}
 					  	<a class="menubar-tab" href="@{Application.faq()}">FAQ</a>
 					  	<a id="account-tab" class="menubar-tab" href="#">Account <span class="account-icon ui-icon ui-icon-triangle-1-s"></span></a>
@@ -70,7 +70,8 @@
 					<a id="account-tab-open" href="#">Account <span class="account-icon ui-icon ui-icon-triangle-1-s"></span></a>
 					<div id="account-tab-nav">
 						#{if session.get("userid") != null}
-							<a class="account-nav-link" href="@{Application.settings()}">Settings</a> 
+							<a class="account-nav-link" id="clearDisplayedEvents" href="javascript:void(0)">Clear Displayed Events</a>
+							<a class="account-nav-link" href="@{Application.settings()}">Settings</a>
 							<a class="account-nav-link" href="@{Application.logout()}">Logout</a>
 						#{/if}
 						#{else}
@@ -99,11 +100,13 @@
 						$('#account-tab-nav').css('visibility', 'visible');
 					});
 
-					$('#account-tab-open').bind('click', function(){
+					$('#account-tab-open, #account-tab-nav').bind('click', function(){
 						$(this).css('visibility', 'hidden');
 						$('#account-tab').css('visibility', 'visible');
 						$('#account-tab-nav').css('visibility', 'hidden');
 					});
+					
+					
 				</script>
 		</div>
 		<div id="maincolumn">

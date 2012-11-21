@@ -120,7 +120,7 @@ div#left-panel {
 div#topic-search-bar {
 	border: 1px solid #DDDDDD;
 	border-radius: 2px;
-	diplay: block;
+	display: block;
 	width: 256px;
 	float: left;
 	padding: 10px;
@@ -136,7 +136,7 @@ div#topic-search-bar {
 div#available-topics-container {
 	border: 1px solid #DDDDDD;
 	border-radius: 2px;
-	diplay: block;
+	display: block;
 	height: 482px;
 	width: 270px;
 	overflow-y: scroll;

@@ -2,12 +2,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>eu.play-project</groupId>
+	<groupId>org.ow2.play</groupId>
 	<artifactId>webapp</artifactId>
 	<version>1.0-SNAPSHOT</version>
 
 	<name>PLAY Project WebApp</name>
 	<url>http://www.play-project.eu/</url>
+	<inceptionYear>2011</inceptionYear>
 
 	<repositories>
 		<repository>
@@ -97,7 +98,7 @@
 		<dependency>
 			<groupId>fr.inria.eventcloud</groupId>
 			<artifactId>eventcloud-webservices-core</artifactId>
-			<version>1.2.1</version>
+			<version>1.3.0</version>
 			<exclusions>
 				<!-- exclude various files mostly because of conflicts with playframework -->
 				<exclusion>
@@ -179,4 +180,24 @@
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
+
+	<scm>
+		<url>https://github.com/play-project/WebApp</url>
+		<connection>scm:git:git://github.com/play-project/WebApp.git</connection>
+		<developerConnection>scm:git:https://github.com/play-project/WebApp.git</developerConnection>
+	</scm>
+	
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/play-project/play/issues?labels=web+portal&page=1&state=open</url>
+	</issueManagement>
+
+	<licenses>
+		<license>
+			<name>GNU Affero General Public License version 3.0</name>
+			<url>http://www.gnu.org/licenses/agpl-3.0.html</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	
 </project>

@@ -54,3 +54,6 @@ Installation
 6. Import the eclipsified project in Eclipse:
 `File -> Import -> Import existing projects` (add the path where WebApp was cloned)
 
+Issues
+------
+For issues and bug reporting, please go to https://github.com/play-project/play/issues?labels=web+portal&page=1&state=open

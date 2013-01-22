@@ -189,7 +189,7 @@
 	
 	<issueManagement>
 		<system>GitHub Issues</system>
-		<url>https://github.com/play-project/play/issues?labels=web+portal&page=1&state=open</url>
+		<url>https://github.com/play-project/play/issues?labels=web+portal;page=1;state=open</url>
 	</issueManagement>
 
 	<licenses>

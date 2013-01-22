@@ -26,10 +26,11 @@ import com.hp.hpl.jena.query.QuerySolution;
 
 import eu.play_project.play_commons.constants.Constants;
 import eu.play_project.play_commons.eventtypes.EventHelpers;
+import fr.inria.eventcloud.api.exceptions.MalformedSparqlQueryException;
 import fr.inria.eventcloud.api.responses.SparqlConstructResponse;
 import fr.inria.eventcloud.api.responses.SparqlSelectResponse;
 import fr.inria.eventcloud.api.wrappers.ResultSetWrapper;
-import fr.inria.eventcloud.webservices.api.EventCloudManagementApi;
+import fr.inria.eventcloud.webservices.api.EventCloudsManagementWsApi;
 import fr.inria.eventcloud.webservices.api.PutGetWsApi;
 import fr.inria.eventcloud.webservices.factories.WsClientFactory;
 
@@ -97,13 +98,14 @@ public class HistoricalEvents extends Controller {
      * @return Returns null if topics doesn't exist. Returns an empty 
      * ArrayList if no events were found.
 	 * @throws IOException 
+	 * @throws MalformedSparqlQueryException 
      */
     @Util
-    public static ArrayList<models.eventstream.Event> getHistorical(EventTopic et) throws IOException {
+    public static ArrayList<models.eventstream.Event> getHistorical(EventTopic et) throws IOException, MalformedSparqlQueryException {
             // Creates an Event Cloud Management Web Service Client
-            EventCloudManagementApi eventCloudManagementWsClient =
+    	EventCloudsManagementWsApi eventCloudManagementWsClient =
                     WsClientFactory.createWsClient(
-                            EventCloudManagementApi.class, EC_MANAGEMENT_WS_SERVICE);
+                    		EventCloudsManagementWsApi.class, EC_MANAGEMENT_WS_SERVICE);
 
             String topicUrl = et.getTopicUrl();
 
@@ -173,14 +175,14 @@ public class HistoricalEvents extends Controller {
     }
  
 	@Util
-    private static String findPutGetProxyEndpoint(EventCloudManagementApi eventCloudManagementWsClient,
+    private static String findPutGetProxyEndpoint(EventCloudsManagementWsApi eventCloudManagementWsClient,
                                                   String topicUrl) {
         List<String> putgetProxyEndpoints = 
-                eventCloudManagementWsClient.getPutgetProxyEndpointUrls(topicUrl);
+                eventCloudManagementWsClient.getPutGetWsProxyEndpointUrls(topicUrl);
         
         if (putgetProxyEndpoints == null || putgetProxyEndpoints.size() == 0) {
             Logger.info("Creating new putget proxy for eventcloud " + topicUrl);
-            return eventCloudManagementWsClient.createPutGetProxy(topicUrl);
+            return eventCloudManagementWsClient.deployPutGetWsProxy(topicUrl);
         } else {
             return putgetProxyEndpoints.get(0);
         }

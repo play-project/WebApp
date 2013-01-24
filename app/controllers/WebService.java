@@ -135,13 +135,12 @@ public class WebService extends Controller {
 			List<Topic> topics = eventGovernance.getTopics();
 			Logger.info("Number of topics : " + topics.size());
 			for (Topic t : topics) {
+				String icon = "/images/noicon.png";
+				String description = "No description available.";
+				String title = EventTopic.createId(t.getPrefix(), t.getName());
+				Logger.info("name:" + t.getName() + " ns:" + t.getNs()
+						+ " prefix:" + t.getPrefix());
 				try {
-					String icon = "/images/noicon.png";
-					String description = "No description available.";
-					String title = EventTopic.createId(t.getPrefix(),
-							t.getName());
-					Logger.info("name:" + t.getName() + " ns:" + t.getNs()
-							+ " prefix:" + t.getPrefix());
 					List<Metadata> metadataList;
 					metadataList = client
 							.getMetaData(new org.ow2.play.metadata.api.Resource(
@@ -158,18 +157,22 @@ public class WebService extends Controller {
 							}
 						}
 					}
-					result.add(new EventTopic(t.getPrefix(), t.getName(), t
-							.getNs(), title, icon, description, ""));
 				} catch (MetadataException e) {
 					Logger.warn(
 							e,
-							"A problem occurred while fetching topic metadata " +
-							"from the Metadata Service. Skipping topic name:" + t.getName());
+							"A problem occurred while fetching topic metadata "
+									+ "from the Metadata Service. Skipping topic name:"
+									+ t.getName());
 				} catch (SOAPFaultException e) {
 					Logger.warn(
 							e,
-							"A SOAP problem occurred while fetching topic metadata " +
-							"from the Metadata Service. Skipping topic name:" + t.getName());
+							"A SOAP problem occurred while fetching topic metadata "
+									+ "from the Metadata Service. Skipping topic name:"
+									+ t.getName());
+				} finally {
+					result.add(new EventTopic(t.getPrefix(), t.getName(), t
+							.getNs(), title, icon, description, ""));
+
 				}
 			}
 		} catch (GovernanceExeption e) {

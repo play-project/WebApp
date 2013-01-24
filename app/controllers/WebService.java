@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import models.ModelManager;
 import models.eventstream.EventTopic;
@@ -163,6 +164,11 @@ public class WebService extends Controller {
 					Logger.warn(
 							e,
 							"A problem occurred while fetching topic metadata " +
+							"from the Metadata Service. Skipping topic name:" + t.getName());
+				} catch (SOAPFaultException e) {
+					Logger.warn(
+							e,
+							"A SOAP problem occurred while fetching topic metadata " +
 							"from the Metadata Service. Skipping topic name:" + t.getName());
 				}
 			}

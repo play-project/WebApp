@@ -15,9 +15,11 @@ import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.ontoware.rdf2go.model.Model;
 import org.ow2.play.governance.api.EventGovernance;
+import org.ow2.play.governance.api.GovernanceExeption;
 import org.ow2.play.governance.api.bean.Topic;
 import org.ow2.play.metadata.api.Data;
 import org.ow2.play.metadata.api.Metadata;
+import org.ow2.play.metadata.api.MetadataException;
 import org.ow2.play.metadata.client.MetadataClient;
 import org.petalslink.dsb.notification.client.http.simple.HTTPProducerClient;
 import org.petalslink.dsb.notification.client.http.simple.HTTPSubscriptionManagerClient;
@@ -132,36 +134,44 @@ public class WebService extends Controller {
 			List<Topic> topics = eventGovernance.getTopics();
 			Logger.info("Number of topics : " + topics.size());
 			for (Topic t : topics) {
-				String icon = "/images/noicon.png";
-				String description = "No description available.";
-				String title = EventTopic.createId(t.getPrefix(), t.getName());
-				Logger.info("name:" + t.getName() + " ns:" + t.getNs() + " prefix:"
-						+ t.getPrefix());
-				List<Metadata> metadataList = client
-						.getMetaData(new org.ow2.play.metadata.api.Resource("stream", t
-								.getNs() + t.getName()));
-				for (Metadata m : metadataList) {
-					for (Data d : m.getData()) {
-						if (m.getName().equals(Stream.STREAM_ICON)) {
-							icon = d.getValue();
-						} else if (m.getName().equals(
-								Stream.STREAM_TITLE)) {
-							title = d.getValue();
-						} else if (m.getName().equals(
-								Stream.STREAM_DESCRIPTION)) {
-							description = d.getValue();
+				try {
+					String icon = "/images/noicon.png";
+					String description = "No description available.";
+					String title = EventTopic.createId(t.getPrefix(),
+							t.getName());
+					Logger.info("name:" + t.getName() + " ns:" + t.getNs()
+							+ " prefix:" + t.getPrefix());
+					List<Metadata> metadataList;
+					metadataList = client
+							.getMetaData(new org.ow2.play.metadata.api.Resource(
+									"stream", t.getNs() + t.getName()));
+					for (Metadata m : metadataList) {
+						for (Data d : m.getData()) {
+							if (m.getName().equals(Stream.STREAM_ICON)) {
+								icon = d.getValue();
+							} else if (m.getName().equals(Stream.STREAM_TITLE)) {
+								title = d.getValue();
+							} else if (m.getName().equals(
+									Stream.STREAM_DESCRIPTION)) {
+								description = d.getValue();
+							}
 						}
 					}
+					result.add(new EventTopic(t.getPrefix(), t.getName(), t
+							.getNs(), title, icon, description, ""));
+				} catch (MetadataException e) {
+					Logger.warn(
+							e,
+							"A problem occurred while fetching topic metadata " +
+							"from the Metadata Service. Skipping topic name:" + t.getName());
 				}
-				result.add(new EventTopic(t.getPrefix(), t.getName(), t.getNs(), title, icon, description, ""));
 			}
-
-		} catch (Exception e) {
+		} catch (GovernanceExeption e) {
 			Logger.warn(
 					e,
-					"A problem occurred while fetching the list of available topics from the DSB. Continuing with empty set of topics.");
+					"A problem occurred while fetching the list of available topics " +
+					"from the DSB. Continuing with empty set of topics.");
 		}
-
 		return result;
 	}
 

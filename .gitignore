@@ -28,6 +28,7 @@ conf/secure
 .checkstyle-rules.xml
 .classpath
 .project
+.wtpmodules
 server.pid
 system.out
 webapp.ucls

@@ -88,6 +88,14 @@
 					<groupId>org.ow2.proactive</groupId>
 					<artifactId>scheduling-scheduler-core</artifactId>		
 				</exclusion>
+				<exclusion>
+					<artifactId>play-commons-constants</artifactId>
+					<groupId>eu.play-project</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>play-commons-eventformat</artifactId>
+					<groupId>eu.play-project</groupId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>

@@ -40,8 +40,6 @@ import fr.inria.eventcloud.webservices.factories.WsClientFactory;
  * @author Roland Stühmer
  * @author Laurent Pellegrino
  *
- * @version $Revision$
- *
  */
 public class HistoricalEvents extends Controller {
 	

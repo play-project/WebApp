@@ -113,7 +113,8 @@ public class WebService extends Controller {
 	}
 
 	/**
-	 * Sends a request to the DSB to get the list of supported topics
+	 * Sends a request to the DSB to get the list of supported topics and then requests
+	 * metadata for the topics from the metadata service.
 	 */
 	@Util
 	public static ArrayList<EventTopic> getSupportedTopics() {

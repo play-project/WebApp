@@ -180,10 +180,18 @@ public class HistoricalEvents extends Controller {
         
         if (putgetProxyEndpoints == null || putgetProxyEndpoints.size() == 0) {
             Logger.info("Creating new putget proxy for eventcloud " + topicUrl);
-            return eventCloudManagementWsClient.deployPutGetWsProxy(topicUrl);
+            return filterURL(eventCloudManagementWsClient.deployPutGetWsProxy(topicUrl));
         } else {
-            return putgetProxyEndpoints.get(0);
+            return filterURL(putgetProxyEndpoints.get(0));
         }
     }
+	
+	/*
+	 * TODO: temporary bug fix, should be removed once 
+	 * EventCloud release 1.4.0 is out. 
+	 */
+	private static String filterURL(String url) {
+	    return url.replace("localhost", "eventcloud.inria.fr");
+	}
     
 }

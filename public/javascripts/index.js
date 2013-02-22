@@ -44,7 +44,7 @@ $(document).ready(function() {
 	var subAction = #{jsAction @Application.subscribe(':topicId') /}
 	$("a.subscribe-button").live('click', function() {
 		var $id = $(this).parent().attr('id');
-		var $sid = $id.substring($id.lastIndexOf('-') + 1);
+		var $sid = $id.substring($id.indexOf('-') + 1);
 	    $.ajax({
             url: subAction({topicId: $sid}),
             type: 'POST',
@@ -77,7 +77,7 @@ $(document).ready(function() {
 	var unsubAction = #{jsAction @Application.unsubscribe(':topicId') /}
 	$("a.unsubscribe-button").live('click', function() {
 		var $id = $(this).attr('id');
-		var $sid = $id.substring($id.lastIndexOf('-') + 1);
+		var $sid = $id.substring($id.indexOf('-') + 1);
 	    $.ajax({
             url: unsubAction({topicId: $sid}),
             type: 'POST',

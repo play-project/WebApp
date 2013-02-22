@@ -51,7 +51,7 @@ $(function() {
 	var histoAction = #{jsAction @HistoricalEvents.historicalByTopic() /}
 	$("#tabs").bind("tabsselect", function(event, ui) {
 		var $tab = ui.tab.href;
-		var $sid = $tab.substring($tab.lastIndexOf('-') + 1);
+		var $sid = $tab.substring($tab.indexOf('tab-topic-') + 'tab-topic-'.length);
 		
 		$.post(
 			histoAction(),

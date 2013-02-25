@@ -5,7 +5,7 @@ import static eu.play_project.play_commons.constants.Namespace.EVENTS;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Random;
+import java.util.UUID;
 
 import models.ModelManager;
 import models.User;
@@ -36,8 +36,6 @@ import eu.play_project.play_eventadapter.AbstractSender;
 public class EventSender extends Controller {
 
 	private static AbstractSender sender = new AbstractSender(Stream.FacebookStatusFeed.getTopicQName());
-	
-	private static Random random = new Random();
 	
 	private static long lastSequenceNumber = 0;
 	
@@ -84,7 +82,7 @@ public class EventSender extends Controller {
 	 */
 	public static void simulate(@Required String eventType) {
 		
-		String uniqueId = "webapp/" + Long.toString(nextSequenceNumber()) + "_" + eventType + "_" + Math.abs(random.nextLong());
+		String uniqueId = "webapp_" + Long.toString(nextSequenceNumber()) + "_" + eventType + "_" + UUID.randomUUID();
 		String eventId = EVENTS.getUri() + uniqueId;
 		Logger.info("An event with type '%s' was requested.", eventType);
 		final String CALLEE = "49123456789";
@@ -161,7 +159,7 @@ public class EventSender extends Controller {
 	
 	public static void simulateRecommendation(@Required String calleePhoneNumber, @Required String callerPhoneNumber, @Required String message) {
 		
-		String uniqueId = "webapp/" + Long.toString(nextSequenceNumber()) + "_" + Math.abs(random.nextLong());
+		String uniqueId = "webapp_" + Long.toString(nextSequenceNumber()) + "_" + UUID.randomUUID();
 		String eventId = EVENTS.getUri() + uniqueId;
 		Logger.info("A recommendation event was requested.");
 

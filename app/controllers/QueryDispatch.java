@@ -16,6 +16,7 @@ import play.mvc.Before;
 import play.mvc.Controller;
 import play.mvc.Util;
 import eu.play_project.play_commons.constants.Constants;
+import eu.play_project.play_commons.constants.Namespace;
 import eu.play_project.play_platformservices.api.QueryDispatchApi;
 
 public class QueryDispatch extends Controller {
@@ -66,7 +67,7 @@ public class QueryDispatch extends Controller {
 		QueryDispatchApi queryDispatchApi = service
 				.getPort(eu.play_project.play_platformservices.api.QueryDispatchApi.class);
 
-		String s = queryDispatchApi.registerQuery("http://patterns.event-processing.org/ids/webapp_" + UUID.randomUUID(), queryString);
+		String s = queryDispatchApi.registerQuery(Namespace.PATTERN.getUri() + "webapp_" + UUID.randomUUID(), queryString);
 		Logger.info(s);
 		
 		return true;

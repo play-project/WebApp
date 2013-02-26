@@ -3,12 +3,10 @@ package controllers;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
+import java.util.UUID;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
-
-import eu.play_project.play_commons.constants.Constants;
-import eu.play_project.play_platformservices.api.QueryDispatchApi;
 
 import models.ModelManager;
 import models.PredefinedPatterns;
@@ -17,6 +15,8 @@ import play.Logger;
 import play.mvc.Before;
 import play.mvc.Controller;
 import play.mvc.Util;
+import eu.play_project.play_commons.constants.Constants;
+import eu.play_project.play_platformservices.api.QueryDispatchApi;
 
 public class QueryDispatch extends Controller {
 
@@ -66,7 +66,7 @@ public class QueryDispatch extends Controller {
 		QueryDispatchApi queryDispatchApi = service
 				.getPort(eu.play_project.play_platformservices.api.QueryDispatchApi.class);
 
-		String s = queryDispatchApi.registerQuery("http://patterns.event-processing.org/ids/webapp_" + Math.random(), queryString);
+		String s = queryDispatchApi.registerQuery("http://patterns.event-processing.org/ids/webapp_" + UUID.randomUUID(), queryString);
 		Logger.info(s);
 		
 		return true;

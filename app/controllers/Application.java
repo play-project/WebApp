@@ -1,39 +1,33 @@
 package controllers;
 
-import play.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+import models.BoyerMoore;
+import models.ModelManager;
+import models.PasswordEncrypt;
+import models.User;
+import models.eventstream.Event;
+import models.eventstream.EventTopic;
+import play.Logger;
 import play.cache.Cache;
-import play.data.validation.*;
+import play.data.validation.Email;
+import play.data.validation.Equals;
+import play.data.validation.Required;
 import play.libs.Codec;
 import play.libs.F.IndexedEvent;
-import play.libs.F.Promise;
-import play.libs.WS.HttpResponse;
 import play.libs.Images;
-import play.libs.WS;
-import play.mvc.*;
+import play.mvc.Before;
+import play.mvc.Controller;
 import securesocial.provider.ProviderType;
 import securesocial.provider.SocialUser;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.*;
-import java.util.concurrent.ExecutionException;
-
-import javax.xml.namespace.QName;
-import javax.xml.transform.TransformerException;
-
-import org.w3c.dom.Document;
-
-import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
-import controllers.Authentifier;
-import controllers.WebService;
 import controllers.securesocial.SecureSocial;
-
-import models.*;
-import models.eventstream.Event;
-import models.eventstream.EventTopic;
+import eu.play_project.play_platformservices.api.QueryDispatchException;
 
 /**
  * The Application controller is the main controller in charge of all basic
@@ -116,12 +110,17 @@ public class Application extends Controller {
 
 	public static void processTokenPatternQuery(String token) {
 		if (token != null && token != "") {
-			Boolean result = QueryDispatch.sendTokenPatternQuery(token);
-			if (!result) {
-				flash.error("The operation encoutered an error.");
-			}
-			else {
-				flash.success("Pattern registered successfully.");
+			Boolean result;
+			try {
+				result = QueryDispatch.sendTokenPatternQuery(token);
+				if (!result) {
+					flash.error("The operation encoutered an error.");
+				}
+				else {
+					flash.success("Pattern registered successfully.");
+				}
+			} catch (QueryDispatchException e) {
+				flash.error(e.getMessage());
 			}
 		}
 		patternQuery();

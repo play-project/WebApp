@@ -18,6 +18,7 @@ import play.mvc.Util;
 import eu.play_project.play_commons.constants.Constants;
 import eu.play_project.play_commons.constants.Namespace;
 import eu.play_project.play_platformservices.api.QueryDispatchApi;
+import eu.play_project.play_platformservices.api.QueryDispatchException;
 
 public class QueryDispatch extends Controller {
 
@@ -44,7 +45,7 @@ public class QueryDispatch extends Controller {
 	
 	
 	@Util
-	public static boolean sendTokenPatternQuery(String token) {
+	public static boolean sendTokenPatternQuery(String token) throws QueryDispatchException {
 		String defaultQueryString = PredefinedPatterns.getPattern("play-epsparql-m12-jeans-example-query.eprq");
 		String queryString = defaultQueryString.replaceAll("\"JEANS\"", "\"" + token + "\"");
 
@@ -52,7 +53,7 @@ public class QueryDispatch extends Controller {
 	}
 
 	@Util
-	public static Boolean sendFullPatternQuery(String queryString) {
+	public static Boolean sendFullPatternQuery(String queryString) throws QueryDispatchException {
 
 		URL wsdl = null;
 		try {

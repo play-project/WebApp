@@ -65,18 +65,31 @@ public class Event {
 	
 	/**
 	 * Factory method to create {@linkplain Event}s from RDF {@linkplain Model}s.
-	 * 
-	 * @param rdf
-	 * @return
 	 */
 	public static Event eventFromRdf(Model rdf) {
-		String eventTitle;
 		String eventText;
 
 		eventText = rdf.serialize(Syntax.Turtle);
 		// FIXME stuehmer: this is a hack to hide the many namespace declarations... we should nicely "fold"/"collapse" instead of deleting
 		eventText = eventText.replaceAll("@prefix.*?> \\.", "").trim();
 		eventText = HTML.htmlEscape(eventText).replaceAll("\n", "<br />").replaceAll("\\s{4}", "&nbsp;&nbsp;&nbsp;&nbsp;");
+
+		return new Event(createEventTitle(rdf), eventText);
+
+	}
+	
+	/**
+	 * Factory method to create HTML-formatted {@linkplain Event}s from RDF {@linkplain Model}s.
+	 */
+	public static Event eventPrettyPrintFromRdf(Model rdf) {
+		String eventText = "";
+
+		return new Event(createEventTitle(rdf), eventText);
+	
+	}
+	
+	public static String createEventTitle(Model rdf) {
+		String eventTitle;
 
 		// First try RDF types with the expected event ID
 		if (rdf.getContextURI() != null) {
@@ -88,7 +101,7 @@ public class Event {
 				Statement stat = it.next();
 				eventTitle = stat.getObject().asURI().asJavaURI().getPath();
 				eventTitle = eventTitle.substring(eventTitle.lastIndexOf("/") + 1);
-				return new Event(eventTitle, eventText);
+				return eventTitle;
 			}
 		}
 		// Then try any RDF types
@@ -98,12 +111,14 @@ public class Event {
 			Statement stat = it2.next();
 			eventTitle = stat.getObject().asURI().asJavaURI().getPath();
 			eventTitle = eventTitle.substring(eventTitle.lastIndexOf("/") + 1);
-			return new Event(eventTitle, eventText);
+			return eventTitle;
 		}
 		// Then fall back to a constant String
 		else {
 			eventTitle = "RDF Event";
-			return new Event(eventTitle, eventText);
+			return eventTitle;
 		}
+
 	}
+
 }

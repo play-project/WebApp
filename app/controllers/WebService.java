@@ -53,11 +53,11 @@ import eu.play_project.play_eventadapter.AbstractReceiver;
  */
 public class WebService extends Controller {
 
-	public static String DSB_NOTIFICATION_PRODUCER_SERVICE = 
+	public static String DSB_NOTIFICATION_PRODUCER_SERVICE =
 			Constants.getProperties().getProperty("dsb.subscribe.endpoint");
-	public static String EVENT_GOVERNANCE_SERVICE = 
+	public static String EVENT_GOVERNANCE_SERVICE =
 			Constants.getProperties().getProperty("governance.eventgovernance.endpoint");
-	public static String METADATA_SERVICE = 
+	public static String METADATA_SERVICE =
 			Constants.getProperties().getProperty("governance.metadataservice.endpoint");
 	private static AbstractReceiver receiver = new AbstractReceiver() {
 	};
@@ -100,7 +100,7 @@ public class WebService extends Controller {
 			/*
 			 * Deal with non-RDF events:
 			 */
-			String eventTitle = "Event";
+			String eventTitle = "XmlEvent";
 			String eventText = HTML
 					.htmlEscape(
 							EventFormatHelpers

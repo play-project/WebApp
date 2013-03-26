@@ -72,7 +72,7 @@ $(function() {
 	
 	var display = function(event, topicid) {		
 		$('#topic-events-'+topicid)
-			.prepend('<div class="event"><table width="100%"><tr><td><img src="'+event.data.icon+'" alt="" align="middle" align="left" /></td><td><h3>'+event.data.title+'</h3></td></tr></table><p>'+event.content+'</p></div>');
+			.prepend('<div class="event"><table width="100%"><tr><td width="16"><img src="'+event.data.icon+'" alt="" align="middle" align="left" /></td><td><h3>'+event.data.title+'</h3></td></tr></table><p>'+event.content+'</p></div>');
 	}
 	
 	var displayError = function(event, topicid) {

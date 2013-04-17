@@ -72,7 +72,7 @@ $(function() {
 	
 	var display = function(event, topicid) {		
 		$('#topic-events-'+topicid)
-			.prepend('<div class="event"><table width="100%"><tr><td width="16"><img src="'+event.icon+'" alt="" align="middle" align="left" /></td><td><h3>'+event.title+'</h3></td></tr><tr><td colspan="2">'+event.content+'</td></tr></table></div>');
+			.prepend('<div class="event">' + event.htmlContent + '</div>');
 	}
 	
 	var displayError = function(event, topicid) {

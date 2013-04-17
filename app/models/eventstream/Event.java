@@ -18,6 +18,7 @@ public class Event {
 	private String topicId;
 	private String title;
 	private String content;
+	private String htmlContent;
 	private String icon;
 
 	public Event(String title, String content) {
@@ -29,6 +30,11 @@ public class Event {
 		this.title = title;
 		this.content = content;
 		this.icon = icon;
+	}
+	
+	public Event(String title, String content, String htmlContent, String icon) {
+		this(title, content, icon);
+		this.htmlContent = htmlContent;
 	}
 	
 	/**
@@ -66,43 +72,54 @@ public class Event {
 		this.icon = icon;
 	}
 
+	public String getHtmlContent() {
+		if (htmlContent == null) {
+			return content;
+		}
+		return htmlContent;
+	}
+
+	public void setHtmlContent(String htmlContent) {
+		this.htmlContent = htmlContent;
+	}
+
 	@Override
 	public String toString() {
 		return "Event [topicId=" + getTopicId() + ", title=" + getTitle() + ", content=" + getContent() + "]";
 	}
-	
+
 	/**
 	 * Factory method to create {@linkplain Event}s from RDF {@linkplain Model}s.
 	 */
 	public static Event eventFromRdf(Model rdf) {
-		String eventText;
+		String content;
+		String htmlContent;
 		String eventIcon;
+		String eventTitle;
 		
-		eventText = rdf.serialize(Syntax.Turtle);
-		// FIXME stuehmer: this is a hack to hide the many namespace declarations... we should nicely "fold"/"collapse" instead of deleting
-		eventText = eventText.replaceAll("@prefix.*?> \\.", "").trim();
-		eventText = HTML.htmlEscape(eventText).replaceAll("\n", "<br />").replaceAll("\\s{4}", "&nbsp;&nbsp;&nbsp;&nbsp;");
-
+		// Title:
+		eventTitle = createEventTitle(rdf);
+		
+		// Icon:
 		eventIcon = EventTypeMetadata.getEventTypeIcon(EventTypeMetadata.getEventType(rdf));
+	
+		// Plain text representation:
+		content = rdf.serialize(Syntax.Turtle);
 		
-		return new Event(createEventTitle(rdf), eventText, eventIcon);
-
-	}
-	
-	/**
-	 * Factory method to create HTML-formatted {@linkplain Event}s from RDF {@linkplain Model}s.
-	 */
-	public static Event eventPrettyPrintFromRdf(Model rdf) {
-		String eventText = "";
-		String eventIcon = "";
-
-		return new Event(createEventTitle(rdf), eventText, eventIcon);
+		// HTML representation:
+		// FIXME stuehmer: this is a hack to hide the many namespace declarations... we should nicely "fold"/"collapse" instead of deleting
+		htmlContent = content.replaceAll("@prefix.*?>\\s*?\\.", "").trim();
+		htmlContent = HTML.htmlEscape(htmlContent).replaceAll("\n", "<br />").replaceAll("\\s{4}", "&nbsp;&nbsp;&nbsp;&nbsp;");
+		htmlContent = "<table width='100%'><tr><td width='16'><img src='" + eventIcon + "' alt='' align='middle' align='left' /></td><td><h3>" + eventTitle + "</h3></td></tr><tr><td></td><td>" + htmlContent + "</td></tr></table>";
+		
+		
+		return new Event(eventTitle, content, htmlContent, eventIcon);
 	
 	}
-	
+
 	public static String createEventTitle(Model rdf) {
 		String eventTitle = EventTypeMetadata.getEventType(rdf);
-
+	
 		return eventTitle.substring(eventTitle.lastIndexOf("/") + 1);
 	}
 

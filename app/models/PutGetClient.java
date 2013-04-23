@@ -10,12 +10,8 @@ import javax.jws.WebMethod;
 
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.jaxws.JaxWsClientFactoryBean;
-import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 
 import play.Logger;
-
-import eu.play_project.play_commons.constants.Constants;
-import fr.inria.eventcloud.api.PutGetApi;
 import fr.inria.eventcloud.api.Quadruple;
 import fr.inria.eventcloud.api.QuadruplePattern;
 import fr.inria.eventcloud.api.responses.SparqlAskResponse;
@@ -27,7 +23,7 @@ import fr.inria.eventcloud.webservices.api.PutGetWsApi;
 
 public class PutGetClient implements PutGetWsApi {
 	private Client client;
-	private Map<String, String> operationNames;
+	private final Map<String, String> operationNames;
 
 	public PutGetClient(String wsUrl) {
 		JaxWsClientFactoryBean factory = new JaxWsClientFactoryBean();
@@ -83,36 +79,36 @@ public class PutGetClient implements PutGetWsApi {
 	}
 
 	@Override
-	public boolean addQuadruple(Quadruple arg0) {
+	public boolean add(Quadruple arg0) {
 		return (Boolean) callWS("addQuadruple", new Object[] { arg0 });
 	}
 
 	@Override
-	public boolean addQuadrupleCollection(Collection<Quadruple> arg0) {
+	public boolean add(Collection<Quadruple> arg0) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean containsQuadruple(Quadruple arg0) {
+	public boolean contains(Quadruple arg0) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean deleteQuadruple(Quadruple arg0) {
+	public boolean delete(Quadruple arg0) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean deleteQuadrupleCollection(Collection<Quadruple> arg0) {
+	public boolean delete(Collection<Quadruple> arg0) {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public List<Quadruple> deleteQuadruplePattern(QuadruplePattern arg0) {
+	public List<Quadruple> delete(QuadruplePattern arg0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -147,7 +143,7 @@ public class PutGetClient implements PutGetWsApi {
 	}
 
 	@Override
-	public List<Quadruple> findQuadruplePattern(QuadruplePattern arg0) {
+	public List<Quadruple> find(QuadruplePattern arg0) {
 		return (List<Quadruple>) callWS("findQuadruplePattern", new Object[] { arg0 });
 	}
 }

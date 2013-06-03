@@ -60,8 +60,8 @@ nobanner:true /} #{set nofooter:true /}
 						<div>
 				<form id="processComposedPatternQuery" action="@{Application.processComposedPatternQuery()}" method="POST">
 					<fieldset>
-						<legend>Here, you can compose your own query</legend>
-						<div>EVENT</div>
+						<legend>Here, test the graphical event editor:</legend>
+						<div><a href="http://laus.fzi.de:8080/play/Panteon.html?userId=1" onclick="modalWin('http://laus.fzi.de:8080/play/Panteon.html?userId=1', 'PANTEON'); return false;">Go to PANTEON</a></div>
 					</fieldset>
 					<fieldset>
 						<legend>Event Level Requirements</legend>
@@ -129,7 +129,16 @@ ${models.PredefinedPatterns.getPattern("play-epsparql-m12-jeans-example-query.ep
 		$.post(processFullPatternQuery({text: $('#processFullPatternQuery textarea[name="text"]').val()}))
 	});
 	*/
-
+	
+	function modalWin(url, name) {
+		if (window.showModalDialog) {
+			window.showModalDialog(url,name,
+				"");
+		} else {
+			window.open(url,name,
+				'toolbar=no,directories=no,status=no,menubar=no,modal=yes');
+		}
+	} 
 
 	$(document).ready(
 			function() {

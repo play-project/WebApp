@@ -10,7 +10,7 @@ import models.User;
 import models.eventstream.Event;
 import models.eventstream.EventTopic;
 
-import org.ontoware.rdf2go.impl.jena29.ModelImplJena26;
+import org.ontoware.rdf2go.impl.jena.ModelImplJena;
 import org.ontoware.rdf2go.model.Model;
 import org.ontoware.rdf2go.model.Syntax;
 import org.ontoware.rdf2go.model.node.impl.URIImpl;
@@ -43,7 +43,7 @@ import fr.inria.eventcloud.webservices.factories.WsClientFactory;
  */
 public class HistoricalEvents extends Controller {
 	
-	public static String EC_MANAGEMENT_WS_SERVICE = 
+	public static String EC_MANAGEMENT_WS_SERVICE =
 	        Constants.getProperties().getProperty("eventclouds.management.endpoint");
 	
 	@Before
@@ -93,10 +93,10 @@ public class HistoricalEvents extends Controller {
      * 
      * @param et event topic.
      * 
-     * @return Returns null if topics doesn't exist. Returns an empty 
+     * @return Returns null if topics doesn't exist. Returns an empty
      * ArrayList if no events were found.
-	 * @throws IOException 
-	 * @throws MalformedSparqlQueryException 
+	 * @throws IOException
+	 * @throws MalformedSparqlQueryException
      */
     @Util
     public static ArrayList<models.eventstream.Event> getHistorical(EventTopic et) throws IOException, MalformedSparqlQueryException {
@@ -115,7 +115,7 @@ public class HistoricalEvents extends Controller {
                     findPutGetProxyEndpoint(
                             eventCloudManagementWsClient, topicUrl);
 
-            PutGetWsApi putgetProxyClient = 
+            PutGetWsApi putgetProxyClient =
                     WsClientFactory.createWsClient(PutGetWsApi.class, putgetProxyEndpoint);
 
             /*
@@ -139,12 +139,12 @@ public class HistoricalEvents extends Controller {
 
             Logger.debug("Executing the following historical SPARQL query to get graph names: " + sparqlQuery);
 
-            SparqlSelectResponse response = 
+            SparqlSelectResponse response =
                     putgetProxyClient.executeSparqlSelect(sparqlQuery);
 
             ResultSetWrapper result = response.getResult();
             
-            ArrayList<models.eventstream.Event> events = 
+            ArrayList<models.eventstream.Event> events =
                     new ArrayList<models.eventstream.Event>();
             
             while (result.hasNext()) {
@@ -161,7 +161,7 @@ public class HistoricalEvents extends Controller {
                 SparqlConstructResponse constructResponse =
                         putgetProxyClient.executeSparqlConstruct(sparqlQuery);
 
-                Model rdf = new ModelImplJena26(new URIImpl(shortGraph.getURI()), constructResponse.getResult()).open();
+                Model rdf = new ModelImplJena(new URIImpl(shortGraph.getURI()), constructResponse.getResult()).open();
                 EventHelpers.addNamespaces(rdf);
 
                 Logger.debug("Resulting RDF: %s", rdf.serialize(Syntax.Turtle));
@@ -175,7 +175,7 @@ public class HistoricalEvents extends Controller {
 	@Util
     private static String findPutGetProxyEndpoint(EventCloudsManagementWsApi eventCloudManagementWsClient,
                                                   String topicUrl) {
-        List<String> putgetProxyEndpoints = 
+        List<String> putgetProxyEndpoints =
                 eventCloudManagementWsClient.getPutGetWsProxyEndpointUrls(topicUrl);
         
         if (putgetProxyEndpoints == null || putgetProxyEndpoints.size() == 0) {
@@ -186,10 +186,13 @@ public class HistoricalEvents extends Controller {
         }
     }
 	
-	/*
-	 * TODO: temporary bug fix, should be removed once 
-	 * EventCloud release 1.4.0 is out. 
+	/**
+	 * TODO: temporary bug fix, should be removed once
+	 * EventCloud release 1.4.0 is out.
+	 * 
+	 * @deprecated
 	 */
+	@Deprecated
 	private static String filterURL(String url) {
 	    return url.replace("localhost", "eventcloud.inria.fr");
 	}

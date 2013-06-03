@@ -85,55 +85,55 @@ public class PutGetClient implements PutGetWsApi {
 
 	@Override
 	public boolean add(Collection<Quadruple> arg0) {
-		// TODO Auto-generated method stub
+		Logger.error("Usupported action called in " + this.getClass().getCanonicalName());
 		return false;
 	}
 
 	@Override
 	public boolean contains(Quadruple arg0) {
-		// TODO Auto-generated method stub
+		Logger.error("Usupported action called in " + this.getClass().getCanonicalName());
 		return false;
 	}
 
 	@Override
 	public boolean delete(Quadruple arg0) {
-		// TODO Auto-generated method stub
+		Logger.error("Usupported action called in " + this.getClass().getCanonicalName());
 		return false;
 	}
 
 	@Override
 	public boolean delete(Collection<Quadruple> arg0) {
-		// TODO Auto-generated method stub
+		Logger.error("Usupported action called in " + this.getClass().getCanonicalName());
 		return false;
 	}
 
 	@Override
 	public List<Quadruple> delete(QuadruplePattern arg0) {
-		// TODO Auto-generated method stub
+		Logger.error("Usupported action called in " + this.getClass().getCanonicalName());
 		return null;
 	}
 
 	@Override
 	public SparqlAskResponse executeSparqlAsk(String arg0) {
-		// TODO Auto-generated method stub
+		Logger.error("Usupported action called in " + this.getClass().getCanonicalName());
 		return null;
 	}
 
 	@Override
 	public SparqlConstructResponse executeSparqlConstruct(String arg0) {
-		// TODO Auto-generated method stub
+		Logger.error("Usupported action called in " + this.getClass().getCanonicalName());
 		return null;
 	}
 
 	@Override
 	public SparqlDescribeResponse executeSparqlDescribe(String arg0) {
-		// TODO Auto-generated method stub
+		Logger.error("Usupported action called in " + this.getClass().getCanonicalName());
 		return null;
 	}
 
 	@Override
 	public SparqlResponse<?> executeSparqlQuery(String arg0) {
-		// TODO Auto-generated method stub
+		Logger.error("Usupported action called in " + this.getClass().getCanonicalName());
 		return null;
 	}
 

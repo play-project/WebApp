@@ -1,10 +1,10 @@
 package controllers;
 
+import models.ModelManager;
+import models.User;
 import play.Logger;
 import play.cache.Cache;
 import play.mvc.Controller;
-import models.ModelManager;
-import models.User;
 import securesocial.provider.ProviderType;
 import securesocial.provider.SocialUser;
 import securesocial.provider.UserId;
@@ -119,41 +119,35 @@ public class UserService extends Controller implements UserServiceDelegate {
 
 	@Override
 	public boolean activate(String uuid) {
-		// TODO Auto-generated method stub
 		Logger.error("Usupported action called in " + this.getClass().getCanonicalName());
 		return false;
 	}
 
 	@Override
 	public void deletePendingActivations() {
-		// TODO Auto-generated method stub
-
+		Logger.error("Usupported action called in " + this.getClass().getCanonicalName());
 	}
 
 	@Override
 	public SocialUser find(String email) {
-		// TODO Auto-generated method stub
 		Logger.error("Usupported action called in " + this.getClass().getCanonicalName());
 		return null;
 	}
 
 	@Override
 	public String createPasswordReset(SocialUser user) {
-		// TODO Auto-generated method stub
 		Logger.error("Usupported action called in " + this.getClass().getCanonicalName());
 		return null;
 	}
 
 	@Override
 	public SocialUser fetchForPasswordReset(String username, String uuid) {
-		// TODO Auto-generated method stub
 		Logger.error("Usupported action called in " + this.getClass().getCanonicalName());
 		return null;
 	}
 
 	@Override
 	public void disableResetCode(String username, String uuid) {
-		// TODO Auto-generated method stub
 		Logger.error("Usupported action called in " + this.getClass().getCanonicalName());
 	}
 

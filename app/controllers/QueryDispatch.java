@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
+import javax.xml.ws.WebServiceException;
 
 import models.ModelManager;
 import models.PredefinedPatterns;
@@ -63,15 +64,19 @@ public class QueryDispatch extends Controller {
 		}
 
 		QName serviceName = new QName("http://play_platformservices.play_project.eu/", "QueryDispatchApi");
-
-		Service service = Service.create(wsdl, serviceName);
-		QueryDispatchApi queryDispatchApi = service
-				.getPort(eu.play_project.play_platformservices.api.QueryDispatchApi.class);
-
-		String s = queryDispatchApi.registerQuery(Namespace.PATTERN.getUri() + "webapp_" + UUID.randomUUID(), queryString);
-		Logger.info(s);
-		
+		try {
+			Service service = Service.create(wsdl, serviceName);
+			QueryDispatchApi queryDispatchApi = service
+					.getPort(eu.play_project.play_platformservices.api.QueryDispatchApi.class);
+	
+			String s = queryDispatchApi.registerQuery(Namespace.PATTERN.getUri() + "webapp_" + UUID.randomUUID(), queryString);
+			Logger.info(s);
+		}
+		catch (WebServiceException e) {
+			throw new QueryDispatchException("Problem while sending event pattern: " + e.getMessage());
+		}
 		return true;
+		
 	}
 
 	

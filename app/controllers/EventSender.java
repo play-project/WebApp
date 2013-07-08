@@ -3,6 +3,7 @@ package controllers;
 import static eu.play_project.play_commons.constants.Event.EVENT_ID_SUFFIX;
 import static eu.play_project.play_commons.constants.Namespace.EVENTS;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
@@ -12,7 +13,6 @@ import models.User;
 
 import org.event_processing.events.types.CrisisMeasureEvent;
 import org.event_processing.events.types.FacebookStatusFeedEvent;
-import org.event_processing.events.types.TwitterEvent;
 import org.event_processing.events.types.UcTelcoCall;
 import org.event_processing.events.types.UcTelcoComposeMail;
 import org.event_processing.events.types.UcTelcoEsrRecom;
@@ -20,9 +20,12 @@ import org.ontoware.rdf2go.model.Syntax;
 import org.ontoware.rdf2go.model.node.impl.URIImpl;
 
 import play.Logger;
+import play.Play;
 import play.data.validation.Required;
+import play.libs.IO;
 import play.mvc.Before;
 import play.mvc.Controller;
+import eu.play_project.play_commons.constants.Event;
 import eu.play_project.play_commons.constants.Source;
 import eu.play_project.play_commons.constants.Stream;
 import eu.play_project.play_commons.eventtypes.EventHelpers;
@@ -38,6 +41,8 @@ public class EventSender extends Controller {
 	private static AbstractSender sender = new AbstractSender(Stream.FacebookStatusFeed.getTopicQName());
 	
 	private static long lastSequenceNumber = 0;
+	
+	private static String heartRateTemplate = IO.readContentAsString(Play.classloader.getResourceAsStream("templates/AlarmEvent.tmpl"));
 	
 	@Before
 	private static void checkAuthentification() {
@@ -121,21 +126,31 @@ public class EventSender extends Controller {
 			Logger.debug("Sending event: %s", event.getModel().serialize(Syntax.Turtle));
 			sender.notify(event, Stream.TaxiUCCall.getTopicQName());
 		}
-		else if (eventType.equals("tweet")) {
-			TwitterEvent event = new TwitterEvent(EventHelpers.createEmptyModel(eventId),
-					eventId + EVENT_ID_SUFFIX, true);
-			// Run some setters of the event
-			event.setUcTelcoPhoneNumber(CALLEE);
-			event.setTwitterScreenName("roland.stuehmer");
-			event.setContent("Tweet test.");
-			// Create a Calendar for the current date and time
-			event.setEndTime(Calendar.getInstance());
-			event.setStream(new URIImpl(Stream.TaxiUCTwitter.getUri()));
-			event.setSource(new URIImpl(Source.WebApp.toString()));
-			EventHelpers.setLocationToEvent(event, 111, 222);
+		else if (eventType.equals("heartrate")) {
 			
-			Logger.debug("Sending event: %s", event.getModel().serialize(Syntax.Turtle));
-			sender.notify(event, Stream.TaxiUCTwitter.getTopicQName());
+			String event = heartRateTemplate;
+			final String STREAM = "PersonalStream1";
+			final String TIMESTAMP = new SimpleDateFormat(Event.DATE_FORMAT_8601).format(new Date());
+			final String TWITTER_ID = "rolandstuehmer";
+			final String FACEBOOK_ID = "roland.stuehmer" ;
+			final String USER_ID = "mailto:roland.stuehmer@fzi.de";
+			final String PHONENUMBER = "+491119041747";
+			final int SESSIONID = 4;
+			
+			event = event.replaceAll("%EVENT_ID%", eventId);
+			event = event.replaceAll("%STREAM_LOCALPART%", STREAM);
+			event = event.replaceAll("%DATE_TIME%", TIMESTAMP);
+			event = event.replaceAll("%TWITTER_ID%", TWITTER_ID);
+			event = event.replaceAll("%PHONE%", PHONENUMBER);
+			event = event.replaceAll("%FACEBOOK_ID%", FACEBOOK_ID);
+			event = event.replaceAll("%USER_ID%", USER_ID);
+			event = event.replaceAll("%SESSION_ID%", Integer.toString(SESSIONID));
+			event = event.replaceAll("%CEP_PATTERN_ID%", "20");
+			event = event.replaceAll("%ALARM_PARAMETER_VALUE%", "rpm:HeartbeatValue");
+			event = event.replaceAll("%CEP_PATTERN_VALUE%", "85");
+			
+			Logger.debug("Sending event: %s", event);
+			sender.notifyRaw(event);
 		}
 		else if (eventType.equals("measure")) {
 			CrisisMeasureEvent event = new CrisisMeasureEvent(EventHelpers.createEmptyModel(eventId),
@@ -151,7 +166,7 @@ public class EventSender extends Controller {
 			
 			Logger.debug("Sending event: %s", event.getModel().serialize(Syntax.Turtle));
 			sender.notify(event, Stream.SituationalEventStream.getTopicQName());
-		}		
+		}
 		else {
 			Logger.error("A dummy event was to be simulated but it's type '%s' is unknown.", eventType);
 		}
@@ -166,7 +181,7 @@ public class EventSender extends Controller {
 		UcTelcoEsrRecom event = new UcTelcoEsrRecom(EventHelpers.createEmptyModel(eventId),
 				eventId + EVENT_ID_SUFFIX, true);
 		event.setEndTime(Calendar.getInstance());
-		event.setStream(new URIImpl(Stream.TaxiUCESRRecom.getUri()));
+		event.setStream(new URIImpl(Stream.TaxiUCESRRecomDcep.getUri()));
 		event.setSource(new URIImpl(Source.WebApp.toString()));
 		event.setUcTelcoCalleePhoneNumber(calleePhoneNumber);
 		event.setUcTelcoCallerPhoneNumber(callerPhoneNumber);
@@ -184,7 +199,7 @@ public class EventSender extends Controller {
 		event.addUcTelcoAction(action1);
 
 		Logger.debug("Sending event: %s", event.getModel().serialize(Syntax.Turtle));
-		sender.notify(event, Stream.TaxiUCESRRecom.getTopicQName());
-}
+		sender.notify(event, Stream.TaxiUCESRRecomDcep.getTopicQName());
+	}
 
 }

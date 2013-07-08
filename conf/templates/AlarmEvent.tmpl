@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/"
+                   xmlns:xsd="http://www.w3.org/1999/XMLSchema"
+                   xmlns:xsi="http://www.w3.org/1999/XMLSchema-instance">
+   <soap-env:Body>
+      <wsnt:Notify xmlns:wsnt="http://docs.oasis-open.org/wsn/b-2">
+         <wsnt:NotificationMessage>
+            <wsnt:Topic xmlns:s="http://streams.event-processing.org/ids/"
+                        Dialect="http://docs.oasis-open.org/wsn/t-1/TopicExpression/Concrete">s:%STREAM_LOCALPART%</wsnt:Topic>
+            <wsnt:Message>
+               <mt:nativeMessage xmlns:mt="http://www.event-processing.org/wsn/msgtype/"
+                                 mt:syntax="application/x-trig">
+@prefix : &lt;http://events.event-processing.org/types/&gt; .
+@prefix rpm: &lt;http://events.event-processing.org/rpm/&gt; .
+@prefix uctelco: &lt;http://events.event-processing.org/uc/telco/&gt; .
+@prefix geo: &lt;http://www.w3.org/2003/01/geo/wgs84_pos#&gt; .
+@prefix sioc: &lt;http://rdfs.org/sioc/ns#&gt; .
+@prefix ssn: &lt;http://purl.oclc.org/NET/ssnx/ssn#&gt; .
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .
+@prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
+@prefix rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt; .
+@prefix user: &lt;http://graph.facebook.com/schema/user#&gt; .
+&lt;http://events.event-processing.org/ids/%EVENT_ID%&gt; {
+	&lt;http://events.event-processing.org/ids/%EVENT_ID%#event&gt;
+		rdf:type rpm:AlarmEvent ;
+		:message &quot;This is an alarm event sent from Android.&quot; ;
+		:endTime &quot;%DATE_TIME%&quot;^^xsd:dateTime ;
+		:stream &lt;http://streams.event-processing.org/ids/%STREAM_LOCALPART%#stream&gt; ;
+		:screenName &quot;%TWITTER_ID%&quot; ;
+		uctelco:phoneNumber &quot;%PHONE%&quot; ;
+		user:link &lt;http://graph.facebook.com/%FACEBOOK_ID%#&gt; ;
+		user:id &quot;%FACEBOOK_ID%&quot; ;
+		
+		ssn:featureOfInterest &lt;%USER_ID%&gt; ;
+		ssn:observedProperty rpm:EventdrivenAlarmSensor ;
+		ssn:observationResult [ ssn:hasValue [
+			rdf:type rpm:EventdrivenAlarmValue ;
+			rpm:sessionId &quot;%SESSION_ID%&quot;^^xsd:int ;
+            rpm:cepPatternId &quot;%CEP_PATTERN_ID%&quot; ;
+            rpm:cepPatternValue [
+				rdf:type %ALARM_PARAMETER_VALUE% ;
+                rpm:value &quot;%CEP_PATTERN_VALUE%&quot;^^xsd:float 
+			]
+		] ] ;
+		ssn:observationSamplingTime &quot;%DATE_TIME%&quot;^^xsd:dateTime .
+}
+</mt:nativeMessage>
+            </wsnt:Message>
+         </wsnt:NotificationMessage>
+      </wsnt:Notify>
+   </soap-env:Body>
+</soap-env:Envelope>
+

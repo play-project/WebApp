@@ -116,8 +116,8 @@
 		<fieldset><legend>Trigger Events:</legend>
 		<input id="fb" type="button" value="Facebook Event" />
 		<input id="call" type="button" value="Call Event" />
-		<input id="tweet" type="button" value="Telco Tweet" />
 		<input id="measure" type="button" value="Measure Event" />
+		<input id="heartrate" type="button" value="Heartrate Alert" />
 		</fieldset>
 	</form>
 </div>
@@ -271,8 +271,8 @@ $("#fb").click(function(e) {
 $("#call").click(function(e) {
 	$.post(sendEvent({eventType: 'call'}))
 });
-$("#tweet").click(function(e) {
-	$.post(sendEvent({eventType: 'tweet'}))
+$("#heartrate").click(function(e) {
+	$.post(sendEvent({eventType: 'heartrate'}))
 });
 $("#measure").click(function(e) {
 	$.post(sendEvent({eventType: 'measure'}))

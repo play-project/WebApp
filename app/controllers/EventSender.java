@@ -137,7 +137,7 @@ public class EventSender extends Controller {
 			final String PHONENUMBER = "+491119041747";
 			final int SESSIONID = 4;
 			
-			event = event.replaceAll("%EVENT_ID%", eventId);
+			event = event.replaceAll("%EVENT_ID%", uniqueId);
 			event = event.replaceAll("%STREAM_LOCALPART%", STREAM);
 			event = event.replaceAll("%DATE_TIME%", TIMESTAMP);
 			event = event.replaceAll("%TWITTER_ID%", TWITTER_ID);

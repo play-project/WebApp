@@ -208,7 +208,6 @@
 			<name>OW2 Snapshot Repository</name>
 			<url>http://repository.ow2.org/nexus/content/repositories/snapshots</url>
 		</repository>
-		<repository>
 	</repositories>
 
 </project>

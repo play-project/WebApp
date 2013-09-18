@@ -114,7 +114,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.ow2.play</groupId>
-			<artifactId>play-metadata-client</artifactId>
+			<artifactId>governance-metadata-client</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
@@ -159,7 +159,7 @@
 	</licenses>
 	
 	<properties>
-		<play.commons.version>1.1-SNAPSHOT</play.commons.version>
+		<play.commons.version>1.2-SNAPSHOT</play.commons.version>
 		<slf4j.version>1.6.6</slf4j.version>
 	</properties>
 

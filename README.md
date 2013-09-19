@@ -30,13 +30,11 @@ everything running including Eclipse integration.
 
 Installation
 -------------																 
-1. Install the Play! framework from www.playframework.org. We tested v. 1.2.x. Add the play-x.x.x folder to your systems's PATH variable. Install some dependencies:
-
-		$ play install securesocial-0.2.5
+1. Install the Play! framework from www.playframework.org. We tested v. 1.2.x. Add the play-x.x.x folder to your systems's PATH variable.
 
 2. Clone the WebApp e.g. into your Eclipse workspace:
 
-		$ git clone https://github.com/play-project/WebApp.git
+	$ git clone https://github.com/play-project/WebApp.git
 
 3. Fetch all Maven dependencies for WebApp:
 
@@ -53,6 +51,10 @@ Installation
 
 6. Import the eclipsified project in Eclipse:
 `File -> Import -> Import existing projects` (add the path where WebApp was cloned)
+
+7. Run using `--%stable` or `--%unstable` to select configuration options:
+
+	$ play start --%stable
 
 Issues
 ------

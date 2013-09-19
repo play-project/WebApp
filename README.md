@@ -54,7 +54,7 @@ Installation
 
 7. Run using `--%stable` or `--%unstable` to select configuration options:
 
-	$ play start --%stable
+        $ play start --%stable
 
 Issues
 ------

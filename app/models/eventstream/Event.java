@@ -101,7 +101,7 @@ public class Event {
 		eventTitle = createEventTitle(rdf);
 		
 		// Icon:
-		eventIcon = EventTypeMetadata.getEventTypeIcon(EventTypeMetadata.getEventType(rdf));
+		eventIcon = EventTypeMetadata.getIcon(rdf);
 	
 		// Plain text representation:
 		content = rdf.serialize(Syntax.Turtle);
@@ -118,7 +118,7 @@ public class Event {
 	}
 
 	public static String createEventTitle(Model rdf) {
-		String eventTitle = EventTypeMetadata.getEventType(rdf);
+		String eventTitle = EventTypeMetadata.getType(rdf);
 	
 		return eventTitle.substring(eventTitle.lastIndexOf("/") + 1);
 	}

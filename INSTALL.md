@@ -16,7 +16,7 @@
 
 PLAY Project WebApp INSTALLATION
 ================================
-Before you install WebApp as described in `README.md` here are some system requirements:
+Before you install WebApp as described in [README](README.md) here are some system requirements:
 
 Tested on `CentOS release 6.3 (Final)`:
 
@@ -26,14 +26,22 @@ Requirements
 ### Runtime Requirements:
 #### Java (>=1.6)
 #### Postgresql (>=8)
-```
-yum install postgresql-server postgresql
-chkconfig postgresql on
-```
+
+	$ yum install postgresql-server postgresql
+	$ chkconfig postgresql on
+
+To use a JDBC connection like `db.url=jdbc:postgresql:webappdb` add this to PostgreSQL's `pg_hba.conf`:
+
+	host    all         all         127.0.0.1/32          md5
+
+Then login to PostgreSQL and add the role:
+
+	$ su - postgres -c psql
+	postgres=# CREATE ROLE webapp LOGIN;
+
 #### Python (2.6)
-```
-yum install python
-```
+	$ yum install python
+
 For CentOS 5.5 it is `python26`.
 
 #### Play! framework (1.2.x)
@@ -41,9 +49,8 @@ For CentOS 5.5 it is `python26`.
 ### Build Requirements:
 #### Maven (3.x)
 #### Git
-```
-yum install git
-```
+
+	$ yum install git
 
 
 Issues

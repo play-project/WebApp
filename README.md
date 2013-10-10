@@ -30,7 +30,7 @@ everything running including Eclipse integration.
 
 Installation
 -------------																 
-1. Install the Play! framework from www.playframework.org. We tested v. 1.2.x. Add the play-x.x.x folder to your systems's PATH variable.
+1. Install the Play! framework from www.playframework.org. We tested v. 1.2.x. Add the play-x.x.x folder to your system's PATH variable. For details see [INSTALL](INSTALL.md).
 
 2. Clone the WebApp e.g. into your Eclipse workspace:
 

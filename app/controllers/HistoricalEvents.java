@@ -100,10 +100,10 @@ public class HistoricalEvents extends Controller {
      */
     @Util
     public static ArrayList<models.eventstream.Event> getHistorical(EventTopic et) throws IOException, MalformedSparqlQueryException {
-            // Creates an Event Cloud Management Web Service Client
-    	EventCloudsManagementWsApi eventCloudManagementWsClient =
-                    WsClientFactory.createWsClient(
-                    		EventCloudsManagementWsApi.class, EC_MANAGEMENT_WS_SERVICE);
+		// Creates an EventCloud Management Web Service Client
+		EventCloudsManagementWsApi eventCloudManagementWsClient =
+				WsClientFactory.createWsClient(
+						EventCloudsManagementWsApi.class, EC_MANAGEMENT_WS_SERVICE);
 
             String topicUrl = et.getTopicUrl();
 
@@ -124,7 +124,7 @@ public class HistoricalEvents extends Controller {
 			 * returns the internal long graph names to be re-used without
 			 * modification in the second query.
 			 * 
-			 * graph is the value internal to event cloud to be used in further queries
+			 * graph is the value internal to EventCloud to be used in further queries
 			 * shortGraph is the cleaned (logical) value to be used for display
 			 */
             String sparqlQuery =

@@ -135,7 +135,7 @@
 					<li>The Governance component allows users to get information
 						about services and events, as well as specifying QoS requirements
 						as SLA contracts</li>
-					<li>The Event Cloud provides storage and forwarding of events</li>
+					<li>The EventCloud provides storage and forwarding of events</li>
 					<li>The Distributed Complex Event Processing (DCEP) component
 						has the role of detecting complex events and reasoning over events</li>
 					<li>The Platform Services component incorporates several
@@ -162,14 +162,14 @@
 				request is delegated to component Query Dispatcher to split the
 				query into its historic and real-time parts. These are further
 				delegated to register a complex event pattern (CEPAT) in component
-				DCEP and to create a new space in component Event Cloud to hold
+				DCEP and to create a new space in component EventCloud to hold
 				historic events. Finally, a topic is created in the Distributed
 				Service Bus. After that has happened, users with role "Event
 				Subscriber" can sign up for events with the new topic through the
 				Distributed Service Bus. Events created by "Event Publishers" with
 				the same topic will then be automatically distributed to the
 				subscribers. Such events are created on the DSB and forwarded to the
-				Event Cloud for storage and real-time forwarding. If the DCEP is a
+				EventCloud for storage and real-time forwarding. If the DCEP is a
 				subscriber the event will be forwarded to DCEP to fulfil a complex
 				event pattern. After such a pattern is fulfilled, any historical
 				part of the same query is evaluated. On success, a new complex event
